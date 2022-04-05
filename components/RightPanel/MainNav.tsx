@@ -36,11 +36,11 @@ export default function MainNav(){
                     <input type="button" className={`${styles.NormalCoin} ${styles.CoinImage}`}  />
                 </div>
             </div> */}
-            <div className={`${styles.onGoingCallContainer}`}>
+            {/* <div className={`${styles.onGoingCallContainer}`}>
             <div className={`${styles.callerUserPic}`}></div>
             <input type="button" className={`${styles.userHangupCall}`}/>
-            </div>
-            <div className={`${styles.friendListCallContainer}`}>
+            </div> */}
+            {/* <div className={`${styles.friendListCallContainer}`}>
             <div className={`${styles.callerUserPic}`}></div>
             <div className={`${styles.callerUserName}`}><span>username</span></div>
             <div className={`${styles.callButtonFriendDiv}`}>
@@ -49,12 +49,12 @@ export default function MainNav(){
             <div className={`${styles.callButtonFriendDiv}`}>
                 <input type="button" className={`${styles.callButtonFriend} ${styles.hangupFriendCall}`}/>
             </div>
-            </div>
-            <div className={`${styles.friendListPanelContainer}`}>
+            </div> */}
+            {/* <div className={`${styles.friendListPanelContainer}`}>
             <div className={`${styles.friendPreview}`}></div>
             <div id="OnlineUsersList" className={`${styles.OnlineUsersList}`}></div>
             <div id="OfflineUsersList" className={`${styles.OfflineUsersList}`}></div>
-            </div>
+            </div> */}
         </div>
     )
 }

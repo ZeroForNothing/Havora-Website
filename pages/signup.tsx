@@ -12,7 +12,10 @@ export default function signup() {
   async function  RegisterUser(data){      
       fetchAPI('/CreateUser', data)
         .then(dataD => {
-          if (dataD.error != null) ShowError(dataD.error);
+          if (dataD.error != null){
+            console.log(dataD);
+            ShowError(dataD.error)
+          }
           else window.location.href = "/"
         }).catch(error =>{
           console.log(error);

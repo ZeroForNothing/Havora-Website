@@ -68,9 +68,7 @@ export const getServerSideProps = withIronSession(
       return { props: {} };
     }
     
-    return {
-      props: { user }
-    };
+    return { props: { user } };
   },
   {
     cookieName: "ZeroForNothing",

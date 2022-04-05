@@ -13,7 +13,7 @@
     "formik": "^2.2.9",
     "graphql": "^15.6.0",
     "moment": "^2.29.1",
-    "next": "10.0.7",
+    "next": "^12.1.4",
     "next-iron-session": "^4.2.0",
     "next-redux-wrapper": "^6.0.2",
     "react": "17.0.1",

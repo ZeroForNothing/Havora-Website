@@ -24,13 +24,13 @@
   
   .bodyDarkMode :is(.baseLayer , .WindowTab) {
     background-color: #2d2d2d;
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
   }
   
   .bodyDarkMode .secondLayer {
     background-color: #444444;
     color: #f9f9f9;
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
   }
   
   .bodyDarkMode .inputText {
@@ -38,11 +38,11 @@
   }
   
   .bodyDarkMode .outsideShadow {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
   }
   
   .bodyDarkMode .insideShadow {
-    box-shadow: inset 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+    box-shadow: inset 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
   }
   .bodyDarkMode .borderColor {
     border-color: #828282;
@@ -71,7 +71,7 @@
     background-color: #ff3232 !important;
     color: #f9f9f9;
     border-radius: 5px;
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
   }
   .bodyDarkMode :is(.WindowButton:hover , .Nav input:hover  , .Nav label:hover){
     transition: 0.4s ease all;

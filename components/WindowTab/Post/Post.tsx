@@ -3,7 +3,7 @@ import {Field, Formik} from "formik"
 import { InputField } from '../../fields/InputField'
 import PostNav from './PostNav'
 import styles from '../../../styles/WindowTab/Post.module.css'
-import { createPostForm } from '../../Utility/Utility';
+// import { createPostForm } from '../../Utility/Utility';
 import { useState,useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import PostData , {InsertYoutubeUrl , checkAcceptedExtensions} from './PostData';
@@ -28,7 +28,7 @@ export default function PostTab(){
     const [discardPost, SetDiscardPost] = useState(() => () => console.log("default"));
     const [submitPost, SetSubmitPost] = useState(() => () => console.log("default"));
 
-    const {socket} = useSelector(state => state.socket)
+    let { socket } = useSelector((state: any) => state.socket)
     useEffect(() => {
       if(socket){
         PostNav(socket,postForProfile ,postForCommunity,postForUser , SetPostType ,SetDiscardPost ,SetSubmitPost , PostText , PostUrl)

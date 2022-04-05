@@ -91,9 +91,16 @@ input {
   height: 58px;
   top: 14px;
   right: 252px;
+  margin: auto;
   left: 92px;
-  border-radius:5px;
+  max-width: 900px;
+  border-radius: 5px;
+  display: -webkit-flex;
+  display: -moz-box;
   display: flex;
+  -webkit-flex-direction: row;
+  -moz-box-orient: horizontal;
+  -moz-box-direction: normal;
   flex-direction: row;
 }
 
@@ -107,6 +114,7 @@ input {
   height: 100%;
   margin-right: 14px;
   width: 100%;
+  max-width: 140px;
 }
 .Nav input:last-child {
   margin-right: 0;

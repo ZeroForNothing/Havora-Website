@@ -1,12 +1,11 @@
 import { Field, Formik } from "formik"
 import { InputField } from '../../fields/InputField'
-import ProfileData, { checkAcceptedExtensions } from "./ProfileData"
 import styles from '../../../styles/WindowTab/Profile.module.css'
 import { useState, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { ShowError } from "../../fields/error"
 import axios from "axios"
-import moment from "moment";
+import PostForm from '../../fields/PostForm'
 
 export default function ProfileTab() {
   const [mainNav, SetMainNav] = useState(true);
@@ -27,12 +26,11 @@ export default function ProfileTab() {
   const [CommentsView, SetComments] = useState(null);
   const [RepliesView, SetReplies] = useState(null);
 
-  let [showComments, ShowComments] = useState(false)
-  let [showReplies, ShowReplies] = useState(false)
+  let [showComments, SetShowComments] = useState(true)
+  let [showReplies, SetShowReplies] = useState(false)
+
   const [showCreateComment, ShowCreateComment] = useState(false)
   const CommentTextCreation = useRef(null)
-
-  const [CreateComment, SetCreateComment] = useState(() => () => console.log("default"));
 
   let { user } = useSelector((state: any) => state.user)
   let { socket } = useSelector((state: any) => state.socket)
@@ -43,9 +41,11 @@ export default function ProfileTab() {
     code: number,
     name: string,
     friendRequest: number,
-    myRequest: number
+    myRequest: number,
   }
   let [CurrentProfile, SetCurrentProfile] = useState<Profile>(null)
+  let [postPage , SetPostPage]  = useState(1);
+  let [commentPage , SetCommentPage]  = useState(1);
 
   useEffect(() => {
     if (socket) {
@@ -60,6 +60,9 @@ export default function ProfileTab() {
           myRequest: data.myRequest
         });
       })
+      socket.on('createProfileComment', function(data) {
+          console.log(data)
+      })
       socket.on('getProfileTopPosts', function (data) {
         if (data.postsList != null) {
           let postsList = JSON.parse(data.postsList)
@@ -71,14 +74,29 @@ export default function ProfileTab() {
         }
       })
       socket.on('getProfileTopComments', function (data) {
+        console.log(data)
         let postID = data.postID;
         let commentID = data.commentID;
         let commentsList = JSON.parse(data.commentsList);
-        let count = 0;
+        let count = commentsList ? commentsList.length : 0;
+
+        SetMainNav(false);
+        SetPostNav(true);
+        //if (itsReply) {
+          
+          //ShowReplies(true)
+          //} else {
+            
+            //ShowReplies(false)
+            // }
         if (postID) {
+          SetShowComments(true)
+          SetShowReplies(false)
           SetComments(commentsList);
           SetLoadMoreComments(count > 4)
         } else if (commentID) {
+          SetShowComments(false)
+          SetShowReplies(true)
           SetReplies(commentsList);
           SetLoadMoreReplies(count > 4)
         }
@@ -117,15 +135,30 @@ export default function ProfileTab() {
     e.preventDefault();
     SetPostNav(false)
     SetMainNav(true)
-    ShowCreateComment(false)
-    //SetCommentPage(1)
+    SetShowComments(false)
+    SetShowReplies(false)
   }
   const BackFromReplies = e => {
     e.preventDefault();
     ShowCreateComment(false)
-    ShowReplies(false)
-    ShowComments(true)
-    //SetReplyPage(1)
+    SetShowComments(true)
+    SetShowReplies(false)
+  }
+  function CreateCommentFunc(){
+    if(socket == null) return;
+    let text = CommentTextCreation.current.value
+    ShowCreateComment(false)
+    socket.emit("createProfileComment",{
+      text
+    })
+  }
+  function checkAcceptedExtensions (file) {
+    const type = file.type.split('/').pop()
+    const accepted = ['jpeg', 'jpg', 'png']
+    if (accepted.indexOf(type) == -1) {
+      return false
+    }
+    return true
   }
   const uploadImage = picType => async e => {
     const files = e.target.files
@@ -135,6 +168,7 @@ export default function ProfileTab() {
       ShowError("File size huge exceeds 100 MB");
       return;
     }
+
     if (!checkAcceptedExtensions(files[0])) {
       e.target.value = "";
       ShowError("File type must be jpeg/jpg/png/mp4/mp3/mov/avi/mkv");
@@ -229,18 +263,18 @@ export default function ProfileTab() {
         {
           postNav ? <>
             {
-              showReplies ? <input type="button" className={`${styles.ReturnBack}`}
-                onClick={BackFromReplies}
-              /> : null
-            }
-            {
               showComments ? <input type="button" className={`${styles.ReturnBack}`}
                 onClick={BackFromComments}
               /> : null
             }
             {
+              showReplies ? <input type="button" className={`${styles.ReturnBack}`}
+                onClick={ BackFromReplies}
+              /> : null
+            }
+            {
               !showCreateComment ? <input type="button" className={`${styles.showCreateComment}`}
-                onClick={() => ShowCreateComment(true)}
+                onClick={() => {ShowCreateComment(true)}}
               /> : null
             }
           </> : null
@@ -249,9 +283,9 @@ export default function ProfileTab() {
       <>
         {
           mainNav ? <>
-            <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` }}>
+            <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
               <div className={`${"secondLayer"} ${styles.userDataPosition}`}>
-                <div className={`${"secondLayer"} ${styles.profPic}`} style={{ backgroundImage: `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` }}></div>
+                <div className={`${"secondLayer"} ${styles.profPic}`} style={{ backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}}></div>
                 <div className={`${styles.userInfoContainer}`}>
                   <div className={`${styles.profileUsername}`}>{CurrentProfile.name}</div>
                   <div className={`${styles.profileUserCode}`}>{`#`}{CurrentProfile.code}</div>
@@ -260,42 +294,41 @@ export default function ProfileTab() {
             </div>
             {PostsView && PostsView.length > 0 ?
               PostsView.map(data => {
-                return <PostForm socket={socket} postID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
+                return <PostForm key={data.id} socket={socket} postID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
               })
               : (
-                loadMorePosts ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>Loading Posts ...</div> : null
+                loadMorePosts ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No posts yet</div> : null
               )
             }
           </> : null
         }
         {
           postNav ? <>
-            {showComments ? (
+            {showComments ? 
               <>
-                {/* {
+                 {
                     CommentsView ?
                     CommentsView.map(data=>{  
-                      return createPostForm(socket,data.id, data.picToken, data.picType, null, null, null, null, null, data.text, data.username, data.userCode,user.name , user.code, data.date, data.count, data.agree, data.disagree, data.interact,null , true , false,ShowComments,ShowReplies)      
+                      return <PostForm key={data.id} socket={socket} postID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
                     }) 
-                    : (
-                      loadMoreComments ?  <div className={`${"secondLayer"} ${styles.loadingContent}`}>Loading Comments ...</div> :null
-                    )
-                  } */}
+                    : 
+                      loadMoreComments ?  <div className={`${"secondLayer"} ${styles.loadingContent}`}>No comments yet</div> :null
+                  } 
               </>
-            ) : null}
-            {showReplies ? (
-              <>
-                {/* {
-                    RepliesView ?
-                    RepliesView.map(data=>{  
-                      return createPostForm(socket,data.id, data.picToken, data.picType, null, null, null, null, null, data.text, data.username, data.userCode,user.name , user.code,data.date, data.count, data.agree, data.disagree, data.interact,null , false , true,ShowComments,ShowReplies)      
-                    }) 
-                    : (
-                      loadMoreReplies ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>Loading Replies ...</div> : null
-                    )
-                  } */}
-              </>
-            ) : null}
+             : null}
+            {
+              showReplies ? <>
+              {
+                  RepliesView ?
+                  RepliesView.map(data=>{  
+                    return <PostForm key={data.id} socket={socket} postID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
+                  }) 
+                  : (
+                    loadMoreReplies ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No replies yet</div> : null
+                  )
+                }
+            </>  : null
+            }
             {
               showCreateComment ? <>
                 <textarea rows={8} cols={80} ref={CommentTextCreation} className="secondLayer CommentTextCreation" placeholder="Type here..."></textarea>
@@ -303,7 +336,7 @@ export default function ProfileTab() {
                   onClick={() => { ShowCreateComment(false) }}
                 />
                 <input type="button" value="Send" className={`pickedInput ${styles.SendComment}`}
-                  onClick={CreateComment}
+                  onClick={CreateCommentFunc}
                 />
               </> : null
             }
@@ -315,7 +348,7 @@ export default function ProfileTab() {
               editPic ? <>
                 <div className={`${styles.divContainer}`}>
                   {
-                    <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` }} ></div>
+                    <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}} ></div>
                   }
                   {
                     profilePercentage ? <>
@@ -433,191 +466,4 @@ export default function ProfileTab() {
     </>
   )
 }
-const PostForm = ({socket, postID, picToken, profilePicType, categoryType, title, mediaFolder, mediaFiles, mediaUrl, postText, username, userCode, myName, myCode, postDate, commentsCount, postAgree, postDisagree, userInteracted, postViews, itsComment, itsReply, ...props})=> {
-  let [textBeingEdited,TextBeingEdited] = useState(false);
-  let [showMoreText,ShowMoreText] = useState(false);
-  let [showUserBoxTools,ShowUserBoxTools] = useState(false);
 
-  itsComment || itsReply ? null : mediaFiles = mediaFiles.split(",")
-  categoryType == 1 ? categoryType = "General"
-    : categoryType == 2 ? categoryType = "Ability"
-      : categoryType == 3 ? categoryType = "Character"
-        : categoryType == 4 ? categoryType = "Skin"
-          : categoryType == 5 ? categoryType = "Story"
-            : categoryType == 6 ? categoryType = "In-Game"
-              : categoryType == 7 ? categoryType = "Feature Request"
-                : null
-
-  return (
-    <div key={`${postID}`} className="postContainer borderColor">
-      {
-        categoryType ? <div className="postCategory">{categoryType}</div> : null
-      }
-      {
-        (title != null && title != '') ? <div className="userProfileTitle">{title}</div> : null
-      }
-      <div className="userProfilePic secondLayer" style={{
-        backgroundImage: `url(/MediaFiles/ProfilePic/${picToken}/file.${profilePicType})`
-      }}></div>
-      <div className="userContentData secondLayer">
-        <span className="userProfileName"
-          onClick={() => { socket.emit('showUserProfile', { username, userCode }) }}
-        >{username}
-          <span>#{userCode}</span></span>
-        <div className="userDateTime">{moment(postDate).format('MMMM Do YYYY, hh:mm a')}</div>
-      </div>
-      <input type="button" className="userBoxTools secondLayer"
-        onClick={() => { ShowUserBoxTools(!showUserBoxTools) }}
-      />
-      {
-        showUserBoxTools ? <div className="userBoxToolContainer baseLayer">
-          {
-            username == myName && userCode == myCode ?
-              <>
-                <input type="button" value="Edit" className="editContent secondLayer"
-                  onClick={() => { TextBeingEdited(true) }}
-                />
-                <input type="button" value="Delete" className="deleteContent secondLayer"
-                  onClick={() => {
-                  if (itsComment)
-                    socket.emit('deleteContent', { postID: null, commentID: postID })
-                  else
-                    socket.emit('deleteContent', { postID: postID, commentID: null })
-                  }}
-                />
-              </>
-              : <input type="button" value="Report" className="reportContent secondLayer" />
-          }
-        </div> : null
-      }
-      {
-        !textBeingEdited ? <div className="userUploadedMedia">{
-          mediaFiles ? mediaFiles.map(media => {
-            (/\.png$/.test(media) || /\.jpg$/.test(media)) ?
-              <img className="secondLayer" src={`"https://localhost/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}"`} />
-              : (
-                (/\.mp4$/.test(media) || /\.mov$/.test(media)) ?
-                  <video className="secondLayer" controls><source src={`"https://localhost/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}"`} />Your browser does not support the video tag.</video> : null)
-          }) : null
-        }
-          {
-            mediaUrl ? <iframe className="secondLayer" src={`https://www.youtube.com/embed/${mediaUrl}?enablejsapi=1&modestbranding=1`} frameBorder={0} allowFullScreen></iframe> : null
-          }
-        </div> : null
-      }
-      <div className={`${"userProfileText"} ${textBeingEdited ? "textBeingEdited" : "secondLayer"}`} contentEditable={textBeingEdited}>
-        {!textBeingEdited ?
-          postText.trim().length > 0 ? <>
-            <span className="shortTextContent">{postText.trim().substr(0, 350)}</span>
-            {!showMoreText && postText >= 350 ? <>
-              <div className="showMoreDots">... </div>
-              <input type="button" className="readMoreButton" value="Read More"
-                onClick={() => { ShowMoreText(true) }}
-              />
-            </>
-              : null
-            }
-            {showMoreText ? <span className="readMoreContent">{postText.trim().substr(350, postText.trim().length)} </span> : null}
-          </>
-            : <span className="shortTextContent">{postText}</span> : <span>
-            postText
-          </span>
-        }
-      </div>
-      {
-        textBeingEdited ? <div className="confirmationDiv">
-          <input type="button" value="Save" className="saveContent secondLayer"
-          onClick={() => {
-            let text = postText;
-            TextBeingEdited(false)
-            let postID = null;
-            let commentID = null;
-            if (itsComment)
-              socket.emit('saveContent', { commentID: commentID, postID: null, text: text })
-            else
-              socket.emit('saveContent', { commentID: null, postID: postID, text: text })
-          }}
-          />
-          <input type="button" value="Discard" className="discardContent secondLayer"
-            onClick={() => { TextBeingEdited(false) }}
-          />
-        </div> : null
-      }
-
-      {!textBeingEdited ? <div className="userBoxOptions">
-        <div className="contentCounterDiv borderColor">
-          <div className="numberOfAgree">{postAgree} Agrees</div>
-          <div className="numberOfDisagree">{postDisagree} Disagrees</div>
-          {
-            !itsReply ?
-              <div className="numberOfComments">{commentsCount}{itsComment ? " Comment" : " Reply"}</div>
-              : null
-          }
-          {
-            !itsReply && !itsComment ?
-              <>
-                <div className="numberOfViewers">{postViews - 1} Views</div>
-                <div className="numberOfShare">0 Shares</div>
-              </> : null
-          }
-        </div>
-        <div className="InteractionDiv">
-          <input type="button" value="Agree" className={`"agreeButton secondLayer ${userInteracted == 1 ? "userInteracted" : null}"`} />
-          <input type="button" value="Disagree" className={`"disagreeButton secondLayer ${userInteracted == 2 ? "userInteracted" : null}"`} />
-          {
-            !itsReply ?
-              <input type="button" value={`View ${itsComment ? " Comment" : " Reply"}`} className="secondLayer"
-                onClick={() =>  ShowCommentsFunc(socket, postID, true, itsComment) }
-              />
-              : null
-          }
-          {
-            !itsReply && !itsComment ?
-              <>
-                <input type="button" value="Share" className="secondLayer" />
-
-              </> : null
-          }
-          {
-            !itsReply ?
-              <input className="createComment secondLayer" type="button" value={`${itsComment ? "Comment" : "Reply"}${" here..."}`}
-                onClick={() => ShowCommentsFunc(socket, postID, false, itsComment) }
-              /> : null
-          }
-        </div>
-      </div> : null}
-    </div>
-  )
-  function ShowCommentsFunc(socket: any, id: number, OnlyView: boolean, itsReply: boolean) {
-    // if (!OnlyView) {
-    //   //show createcomment textarea
-    //   ShowCreateComment(true)
-    // }else{
-    //   ShowCreateComment(false)
-    // }
-    window.scrollTo(0, 0);
-
-    // SetPostNav(true)
-    // SetMainNav(false) 
-
-    // if (element.find("video").length)
-    //   element.find("video").get(0).pause();
-    // $('.mediaUrlPost').each(function() {
-    //   this.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*')
-    // })
-    if (itsReply) {
-      //ShowComments(false)
-      //ShowReplies(true)
-    } else {
-      //ShowComments(true)
-      //ShowReplies(false)
-    }
-    socket.emit('getProfileTopComments', {
-      contentID: id,
-      //page : contentPage,
-      itsComment: !itsReply
-    })
-    //socket.emit('getProfileSpecificContent', data)
-  }
-
-}
