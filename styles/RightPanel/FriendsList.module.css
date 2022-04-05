@@ -1,0 +1,8 @@
+.FriendsList{
+    position: fixed;
+    bottom: 14px;
+    width: 224px;
+    top: 14px;
+    right: 14px;
+    border-radius: 5px;
+}

@@ -1,0 +1,79 @@
+.bodyDarkMode, .bodyDarkMode .displayLogoAtFirst {
+    background-color: #1e1e1e;
+    color: #f9f9f9;
+    background-image: url(../sharedComponents/Media/darkMode.png);
+  }
+  
+  .displayLogoAtFirst {
+    background-color: #1e1e1e;
+  }
+  
+  .bodyDarkMode ::placeholder {
+    color: lightgrey;
+  }
+  
+  .bodyDarkMode :-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: lightgrey;
+  }
+  
+  .bodyDarkMode ::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: lightgrey;
+  }
+  
+  .bodyDarkMode :is(.baseLayer , .WindowTab) {
+    background-color: #2d2d2d;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+  }
+  
+  .bodyDarkMode .secondLayer {
+    background-color: #444444;
+    color: #f9f9f9;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+  }
+  
+  .bodyDarkMode .inputText {
+    color: #f9f9f9;
+  }
+  
+  .bodyDarkMode .outsideShadow {
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+  }
+  
+  .bodyDarkMode .insideShadow {
+    box-shadow: inset 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+  }
+  .bodyDarkMode .borderColor {
+    border-color: #828282;
+  }
+  
+  .bodyDarkMode input[type=button].secondLayer:active {
+    background-color: #717171;
+    box-shadow: none;
+  }
+  .bodyDarkMode :is(input[type=text].secondLayer , textarea.secondLayer) {
+    border-width: 2px;
+    border-color: #828282;
+  }
+  .bodyDarkMode :is(input[type=text].secondLayer:focus , textarea.secondLayer:focus) {
+    box-shadow: none ;
+  }
+  
+  .bodyDarkMode input[type=button].secondLayer:disabled {
+    opacity: 0.5;
+    background-color: transparent ;
+    border-color: #444444 ;
+    color: #444444 ;
+    box-shadow: none ;
+  }
+  .bodyDarkMode .pickedInput , .bodyDarkMode input[type=submit]{
+    background-color: #ff3232 !important;
+    color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.38);
+  }
+  .bodyDarkMode :is(.WindowButton:hover , .Nav input:hover  , .Nav label:hover){
+    transition: 0.4s ease all;
+    background-color: #565656;
+  }

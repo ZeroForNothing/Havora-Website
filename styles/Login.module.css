@@ -1,0 +1,171 @@
+.logo {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    display: inline-block;
+    padding: 4px;
+    border-radius: 6px;
+    background-image: url(../sharedComponents/Media/Z4N_Logo_Compressed.png);
+    width: 62px;
+    height: 62px;
+    background-size: 62px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  
+  .userInteraction {
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    padding: 15px 0;
+    border-radius: 5px;
+    font-size: 21px;
+    margin-top: 20px;
+  }
+  
+  .Login {
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    padding: 15px 0;
+    border-radius: 5px;
+    font-size: 21px;
+  }
+  .otherMediaLogin div{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  .otherMediaLogin span{
+    width: 100%;
+    height: 1px;
+    display: block;
+    margin-top: 20px;
+  }
+  .otherMediaLogin input{
+    width: 30%;
+    font-size: 20px;
+    border-radius: 5px;
+    padding: 8px;
+  }
+  .google{
+    background-color: #f9f9f9 !important;
+    color: #4285F4 !important;
+    font-weight: bold;
+  }
+  .facebook{
+    background-color: #4267B2 !important;
+    color: #f9f9f9 !important;
+    font-weight: bold;
+  }
+  .apple{
+    background-color: #f9f9f9 !important;
+    color: #666 !important;
+    font-weight: bold;
+  }
+  .signIn {
+    font-size: 35px;
+    margin-bottom: 10%;
+    text-align: center;
+  }
+  
+  .signInMainContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 400px;
+    padding: 30px;
+    transition: all 1s ease;
+    border-radius: 6px;
+  }
+  
+  .inputError {
+    border-color: #ff4646 !important;
+  }
+  
+  .inputContainer {
+    width: 100%;
+    display: none;
+  }
+  
+  .inputContainer input:focus {
+    border-color: #bdbdbd;
+  }
+  
+  .switch {
+    /* float: right; */
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  .switch .staySigned {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 11px;
+    left: 0px;
+    right: 13px;
+    bottom: 8px;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 25px;
+    width: 25px;
+    left: -3px;
+    bottom: -5px;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .staySigned:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  
+  .staySignedDiv {
+    width: 100%;
+    display: none;
+    margin-top: 10px;
+  }
+  
+  .staySignedDiv .staySignedSpan {
+    font-size: 20px;
+    float: left;
+    margin-top: 7px;
+  }
+  
+  @media screen and (max-width:768px) {
+    .signInMainContainer {
+      width: 76%;
+    }
+  }

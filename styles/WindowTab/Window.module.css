@@ -1,0 +1,75 @@
+.displayLogoAtFirst {
+    width: 100%;
+    position: fixed;
+    height: 100%;
+    z-index: 99;
+    background-image: url(../../sharedComponents/Media/Z4N_Logo_Compressed.png);
+    margin: 0 auto;
+    background-position: center;
+    background-size: 330px;
+    background-repeat: no-repeat;
+  }
+  
+  .playerModelAtHome {
+    top: 14%;
+    bottom: 2%;
+    left: 40%;
+    right: 19%;
+    display: none;
+  }
+  
+  .titleText {
+    display: none;
+    position: absolute;
+    top: 48%;
+    left: 46%;
+    transform: translate(-50%, -50%);
+    font-size: 60px;
+    font-family: logoFont;
+  }
+  
+  .showHideFriendList {
+    cursor: pointer;
+    height: 5%;
+    width: 75%;
+    padding-top: 3%;
+    float: left;
+    padding-bottom: 2%;
+    margin-bottom: 4%;
+  }
+  
+  .AlertFromServer {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+  }
+  
+  .AlertFromServer div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 4%;
+    border-radius: 6px;
+  }
+  
+  .AlertFromServer span {
+    width: 100%;
+    display: block;
+    margin-bottom: 7%;
+    font-size: 21px;
+  }
+  
+  .AlertFromServer input {
+    cursor: pointer;
+    font-size: 18px;
+    padding: 3% 8%;
+    border-radius: 6px;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.12);
+  }

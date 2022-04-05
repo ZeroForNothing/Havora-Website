@@ -1,0 +1,17 @@
+  .HomeTab div {
+    padding: 16px;
+  }
+  .HomeTab ul {
+    margin: 0;
+  }
+  .HomeTab li {
+    padding: 12px;
+    user-select: none;
+    border-radius: 5px
+  }
+  .whatsNew{
+    background-image: url("../../sharedComponents/Media/whatsNew.png");
+  }
+  .patchNotes{
+    background-image: url("../../sharedComponents/Media/patchNotes.png");
+  }

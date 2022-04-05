@@ -1,0 +1,238 @@
+.postContainer {
+  margin: auto;
+  width: 96%;
+  max-width: 900px;
+  position: relative;
+  padding: 20px 0%;
+  border-bottom: 3px solid;
+  }
+  .postCategory {
+    padding: 1% 4%;
+    font-size: 21px;
+    margin-bottom: 2%;
+    cursor: pointer;
+    border-radius: 6px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    display: inline-block;
+    border-left: 5px solid lightgrey;
+  }
+  .ShowUserBoxTools .userBoxToolContainer{
+    display: block;
+  }
+  .CommentTextCreation {
+    margin: auto;
+    display: block;
+    resize: none;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    padding: 14px 2%;
+    padding-bottom: 2px;
+    outline: none;
+    font-size: 20px;
+    width: 94%;
+  }
+  .userProfileTitle {
+    width: 100%;
+    float: left;
+    font-size: 26px;
+    border-bottom: 1px solid #d8d8d8;
+    margin-bottom: 10px;
+    padding-bottom: 12px;
+  }
+  .userProfilePic {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    float: left;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .userContentData {
+    cursor: pointer;
+    float: left;
+    padding: 5px 12px;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+  .InteractionDiv{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .userProfileName {
+    float: left;
+    font-size: 19px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .userProfileName span {
+    font-size: 15px;
+    margin-left: 7px;
+  }
+  
+ .userDateTime {
+    float: left;
+    clear: left;
+    font-size: 13px;
+  }
+  
+ .userBoxTools {
+    cursor: pointer;
+    border-radius: 5px;
+    width: 40px;
+    height: 40px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 22px;
+    background-image: url(../sharedComponents/Media/3dots.png);
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    outline: none;
+   float: right;
+  }
+ 
+  .userBoxToolsRotate {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+  }
+
+  .userBoxToolContainer {
+    width: 120px;
+    position: absolute;
+    display: inline-block;
+    right: 57px;
+    top: 12px;
+    padding: 2%;
+    border-radius: 6px;
+  }
+ 
+  .userBoxToolContainer input {
+    width: 100%;
+    font-size: 19px;
+    padding: 5% 0%;
+    cursor: pointer;
+    border: 1px solid transparent;
+    margin-bottom: 10%;
+    outline: none;
+    border-radius: 6px;
+  }
+ 
+  .userBoxToolContainer input:last-child {
+    margin-bottom: 0%;
+  }
+  .userUploadedMedia{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+  .userUploadedMedia :is(img , video , iframe)  {
+    width: 100%;
+    margin-top: 14px;
+    display: inline-block;
+    outline: none;
+    border-radius: 6px;
+  }
+  .userUploadedMedia iframe {
+    height: 353px;
+    width: 600px;
+  }
+  .userProfileText span{
+    overflow-wrap: break-word;
+  }
+  .userProfileText {
+    font-size: 17px;
+    margin-top: 14px;
+    white-space: pre-wrap;
+    padding: 3px 2%;
+    width: 96%;
+    display: inline-block;
+    line-height: 1.5em;
+  }
+  .shortTextContent {
+    display: inline;
+  }
+  .showMoreDots {
+    display: inline;
+  }
+  .readMoreButton {
+    cursor: pointer;
+    display: inline;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    color: #ff3232;
+    font-size: 18px;
+    font-weight: bold;
+  }
+ 
+  .readMoreButton:hover {
+    text-decoration: underline;
+  }
+  .readMoreContent {
+    display: none;
+  }
+  .userBoxOptions {
+    width: 100%;
+    margin-top: 14px;
+  }
+ 
+  .userBoxOptions input {
+    margin-right: 20px;
+    outline: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: 15px;
+    padding: 7px 12px;
+    cursor: pointer;
+  }
+  .userBoxOptions input:last-child{
+    margin-right: 0;
+  }
+  .contentCounterDiv {
+    width: 96%;
+    float: left;
+    padding: 9px 2%;
+    margin-bottom: 16px;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+  }
+ 
+  .contentCounterDiv div {
+    user-select: none;
+    width: 20%;
+    float: left;
+    text-align: center;
+  }
+  .createComment {
+    width: 100%;
+  }
+  .confirmationDiv {
+    width: 100%;
+    text-align: center;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    display: none;
+  }
+ 
+  .confirmationDiv input {
+    margin: 0% 3%;
+    padding: 1% 4%;
+    outline: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .textBeingEdited .userProfileText{
+    max-height: 1000px;
+    overflow: auto;
+    padding: 2%;
+    border-radius: 5px;
+    margin-top: 20px;
+    outline: none;
+  }
