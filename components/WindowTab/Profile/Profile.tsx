@@ -2,12 +2,15 @@ import { Field, Formik } from "formik"
 import { InputField } from '../../fields/InputField'
 import styles from '../../../styles/WindowTab/Profile.module.css'
 import { useState, useRef, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ShowError } from "../../fields/error"
 import axios from "axios"
 import PostForm from '../../fields/PostForm'
 
 export default function ProfileTab({userEmail , ...props}) {
+  
+  const dispatch = useDispatch();
+
   const [mainNav, SetMainNav] = useState(true);
   const [editProfileNav, SetEditProfileNav] = useState(false);
   const [postNav, SetPostNav] = useState(false);
@@ -76,7 +79,6 @@ export default function ProfileTab({userEmail , ...props}) {
         }
       })
       socket.on('getProfileTopComments', function (data) {
-        console.log(data)
         let postID = data.postID;
         let commentID = data.commentID;
         let commentsList = JSON.parse(data.commentsList);
@@ -84,13 +86,9 @@ export default function ProfileTab({userEmail , ...props}) {
 
         SetMainNav(false);
         SetPostNav(true);
-        //if (itsReply) {
-          
-          //ShowReplies(true)
-          //} else {
-            
-            //ShowReplies(false)
-            // }
+
+        ShowCreateComment(!data.onlyView)
+
         if (postID) {
           SetShowComments(true)
           SetShowReplies(false)
@@ -246,6 +244,7 @@ export default function ProfileTab({userEmail , ...props}) {
         if (response.data.msg) {
           if (picType == 1) SetProfilePercentage(null)
           else SetWallpaperPercentage(null)
+          socket.emit('registerUser')
         }
         else ShowError(response.data.error);
         e.target.value = "";
@@ -371,13 +370,17 @@ export default function ProfileTab({userEmail , ...props}) {
             }
             {
               showCreateComment ? <>
-                <textarea rows={8} cols={80} ref={CommentTextCreation} className="secondLayer CommentTextCreation" placeholder="Type here..."></textarea>
-                <input type="button" value="Discard" className={`secondLayer ${styles.DiscardComment}`}
-                  onClick={() => { ShowCreateComment(false) }}
-                />
-                <input type="button" value="Send" className={`pickedInput ${styles.SendComment}`}
-                  onClick={CreateCommentFunc}
-                />
+                <div className="CommentTextCreation">
+                  <textarea rows={8} ref={CommentTextCreation} className="secondLayer" placeholder="Type here..."></textarea>
+                  <div>
+                    <input type="button" value="Discard" className={`secondLayer`}
+                      onClick={() => { ShowCreateComment(false) }}
+                    />
+                    <input type="button" value="Send" className={`pickedInput`}
+                      onClick={CreateCommentFunc}
+                    />
+                  </div>
+                </div>
               </> : null
             }
           </> : null
@@ -386,32 +389,34 @@ export default function ProfileTab({userEmail , ...props}) {
           editProfileNav ? <>
             {
               editPic ? <>
-                <div className={`${styles.divContainer}`}>
-                  {
-                    <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}} ></div>
-                  }
-                  {
-                    profilePercentage ? <>
-                      <span className={`${styles.picPercent}`}>{profilePercentage}</span>
-                      {/* <input type="button" value="Cancel"  className={`pickedInput`}/> */}
-                    </> : <label htmlFor="EditUserProfilePic" className={`secondLayer`}>Change My Profile Picture</label>
-                  }
-                  <input type="file" accept="image/*" name="image" id="EditUserProfilePic"
-                    onChange={uploadImage(1)} style={{ display: "none" }}
-                  />
-                </div>
-                <div className={`${styles.divContainer}`}>
-                  <div className={`secondLayer ${styles.displayPic}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` }}></div>
-                  {
-                    wallpaperPercentage ? <>
-                      <span className={`${styles.picPercent}`}>{wallpaperPercentage}</span>
-                      {/* <input type="button" value="Cancel" className={`pickedInput`}/> */}
-                    </> : <label htmlFor="EditUserWallpaperPic" className={`secondLayer`}>Change My Wallpaper Picture</label>
-                  }
-                  <input type="file" accept="image/*" name="image" id="EditUserWallpaperPic"
-                    onChange={uploadImage(2)} style={{ display: "none" }}
-                  />
-                </div>
+               <div className={`${styles.editPicContainer}`} >
+                <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}} ></div>
+                    
+                    {
+                      profilePercentage ? <>
+                        <span className={`${styles.picPercent}`}>{profilePercentage}</span>
+                        {/* <input type="button" value="Cancel"  className={`pickedInput`}/> */}
+                      </> : <label htmlFor="EditUserProfilePic" className={`secondLayer`}>Change My Profile Picture</label>
+                    }
+                    <input type="file" accept="image/*" name="image" id="EditUserProfilePic"
+                      onChange={uploadImage(1)} style={{ display: "none" }}
+                    />
+               </div>
+               
+               
+                  <div className={`${styles.editPicContainer}`}>
+                    <div className={`secondLayer ${styles.displayPic}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` }}></div>
+                    {
+                      wallpaperPercentage ? <>
+                        <span className={`${styles.picPercent}`}>{wallpaperPercentage}</span>
+                        {/* <input type="button" value="Cancel" className={`pickedInput`}/> */}
+                      </> : <label htmlFor="EditUserWallpaperPic" className={`secondLayer`}>Change My Wallpaper Picture</label>
+                    }
+                    <input type="file" accept="image/*" name="image" id="EditUserWallpaperPic"
+                      onChange={uploadImage(2)} style={{ display: "none" }}
+                    />
+                  </div>
+                
               </> : null
             }
             {
@@ -434,42 +439,51 @@ export default function ProfileTab({userEmail , ...props}) {
             {
               editInfo ?
                 <Formik onSubmit={(values) => { {/*EditUser(values) */ } }} initialValues={{
-                  firstName: "",
+                  firstName: "asd",
                   lastName: "asd",
                   username: "asd",
-                  email: "asd@asd.com",
+                  email: userEmail,
                   gender: "1",
                   year: "",
                   month: "1",
                   day: "1"
                 }}>{({ handleSubmit }) => (
-                  <form id="myForm" onSubmit={handleSubmit}>
-                    <div className={`${styles.divContainer}`} style={{ display: "block" }}>
-                      <label htmlFor="firstName">First Name</label>
-                      <Field name="firstName" type="text" placeholder="ex. Axel" maxLength={26} component={InputField} />
-                      <label htmlFor="lastName">Last Name</label>
-                      <Field name="lastName" type="text" placeholder="ex. Brock" maxLength={26} component={InputField} />
-                    </div>
+                  <form id="myForm"  className={`${styles.formContainer}`} onSubmit={handleSubmit}>
+                    
+                      
+                        <label htmlFor="firstName">First Name</label>
+                        <Field name="firstName" type="text" placeholder="ex. Axel" maxLength={26} component={InputField} />
+                      
+                        <label htmlFor="lastName">Last Name</label>
+                        <Field name="lastName" type="text" placeholder="ex. Brock" maxLength={26} component={InputField} />
+                      
+                   
 
-                    <div className={`${styles.divContainer}`}>
-                      <label htmlFor="email">Email</label>
-                      <Field name="email" type="email" placeholder="ex. whatever@whatever.com" maxLength={50} component={InputField} disabled />
-                      <label htmlFor="username">Username</label>
-                      <Field name="username" type="text" placeholder="ex. DevilsDontCry" maxLength={26} component={InputField} />
-                    </div>
+                    
+                        <label htmlFor="email">Email</label>
+                        <Field name="email" type="email" placeholder="ex. whatever@whatever.com" maxLength={50} component={InputField} disabled />
+                      
+                        <label htmlFor="username">Username</label>
+                        <Field name="username" type="text" placeholder="ex. DevilsDontCry" maxLength={26} component={InputField} />
+                      
+                    
                     {/* <div className={`${styles.divContainer}`}>
               <label htmlFor="password">Password</label>
               <Field name="password" type="password" placeholder="ex. bG0J5GW2g^16%klm" maxLength={50} component={InputField} />
               <label htmlFor="confPassword">Confirm Password</label>
               <Field name="confPassword" type="password" placeholder="Re-type password..." maxLength={50} component={InputField} />
             </div> */}
-                    <div className={`${styles.divContainer} ${styles.radioButtonDiv}`}>
+                    
                       <label className="title">Pick your Gender</label>
                       <div>
-                        <label id="maleLabel" htmlFor="male" className={`${"secondLayer"} ${"pickedInput"} ${styles.radioLabel} `}>Male</label>
-                        <Field type="radio" id="male" name="gender" onClick={() => { {/*SetGender(false) */ } }} className={styles.radioInput} value={1} />
-                        <label id="femaleLabel" htmlFor="female" className={`${"secondLayer"} ${styles.radioLabel} `} style={{ float: "right" }}>Female</label>
-                        <Field type="radio" id="female" name="gender" onClick={() => { {/*SetGender(true) */ } }} className={styles.radioInput} value={0} />
+                        
+                          <label id="maleLabel" htmlFor="male" className={`${"secondLayer"} ${"pickedInput"} ${styles.radioLabel} `}>Male</label>
+                          <Field type="radio" id="male" name="gender" onClick={() => { {/*SetGender(false) */ } }} className={styles.radioInput} value={1} />
+                     
+                        
+                          <label id="femaleLabel" htmlFor="female" className={`${"secondLayer"} ${styles.radioLabel} `} style={{ float: "right" }}>Female</label>
+                          <Field type="radio" id="female" name="gender" onClick={() => { {/*SetGender(true) */ } }} className={styles.radioInput} value={0} />
+                        
                       </div>
                       <label>Birth Date</label>
                       <div className={styles.dateDiv}>
@@ -494,8 +508,8 @@ export default function ProfileTab({userEmail , ...props}) {
                           <option hidden>Day</option>
                         </Field>
                       </div>
-                    </div>
-                    <input type="button" value="Save" />
+                    
+                    <input type="button" value="Save"  className={`pickedInput ${styles.saveProfileData}`}/>
                   </form>
                 )}</Formik>
                 : null

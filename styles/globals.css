@@ -77,14 +77,17 @@ input {
   margin: auto;
 }
 .InputField{
-  outline: none;
-  width: 90%;
-  margin-left: 0%;
+  /* outline: none; */
+  width: 92%;
+  /* margin-left: 0%; */
   font-size: 21px;
-  margin-bottom: 30px;
+  /* margin-bottom: 30px; */
   border: 3px solid #f3f3f3;
   padding: 12px 4%;
   border-radius: 5px;
+}
+.InputField:disabled{
+  background-color: #828282;
 }
 .Nav {
   position: fixed;

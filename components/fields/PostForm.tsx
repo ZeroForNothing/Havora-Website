@@ -181,28 +181,19 @@ console.log(userInteracted)
         </div> : null}
       </div>
     )
-    function ShowCommentsFunc(socket: any, id: number, OnlyView: boolean, itsReply: boolean) {
+    function ShowCommentsFunc(socket: any, id: number, onlyView: boolean, itsReply: boolean) {
       // if (!OnlyView) {
       //   //show createcomment textarea
       //   ShowCreateComment(true)
       // }else{
       //   ShowCreateComment(false)
       // }
-      //window.scrollTo(0, 0);
   
-      // SetPostNav(true)
-      // SetMainNav(false) 
-  
-      // if (element.find("video").length)
-      //   element.find("video").get(0).pause();
-      // $('.mediaUrlPost').each(function() {
-      //   this.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*')
-      // })
-
       socket.emit('getProfileTopComments', {
         contentID: id,
         page : 1,
-        itsComment: !itsReply
+        itsComment: !itsReply,
+        onlyView
       })
       //socket.emit('getProfileSpecificContent', data)
     }

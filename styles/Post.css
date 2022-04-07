@@ -21,16 +21,29 @@
     display: block;
   }
   .CommentTextCreation {
+    padding: 2%;
+    width: 96%;
+  }
+  .CommentTextCreation textarea{
+    width: 96%;
     margin: auto;
-    display: block;
+    margin-bottom: 22px;
+    font-size: 20px;
     resize: none;
     border-radius: 5px;
-    border: 2px solid transparent;
     padding: 14px 2%;
-    padding-bottom: 2px;
-    outline: none;
+  }
+  .CommentTextCreation div{
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+  }
+  .CommentTextCreation input{
     font-size: 20px;
-    width: 94%;
+    padding: 8px 12px;
+    width: 200px;
+    border-radius: 5px;
+    cursor: pointer;
   }
   .userProfileTitle {
     width: 100%;
@@ -142,7 +155,7 @@
     border-radius: 6px;
   }
   .userUploadedMedia iframe {
-    height: 336px;
+    height: 300px;
     width: 600px;
   }
   .userProfileText span{
