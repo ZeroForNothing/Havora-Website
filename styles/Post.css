@@ -1,7 +1,7 @@
 .postContainer {
   margin: auto;
   width: 96%;
-  max-width: 900px;
+  max-width: 600px;
   position: relative;
   padding: 20px 0%;
   border-bottom: 3px solid;
@@ -61,6 +61,9 @@
     flex-direction: row;
     justify-content: flex-start;
     width: 100%;
+  }
+  .InteractionDiv input{
+    border-radius: 5px;
   }
   .userProfileName {
     float: left;
@@ -139,13 +142,14 @@
     border-radius: 6px;
   }
   .userUploadedMedia iframe {
-    height: 353px;
+    height: 336px;
     width: 600px;
   }
   .userProfileText span{
     overflow-wrap: break-word;
   }
   .userProfileText {
+    border-radius: 5px;
     font-size: 17px;
     margin-top: 14px;
     white-space: pre-wrap;
@@ -153,6 +157,9 @@
     width: 96%;
     display: inline-block;
     line-height: 1.5em;
+  }
+  textarea{
+    resize: none;
   }
   .shortTextContent {
     display: inline;
@@ -183,10 +190,8 @@
   }
  
   .userBoxOptions input {
+    width: 100%;
     margin-right: 20px;
-    outline: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
     font-size: 15px;
     padding: 7px 12px;
     cursor: pointer;
@@ -195,11 +200,9 @@
     margin-right: 0;
   }
   .contentCounterDiv {
-    width: 96%;
+    width: 100%;
     display: inline-block;
-    padding: 9px 2%;
-    margin-bottom: 5px;
-    border-top: 1px solid;
+    margin-bottom: 12px;
   }
  
   .contentCounterDiv div {
@@ -208,15 +211,11 @@
     float: left;
     text-align: center;
   }
-  .createComment {
-    width: 100%;
-  }
   .confirmationDiv {
     width: 100%;
     text-align: center;
     margin-top: 16px;
     margin-bottom: 4px;
-    display: none;
   }
  
   .confirmationDiv input {

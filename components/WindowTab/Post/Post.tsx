@@ -1,12 +1,9 @@
-import Link from 'next/link'
 import {Field, Formik} from "formik"
 import { InputField } from '../../fields/InputField'
-import PostNav from './PostNav'
 import styles from '../../../styles/WindowTab/Post.module.css'
-// import { createPostForm } from '../../Utility/Utility';
 import { useState,useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import PostData , {InsertYoutubeUrl , checkAcceptedExtensions} from './PostData';
+import {InsertYoutubeUrl , checkAcceptedExtensions} from './PostData';
 import { ShowError } from '../../fields/error';
 import axios from 'axios';
 
@@ -24,16 +21,31 @@ export default function PostTab(){
     let PostUrl = useRef(null)
     let [itsCategory , SetItsCategory] = useState(null)
 
-    const [postType, SetPostType] = useState(() => () => console.log("default"));
-    const [discardPost, SetDiscardPost] = useState(() => () => console.log("default"));
-    const [submitPost, SetSubmitPost] = useState(() => () => console.log("default"));
-
+    let { user } = useSelector((state: any) => state.user)
     let { socket } = useSelector((state: any) => state.socket)
+    let [picToken , SetPicToken] = useState(null)
     useEffect(() => {
-      if(socket){
-        PostNav(socket,postForProfile ,postForCommunity,postForUser , SetPostType ,SetDiscardPost ,SetSubmitPost , PostText , PostUrl)
-        PostData(socket, SetPostContainer  ,PostTitle ,SetItsCategory)
-      }
+      if(!socket) return;
+      socket.on("startCreatingPost", function(data) {
+        SetPostContainer(true)
+            if (data.type == 1) {
+              SetItsCategory(false)
+              PostTitle.current.textContent = 'Profile Post'
+            } else if (data.type == 2) {
+              SetItsCategory(true)
+              PostTitle.current.textContent = 'Community Post'
+            } else if (data.type == 3 && data.username != null && data.code != null) {
+              SetItsCategory(false)
+              PostTitle.current.textContent = data.username + "#" + data.code + " Post"
+            }       
+        });
+      socket.on("discardPostCreation", ()=> {
+        SetPostContainer(false)
+      });
+      socket.on("promptToDiscardPost",()=>{
+        console.log("Discard post")
+      })     
+      SetPicToken(user.picToken)
     }, [socket]);
     const handleClickInput = (e) => {
       e.preventDefault();
@@ -60,7 +72,6 @@ export default function PostTab(){
     }
     const UploadPostFile = async e => {
       const files = e.target.files
-     
       const form = new FormData()
       let tempArray = mediaUploaded;
       let amountOfFiles = mediaUploaded.length;
@@ -90,7 +101,7 @@ export default function PostTab(){
           let index = amountOfFiles;
           await axios.request({
             method: "post", 
-            url: "/upload", 
+            url: "/upload?picToken=" + picToken, 
             data: form,
             onUploadProgress: (progress) => {
               let ratio = progress.loaded / progress.total
@@ -127,9 +138,33 @@ export default function PostTab(){
     return (  
       <>     
       <div className={`Nav`}> 
+      <input type="button" className={`${styles.discard}`}
+         onClick={()=>{ socket.emit("discardPost") }}
+        />
       {
         !postContainer ?  <input type="button" className={`${styles.nextArrow}`}
-          onClick={postType}
+          onClick={() => {
+            let type = null;
+            let username = null;
+            let userCode = null;
+            if(postForProfile.current.classList.contains("pickedInput")){
+                type = 1
+            }
+            else if(postForCommunity.current.classList.contains("pickedInput")){
+                type = 2
+            }
+            else if(postForUser.current.classList.contains("pickedInput")){
+                type = 3
+                let value : string = (document.getElementById("createPostForUserName") as any).value;
+                username = value.substr(0, value.indexOf('#'));
+                userCode = value.substr(value.indexOf('#') + 1, 4);
+            }
+            socket.emit('startCreatingPost', {
+                type: type,
+                username : username,
+                userCode : userCode
+            })
+          }}
         /> :  <>
         <input type="file" id="mediaFileInsertPost" 
          onChange={UploadPostFile} 
@@ -139,15 +174,20 @@ export default function PostTab(){
             onClick={()=>{ SetMediaUrl(!mediaUrl) }}
         /> 
         <input type="button" className={`${styles.create}`}
-            onClick={submitPost}
+            onClick={()=>{         
+              let text = null;
+              let url = null;
+              if(PostText.current) text = PostText.current.value
+              if(PostUrl.current) url = PostUrl.current.value
+              socket.emit("createPost",{
+                  text,
+                  url
+              }) }}
         />
         </> 
       }
-      <input type="button" className={`${styles.discard}`}
-         onClick={discardPost}
-        />
     </div>
-        <>
+        <div className={`${styles.PostContainer}`}>
             {
                 !postContainer ? <>
                 <div  className={`borderColor ${styles.PostType}`}>
@@ -236,7 +276,7 @@ export default function PostTab(){
             </div>
                 </> : null
             }
-        </>
+        </div>
         </>
     )
 }

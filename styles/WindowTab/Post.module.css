@@ -4,9 +4,9 @@
 .PostType{
     display: flex;
     justify-content: space-between;
-    padding-bottom: 14px;
-    margin-bottom: 14px;
-    border-bottom: 1px solid;
+}
+.PostContainer{
+  padding: 2%;
 }
 .PostType input{
     width: 49%;
@@ -94,7 +94,7 @@
   background-image: url("../../sharedComponents/Media/trash.png");
 }
 .create{
-  background-image: url("../../sharedComponents/Media/createPost.png");
+  background-image: url("../../sharedComponents/Media/nextArrow.png");
 }
 .youtube{
   background-image: url("../../sharedComponents/Media/youtube.png");

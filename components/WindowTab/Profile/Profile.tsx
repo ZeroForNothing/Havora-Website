@@ -7,7 +7,7 @@ import { ShowError } from "../../fields/error"
 import axios from "axios"
 import PostForm from '../../fields/PostForm'
 
-export default function ProfileTab() {
+export default function ProfileTab({userEmail , ...props}) {
   const [mainNav, SetMainNav] = useState(true);
   const [editProfileNav, SetEditProfileNav] = useState(false);
   const [postNav, SetPostNav] = useState(false);
@@ -41,9 +41,11 @@ export default function ProfileTab() {
     code: number,
     name: string,
     friendRequest: number,
-    myRequest: number,
+    myRequest: number
   }
   let [CurrentProfile, SetCurrentProfile] = useState<Profile>(null)
+  let [picToken, SetPicToken] = useState('')
+
   let [postPage , SetPostPage]  = useState(1);
   let [commentPage , SetCommentPage]  = useState(1);
 
@@ -101,6 +103,43 @@ export default function ProfileTab() {
           SetLoadMoreReplies(count > 4)
         }
       })
+      socket.on('saveContent', function(data) {
+        if (data.answer == 1)  {
+          let element = null;
+          if (data.postID) 
+            element = document.getElementById("ContentID_"+data.postID)
+          else 
+            element = document.getElementById("ContentID_"+data.commentID)
+          element.getElementsByClassName("userProfileText")[0].textContent = data.text
+        }
+        else 
+        ShowError("Error editing post")
+      })
+      socket.on('deleteContent', function(data) {
+        let element = data.postID ? document.getElementById("ContentID_"+data.postID) : document.getElementById("ContentID_"+data.commentID);
+        element.remove();
+      })
+      socket.on('setUserOpinion', function(data) {
+        if (data != null) {
+          let element = data.postID ? document.getElementById("ContentID_"+data.postID) : document.getElementById("ContentID_"+data.commentID);
+          console.log(element)
+          if (data.opinion == 1) {
+            element.getElementsByClassName("disagreeButton")[0].classList.remove("pickedInput");
+            element.getElementsByClassName("agreeButton")[0].classList.add("pickedInput");
+          } else if (data.opinion == 2) {
+            element.getElementsByClassName("agreeButton")[0].classList.remove("pickedInput");
+            element.getElementsByClassName("disagreeButton")[0].classList.add("pickedInput");
+          } else {
+            element.getElementsByClassName("disagreeButton")[0].classList.remove("pickedInput");
+            element.getElementsByClassName("agreeButton")[0].classList.remove("pickedInput");
+          }
+          element.getElementsByClassName("numberOfAgree")[0].textContent = (data.agree + " Likes")
+          element.getElementsByClassName("numberOfDisagree")[0].textContent = (data.disagree + " Dislikes")
+        } else {
+          ShowError("User not signed in")
+        }
+      })
+      SetPicToken(user.picToken)
     }
   }, [socket]);
   const ShowEditProfile = e => {
@@ -175,14 +214,15 @@ export default function ProfileTab() {
       return;
     }
     form.append('files', files[0], files[0].name)
+    form.append(`email`, userEmail);
     let perc = "0%"
     let src = URL.createObjectURL(files[0])
     if (picType == 1) {
-      //SetProfilePic(src)
+      // SetProfilePic(src)
       SetProfilePercentage(perc)
     }
     else if (picType == 2) {
-      //SetWallpaperPic(src)
+      // SetWallpaperPic(src)
       SetWallpaperPercentage(perc)
     } else {
       e.target.value = "";
@@ -193,7 +233,7 @@ export default function ProfileTab() {
     try {
       await axios.request({
         method: "post",
-        url: "/profileUpload?picType=" + picType,
+        url: "/profileUpload?picType=" + picType + "&picToken=" + picToken,
         data: form,
         onUploadProgress: (progress) => {
           let ratio = progress.loaded / progress.total
@@ -206,8 +246,8 @@ export default function ProfileTab() {
         if (response.data.msg) {
           if (picType == 1) SetProfilePercentage(null)
           else SetWallpaperPercentage(null)
-        } else
-          ShowError(response.data.error);
+        }
+        else ShowError(response.data.error);
         e.target.value = "";
       }).catch((error) => {
         if (error.toString().includes("413")) {
@@ -294,7 +334,7 @@ export default function ProfileTab() {
             </div>
             {PostsView && PostsView.length > 0 ?
               PostsView.map(data => {
-                return <PostForm key={data.id} socket={socket} postID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
+                return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
               })
               : (
                 loadMorePosts ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No posts yet</div> : null
@@ -309,7 +349,7 @@ export default function ProfileTab() {
                  {
                     CommentsView ?
                     CommentsView.map(data=>{  
-                      return <PostForm key={data.id} socket={socket} postID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
+                      return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
                     }) 
                     : 
                       loadMoreComments ?  <div className={`${"secondLayer"} ${styles.loadingContent}`}>No comments yet</div> :null
@@ -321,7 +361,7 @@ export default function ProfileTab() {
               {
                   RepliesView ?
                   RepliesView.map(data=>{  
-                    return <PostForm key={data.id} socket={socket} postID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
+                    return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
                   }) 
                   : (
                     loadMoreReplies ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No replies yet</div> : null
@@ -466,4 +506,5 @@ export default function ProfileTab() {
     </>
   )
 }
+
 

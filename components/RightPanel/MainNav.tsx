@@ -1,19 +1,34 @@
-import styles from '../../styles/RightPanel/MainNav.module.css'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux';
+import styles from '../../styles/MainNav.module.css'
 export default function MainNav(){
+    let { socket } = useSelector((state: any) => state.socket)
+
+    useEffect(() => {
+        if(!socket) return;
+    }, [socket]);
+
+    const OpenWindow = e => {
+        e.preventDefault();
+        if(!socket) return;
+        socket.emit('OpenWindow',{
+            window : e.target.id
+        })
+    };
     return (
         <div  className={`${styles.RightPanel}`}>
             <div className={`${"baseLayer"} ${styles.UtilityTools}`}>
-                <input type="button" id="Home" className={`${`pickedInput`} ${styles.home}`} />
-                <input type="button" id="Settings" className={`${`WindowButton`} ${styles.Settings}`} />
-                <input type="button" id="Notification" className={`${`WindowButton`} ${styles.Notification}`}  />
-                <input type="button" id="FindPlayer" className={`${`WindowButton`} ${styles.FindPlayer}`}  />
-                <input type="button" id="AccountLink" className={`${`WindowButton`} ${styles.AccountLink}`} />
-                <input type="button" id="Community" className={`${`WindowButton`} ${styles.community}`} />
-                <input type="button" id="Profile" className={`${`WindowButton`} ${styles.profile}`} />
-                <input type="button" id="Post" className={`${`WindowButton`} ${styles.Post}`}  />
-                <input type="button" id="MusicPlayer" className={`${`WindowButton`} ${styles.MusicPlayer}`} />
-                <input type="button" id="Store" className={`${`WindowButton`} ${styles.store}`} />
-                <input type="button" id="Lobby" className={`${`WindowButton`} ${styles.lobby}`} />
+                <input type="button" id="Home" className={`${`pickedInput WindowButton`} ${styles.home}`} onClick={OpenWindow} />
+                <input type="button" id="Settings" className={`${`WindowButton`} ${styles.Settings}`} onClick={OpenWindow} />
+                <input type="button" id="Notification" className={`${`WindowButton`} ${styles.Notification}`} onClick={OpenWindow}  />
+                <input type="button" id="FindPlayer" className={`${`WindowButton`} ${styles.FindPlayer}`} onClick={OpenWindow} />
+                <input type="button" id="AccountLink" className={`${`WindowButton`} ${styles.AccountLink}`} onClick={OpenWindow} />
+                <input type="button" id="Community" className={`${`WindowButton`} ${styles.community}`} onClick={OpenWindow} />
+                <input type="button" id="Profile" className={`${`WindowButton`} ${styles.profile}`} onClick={OpenWindow} />
+                <input type="button" id="Post" className={`${`WindowButton`} ${styles.Post}`} onClick={OpenWindow} />
+                <input type="button" id="MusicPlayer" className={`${`WindowButton`} ${styles.MusicPlayer}`} onClick={OpenWindow} />
+                <input type="button" id="Store" className={`${`WindowButton`} ${styles.store}`} onClick={OpenWindow} />
+                <input type="button" id="Lobby" className={`${`WindowButton`} ${styles.lobby}`} onClick={OpenWindow} />
                 {/* <input type="button" id="Inventory" className={`${`WindowButton`} ${styles.inventory}`} /> */}
                 {/* <input type="button" id="Clan" className={`${`WindowButton`} ${styles.clan}`} /> */}
                 {/* <input type="button" id="PartyGroup" className={`${`WindowButton`} ${styles.partyGroup}`} /> */}
@@ -36,25 +51,7 @@ export default function MainNav(){
                     <input type="button" className={`${styles.NormalCoin} ${styles.CoinImage}`}  />
                 </div>
             </div> */}
-            {/* <div className={`${styles.onGoingCallContainer}`}>
-            <div className={`${styles.callerUserPic}`}></div>
-            <input type="button" className={`${styles.userHangupCall}`}/>
-            </div> */}
-            {/* <div className={`${styles.friendListCallContainer}`}>
-            <div className={`${styles.callerUserPic}`}></div>
-            <div className={`${styles.callerUserName}`}><span>username</span></div>
-            <div className={`${styles.callButtonFriendDiv}`}>
-                <input type="button" className={`${styles.callButtonFriend} ${styles.answerFriendCall}`}/>
-            </div>
-            <div className={`${styles.callButtonFriendDiv}`}>
-                <input type="button" className={`${styles.callButtonFriend} ${styles.hangupFriendCall}`}/>
-            </div>
-            </div> */}
-            {/* <div className={`${styles.friendListPanelContainer}`}>
-            <div className={`${styles.friendPreview}`}></div>
-            <div id="OnlineUsersList" className={`${styles.OnlineUsersList}`}></div>
-            <div id="OfflineUsersList" className={`${styles.OfflineUsersList}`}></div>
-            </div> */}
+            
         </div>
     )
 }

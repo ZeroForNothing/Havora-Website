@@ -22,7 +22,7 @@
   }
   
   .addFriendListButton {
-    background-image: url("../../sharedComponents/Media/AccSwitch_lookFront.png");
+    background-image: url("../sharedComponents/Media/AccSwitch_lookFront.png");
   }
   .CoinImage{
     width: 30px;
@@ -34,10 +34,10 @@
     background-color: transparent;
   }
   .ZeroCoin{
-    background-image: url("../../sharedComponents/Media/Z-Coin.png");
+    background-image: url("../sharedComponents/Media/Z-Coin.png");
   }
   .NormalCoin{
-    background-image: url("../../sharedComponents/Media/N-Coin.png");
+    background-image: url("../sharedComponents/Media/N-Coin.png");
   }
   .friendPreview {
     -webkit-app-region: no-drag;
@@ -240,11 +240,11 @@
   }
   
   .callButtonFriendDiv .answerFriendCall {
-    background-image: url(../../sharedComponents/Media/phoneCall.png);
+    background-image: url(../sharedComponents/Media/phoneCall.png);
   }
   
   .hangupFriendCall {
-    background-image: url(../../sharedComponents/Media/phoneHangup.png);
+    background-image: url(../sharedComponents/Media/phoneHangup.png);
   }
   
   .callerUserName {
@@ -258,7 +258,7 @@
     margin-top: 75%;
     margin-bottom: 13%;
     height: 45%;
-    background-image: url("../../sharedComponents/Media/profPic.jpg");
+    background-image: url("../sharedComponents/Media/profPic.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -279,7 +279,7 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: 31px;
-    background-image: url(../../sharedComponents/Media/phoneHangup.png);
+    background-image: url(../sharedComponents/Media/phoneHangup.png);
     height: 74%;
     margin-top: 4%;
     width: 31%;
@@ -289,7 +289,7 @@
   
   .onGoingCallContainer .callerUserPic {
     width: 39%;
-    background-image: url("../../sharedComponents/Media/profPic.jpg");
+    background-image: url("../sharedComponents/Media/profPic.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -308,79 +308,79 @@
     right: 5px;
     width: 26px;
     height: 26px;
-    background-image: url("../../sharedComponents/Media/Offline.png");
+    background-image: url("../sharedComponents/Media/Offline.png");
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
   }
   
   .GamePlatform {
-    background-image: url("../../sharedComponents/Media/Ingame.png");
+    background-image: url("../sharedComponents/Media/Ingame.png");
   }
   
   .ClientPlatform {
-    background-image: url("../../sharedComponents/Media/Client.png");
+    background-image: url("../sharedComponents/Media/Client.png");
   }
   
   .WebPlatform {
-    background-image: url("../../sharedComponents/Media/Web.png");
+    background-image: url("../sharedComponents/Media/Web.png");
   }
   
   .MobilePlatform {
-    background-image: url("../../sharedComponents/Media/Mobile.png");
+    background-image: url("../sharedComponents/Media/Mobile.png");
   }
   
   .Post {
     background-size: 37px !important;
-    background-image: url(../../sharedComponents/Media/createPost.png);
+    background-image: url(../sharedComponents/Media/createPost.png);
   }
   .AccountLink{
-    background-image: url("../../sharedComponents/Media/AccountLink.png");
+    background-image: url("../sharedComponents/Media/AccountLink.png");
   }
   .Notification {
-    background-image: url("../../sharedComponents/Media/notification.png");
+    background-image: url("../sharedComponents/Media/notification.png");
   }
   .profile {
     background-size: 38px !important;
-    background-image: url("../../sharedComponents/Media/profile.png");
+    background-image: url("../sharedComponents/Media/profile.png");
   }
   .MusicPlayer {
-    background-image: url("../../sharedComponents/Media/music.png");
+    background-image: url("../sharedComponents/Media/music.png");
   }
   .home {
-    background-image: url("../../sharedComponents/Media/home.png");
+    background-image: url("../sharedComponents/Media/home.png");
   }
   .clan{
-    background-image: url("../../sharedComponents/Media/clan.png");
+    background-image: url("../sharedComponents/Media/clan.png");
   }
   .partyGroup{
-    background-image: url("../../sharedComponents/Media/partyGroup.png");
+    background-image: url("../sharedComponents/Media/partyGroup.png");
   }
   .friends{
-    background-image: url("../../sharedComponents/Media/friends.png");
+    background-image: url("../sharedComponents/Media/friends.png");
   }
   .lobby {
-    background-image: url("../../sharedComponents/Media/play.png");
+    background-image: url("../sharedComponents/Media/play.png");
   }
   .inventory {
-    background-image: url("../../sharedComponents/Media/inventory.png");
+    background-image: url("../sharedComponents/Media/inventory.png");
   }
   .store {
     background-size: 42px !important;
-    background-image: url("../../sharedComponents/Media/store.png");
+    background-image: url("../sharedComponents/Media/store.png");
   }
   .community {
     background-size: 38px !important;
-    background-image: url("../../sharedComponents/Media/community.png");
+    background-image: url("../sharedComponents/Media/community.png");
   }
   
   .Settings {
     background-size: 29px;
-    background-image: url("../../sharedComponents/Media/setting.png");
+    background-image: url("../sharedComponents/Media/setting.png");
   }
   
   .FindPlayer {
-    background-image: url("../../sharedComponents/Media/searchForPlayer.png");
+    background-image: url("../sharedComponents/Media/searchForPlayer.png");
   }
   
   .UtilityTools {

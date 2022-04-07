@@ -2,11 +2,10 @@ import Layout from '../components/fields/Layout'
 import MainNav from '../components/RightPanel/MainNav'
 import FriendsList from '../components/RightPanel/FriendsList'
 import { useDispatch, useSelector } from 'react-redux'
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { fetchSocket } from '../store/actions/socketAction'
 import { fetchUser } from '../store/actions/userAction'
 import { ShowError } from '../components/fields/error'
-import Navigation from '../components/Utility/navigation'
 import HomeTab from '../components/WindowTab/Home'
 import ProfileTab from '../components/WindowTab/Profile/Profile'
 import PostTab from '../components/WindowTab/Post/Post'
@@ -22,7 +21,7 @@ const Index = ({ user })=> {
   let [profileTab, SetProfileTab] = useState(false)
   let [postTab, SetPostTab] = useState(false)
   let [storeTab, SetStoreTab] = useState(false)
- 
+
    useEffect(()=>{  
      if(user){
 
@@ -38,7 +37,24 @@ const Index = ({ user })=> {
           socket.on('ShowError',data =>{
             ShowError(data.error)
           })
-          Navigation(socket, SetHomeTab , SetProfileTab , SetPostTab)
+          socket.on('OpenWindow',(data)=>{
+              let window : string = data.window;
+                    
+              let selectedButton = document.getElementById(window);
+              let allButtons = document.getElementsByClassName("WindowButton");
+              
+              for (let i = 0; i < allButtons.length; i++) 
+              allButtons[i].classList.remove("pickedInput");
+              
+              selectedButton.classList.add("pickedInput");
+              
+              SetHomeTab(false)
+              SetProfileTab(false)
+              SetPostTab(false)
+              if(window === "Home") SetHomeTab(true)
+              else if(window === "Profile") SetProfileTab(true)
+              else if(window === "Post") SetPostTab(true)
+          })
         }
       }
     }, [socket])
@@ -50,7 +66,7 @@ const Index = ({ user })=> {
           <FriendsList />
           <div className={`WindowTab`}>
             { homeTab ? <HomeTab /> : null }
-            { profileTab ? <ProfileTab /> : null }
+            { profileTab ? <ProfileTab userEmail={user.email}/> : null }
             { postTab ? <PostTab /> : null }
             { storeTab ? <StoreTab /> : null }
           </div>

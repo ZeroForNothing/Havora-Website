@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import moment from "moment";
 
-const PostForm = ({socket, postID, picToken, profilePicType, categoryType, title, mediaFolder, mediaFiles, mediaUrl, postText, username, userCode, myName, myCode, postDate, commentsCount, postAgree, postDisagree, userInteracted, postViews, itsComment, itsReply, ...props})=> {
-    let [textBeingEdited,TextBeingEdited] = useState(false);
-    let [showMoreText,ShowMoreText] = useState(false);
-    let [showUserBoxTools,ShowUserBoxTools] = useState(false);
-  
+const PostForm = ({socket, contentID, picToken, profilePicType, categoryType, title, mediaFolder, mediaFiles, mediaUrl, postText, username, userCode, myName, myCode, postDate, commentsCount, postAgree, postDisagree, userInteracted, postViews, itsComment, itsReply, ...props})=> {
+    let [textBeingEdited,SetTextBeingEdited] = useState(false);
+    let [showMoreText,SetShowMoreText] = useState(false);
+    let [showUserBoxTools,SetShowUserBoxTools] = useState(false);
+console.log(userInteracted)
+    let EditedText = useRef(postText);
     itsComment || itsReply ? null : mediaFiles = mediaFiles.split(",")
     categoryType == 1 ? categoryType = "General"
       : categoryType == 2 ? categoryType = "Ability"
@@ -16,7 +17,7 @@ const PostForm = ({socket, postID, picToken, profilePicType, categoryType, title
                 : categoryType == 7 ? categoryType = "Feature Request"
                   : null
     return (
-      <div className="postContainer borderColor">
+      <div  id={`ContentID_` + contentID} className="postContainer borderColor">
         {
           categoryType ? <div className="postCategory">{categoryType}</div> : null
         }
@@ -33,23 +34,25 @@ const PostForm = ({socket, postID, picToken, profilePicType, categoryType, title
             <span>#{userCode}</span></span>
           <div className="userDateTime">{moment(postDate).format('MMMM Do YYYY, hh:mm a')}</div>
         </div>
-        <input type="button" className="userBoxTools secondLayer"
-          onClick={() => { ShowUserBoxTools(!showUserBoxTools) }}
-        />
         {
-          showUserBoxTools ? <div className="userBoxToolContainer baseLayer">
+          !textBeingEdited ? <input type="button" className="userBoxTools secondLayer"
+            onClick={() => { SetShowUserBoxTools(!showUserBoxTools) }}
+          /> : null
+        }
+        {
+          showUserBoxTools && !textBeingEdited ? <div className="userBoxToolContainer baseLayer">
             {
               username == myName && userCode == myCode ?
                 <>
                   <input type="button" value="Edit" className="editContent secondLayer"
-                    onClick={() => { TextBeingEdited(true) }}
+                    onClick={() => { SetTextBeingEdited(true); SetShowUserBoxTools(false);}}
                   />
                   <input type="button" value="Delete" className="deleteContent secondLayer"
                     onClick={() => {
                     if (itsComment)
-                      socket.emit('deleteContent', { postID: null, commentID: postID })
+                      socket.emit('deleteContent', { postID: null, commentID: contentID })
                     else
-                      socket.emit('deleteContent', { postID: postID, commentID: null })
+                      socket.emit('deleteContent', { postID: contentID, commentID: null })
                     }}
                   />
                 </>
@@ -63,10 +66,10 @@ const PostForm = ({socket, postID, picToken, profilePicType, categoryType, title
             mediaFiles ? mediaFiles.map((media,indexMedia) => {
               
               (/\.png$/.test(media) || /\.jpg$/.test(media)) ?
-                <img key={indexMedia} className="secondLayer" src={`"/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}"`} />
+                <img key={indexMedia} className="secondLayer" src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
                 : (
                   (/\.mp4$/.test(media) || /\.mov$/.test(media)) ?
-                    <video key={indexMedia} className="secondLayer" controls><source src={`"/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}"`} />Your browser does not support the video tag.</video> : null)
+                    <video key={indexMedia} className="secondLayer" controls><source src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />Your browser does not support the video tag.</video> : null)
             }) : null
           }
             {
@@ -74,52 +77,53 @@ const PostForm = ({socket, postID, picToken, profilePicType, categoryType, title
             }
           </div> : null
         }
-        <div className={`${"userProfileText"} ${textBeingEdited ? "textBeingEdited" : "secondLayer"}`} contentEditable={textBeingEdited}>
           {!textBeingEdited ?
-            postText.trim().length > 0 ? <>
-              <span className="shortTextContent">{postText.trim().substr(0, 350)}</span>
-              {!showMoreText && postText >= 350 ? <>
-                <div className="showMoreDots">... </div>
-                <input type="button" className="readMoreButton" value="Read More"
-                  onClick={() => { ShowMoreText(true) }}
-                />
-              </>
-                : null
+          <div className={`${"userProfileText"} ${"secondLayer"}`}>
+              {
+                postText.trim().length > 0 ? 
+                <>
+                  <span className="shortTextContent">{postText.trim().substr(0, 350)}</span>
+                  {!showMoreText && postText >= 350 ? <>
+                    <div className="showMoreDots">... </div>
+                    <input type="button" className="readMoreButton" value="Read More"
+                      onClick={() => { SetShowMoreText(true) }}
+                    />
+                  </>
+                    : null
+                  }
+                  {showMoreText ? <span className="readMoreContent">{postText.trim().substr(350, postText.trim().length)} </span> : null}
+                </>
+                  : <span className="shortTextContent">{postText}</span> 
               }
-              {showMoreText ? <span className="readMoreContent">{postText.trim().substr(350, postText.trim().length)} </span> : null}
-            </>
-              : <span className="shortTextContent">{postText}</span> : <span>
-              postText
-            </span>
+          </div>
+            : <textarea rows={6} className={`${"userProfileText"} ${"secondLayer"}`} defaultValue={postText} ref={EditedText}></textarea>
           }
-        </div>
         {
-          textBeingEdited ? <div className="confirmationDiv">
-            <input type="button" value="Save" className="saveContent secondLayer"
-            onClick={() => {
-              let text = postText;
-              TextBeingEdited(false)
-              let postID = null;
-              let commentID = null;
-              if (itsComment)
-                socket.emit('saveContent', { commentID: commentID, postID: null, text: text })
-              else
-                socket.emit('saveContent', { commentID: null, postID: postID, text: text })
-            }}
-            />
+          textBeingEdited ? 
+          <div className="confirmationDiv">
             <input type="button" value="Discard" className="discardContent secondLayer"
-              onClick={() => { TextBeingEdited(false) }}
+              onClick={() => { SetTextBeingEdited(false) }}
+            />
+            <input type="button" value="Save" className="saveContent pickedInput"
+              onClick={() => {
+                let text = EditedText.current.value;
+                SetTextBeingEdited(false)
+                if (itsComment)
+                  socket.emit('saveContent', { commentID : contentID, postID : null , text: text })
+                else
+                  socket.emit('saveContent', { commentID : null, postID : contentID , text: text })
+              }}
             />
           </div> : null
         }
   
         {!textBeingEdited ? <div className="userBoxOptions">
           <div className="contentCounterDiv borderColor">
-            <div className="numberOfAgree">{postAgree} Agrees</div>
-            <div className="numberOfDisagree">{postDisagree} Disagrees</div>
+            <div className="numberOfAgree">{postAgree} Likes</div>
+            <div className="numberOfDisagree">{postDisagree} Dislikes</div>
             {
               !itsReply ?
-                <div className="numberOfComments">{commentsCount}{itsComment ? " Comment" : " Reply"}</div>
+                <div className="numberOfComments">{commentsCount}{!itsComment ? " Comment" : " Reply"}</div>
                 : null
             }
             {
@@ -131,12 +135,32 @@ const PostForm = ({socket, postID, picToken, profilePicType, categoryType, title
             }
           </div>
           <div className="InteractionDiv">
-            <input type="button" value="Agree" className={`"agreeButton secondLayer ${userInteracted == 1 ? "userInteracted" : null}"`} />
-            <input type="button" value="Disagree" className={`"disagreeButton secondLayer ${userInteracted == 2 ? "userInteracted" : null}"`} />
+            <input type="button" value="Like" className={`agreeButton secondLayer ${userInteracted == 1 ? "pickedInput" : null}`}
+              onClick={()=>{
+                let postID = itsComment || itsReply ? null : contentID;
+                let commentID = itsComment || itsReply ? contentID : null;
+                socket.emit('setUserOpinion', {
+                  postID,
+                  commentID,
+                  opinion: 1,
+                })
+              }}
+            />
+            <input type="button" value="Dislike" className={`disagreeButton secondLayer ${userInteracted == 2 ? "pickedInput" : null}`}
+              onClick={()=>{
+                let postID = itsComment || itsReply ? null : contentID;
+                let commentID = itsComment || itsReply ? contentID : null;
+                socket.emit('setUserOpinion', {
+                  postID,
+                  commentID,
+                  opinion: 2,
+                })
+              }}
+            />
             {
               !itsReply ?
-                <input type="button" value={`View ${itsComment ? "Reply" : "Comment"}`} className="secondLayer"
-                  onClick={() =>  ShowCommentsFunc(socket, postID, true, itsComment) }
+                <input type="button" value={`View ${itsComment ? "Replies" : "Comments"}`} className="secondLayer"
+                  onClick={() =>  ShowCommentsFunc(socket, contentID, true, itsComment) }
                 />
                 : null
             }
@@ -150,7 +174,7 @@ const PostForm = ({socket, postID, picToken, profilePicType, categoryType, title
             {
               !itsReply ?
                 <input className="createComment secondLayer" type="button" value={`${itsComment ? "Reply" : "Comment"}${" here..."}`}
-                  onClick={() => ShowCommentsFunc(socket, postID, false, itsComment) }
+                  onClick={() => ShowCommentsFunc(socket, contentID, false, itsComment) }
                 /> : null
             }
           </div>
