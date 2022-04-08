@@ -5,8 +5,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType, categoryType, ti
     let [textBeingEdited,SetTextBeingEdited] = useState(false);
     let [showMoreText,SetShowMoreText] = useState(false);
     let [showUserBoxTools,SetShowUserBoxTools] = useState(false);
-console.log(userInteracted)
-    let EditedText = useRef(postText);
+    let EditedText = useRef(null);
     itsComment || itsReply ? null : mediaFiles = mediaFiles.split(",")
     categoryType == 1 ? categoryType = "General"
       : categoryType == 2 ? categoryType = "Ability"
@@ -49,7 +48,7 @@ console.log(userInteracted)
                   />
                   <input type="button" value="Delete" className="deleteContent secondLayer"
                     onClick={() => {
-                    if (itsComment)
+                    if (itsComment || itsReply)
                       socket.emit('deleteContent', { postID: null, commentID: contentID })
                     else
                       socket.emit('deleteContent', { postID: contentID, commentID: null })
@@ -77,7 +76,8 @@ console.log(userInteracted)
             }
           </div> : null
         }
-          {!textBeingEdited ?
+        {postText ? <>
+          {!textBeingEdited?
           <div className={`${"userProfileText"} ${"secondLayer"}`}>
               {
                 postText.trim().length > 0 ? 
@@ -98,6 +98,8 @@ console.log(userInteracted)
           </div>
             : <textarea rows={6} className={`${"userProfileText"} ${"secondLayer"}`} defaultValue={postText} ref={EditedText}></textarea>
           }
+        </>  : null }
+          
         {
           textBeingEdited ? 
           <div className="confirmationDiv">
@@ -108,7 +110,7 @@ console.log(userInteracted)
               onClick={() => {
                 let text = EditedText.current.value;
                 SetTextBeingEdited(false)
-                if (itsComment)
+                if (itsComment || itsReply)
                   socket.emit('saveContent', { commentID : contentID, postID : null , text: text })
                 else
                   socket.emit('saveContent', { commentID : null, postID : contentID , text: text })
@@ -127,7 +129,7 @@ console.log(userInteracted)
                 : null
             }
             {
-              !itsReply && !itsComment ?
+              !itsReply && !itsComment && postViews != null?
                 <>
                   <div className="numberOfViewers">{postViews - 1} Views</div>
                   <div className="numberOfShare">0 Shares</div>
@@ -139,10 +141,11 @@ console.log(userInteracted)
               onClick={()=>{
                 let postID = itsComment || itsReply ? null : contentID;
                 let commentID = itsComment || itsReply ? contentID : null;
+                let opinion = userInteracted == 1 ? 0 : 1
                 socket.emit('setUserOpinion', {
                   postID,
                   commentID,
-                  opinion: 1,
+                  opinion,
                 })
               }}
             />
@@ -150,10 +153,11 @@ console.log(userInteracted)
               onClick={()=>{
                 let postID = itsComment || itsReply ? null : contentID;
                 let commentID = itsComment || itsReply ? contentID : null;
+                let opinion = userInteracted == 2 ? 0 : 2
                 socket.emit('setUserOpinion', {
                   postID,
                   commentID,
-                  opinion: 2,
+                  opinion,
                 })
               }}
             />

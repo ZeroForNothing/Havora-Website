@@ -12,8 +12,8 @@ export default function ProfileTab({userEmail , ...props}) {
   const dispatch = useDispatch();
 
   const [mainNav, SetMainNav] = useState(true);
-  const [editProfileNav, SetEditProfileNav] = useState(false);
   const [postNav, SetPostNav] = useState(false);
+  const [editProfileNav, SetEditProfileNav] = useState(false);
 
   const [editPassword, SetEditPassword] = useState(null);
   const [editInfo, SetEditInfo] = useState(null);
@@ -22,12 +22,13 @@ export default function ProfileTab({userEmail , ...props}) {
   const [profilePercentage, SetProfilePercentage] = useState(null);
   const [wallpaperPercentage, SetWallpaperPercentage] = useState(null);
 
-  const [PostsView, SetPosts] = useState(null);
+  let [PostsView, SetPosts] = useState(null);
+  let [CommentsView, SetComments] = useState(null);
+  let [RepliesView, SetReplies] = useState(null);
+  
   const [loadMorePosts, SetLoadMorePosts] = useState(true);
   const [loadMoreComments, SetLoadMoreComments] = useState(true);
   const [loadMoreReplies, SetLoadMoreReplies] = useState(true);
-  const [CommentsView, SetComments] = useState(null);
-  const [RepliesView, SetReplies] = useState(null);
 
   let [showComments, SetShowComments] = useState(true)
   let [showReplies, SetShowReplies] = useState(false)
@@ -35,8 +36,31 @@ export default function ProfileTab({userEmail , ...props}) {
   const [showCreateComment, ShowCreateComment] = useState(false)
   const CommentTextCreation = useRef(null)
 
+  const postPrevListRef = useRef(null)
+  const commentPrevListRef = useRef(null)
+  const replyPrevListRef = useRef(null)
+
+  const [CurrentPostViewing, SetCurrentPostViewing] = useState(null)
+  const [CurrentCommentViewing, SetCurrentCommentViewing] = useState(null)
+  
+  let [postCurrentPage , SetPostPage]  = useState(1);
+  let [commentCurrentPage , SetCommentPage]  = useState(1);
+  let [replyCurrentPage , SetReplyPage]  = useState(1);
+  
   let { user } = useSelector((state: any) => state.user)
   let { socket } = useSelector((state: any) => state.socket)
+  
+  let [CurrentProfile, SetCurrentProfile] = useState<Profile>(null)
+  let [picToken, SetPicToken] = useState('')
+
+  let [WaitingForPost , SetWaitingForPost] = useState(true)
+  let [WaitingForComment , SetWaitingForComment] = useState(true)
+  let [WaitingForReply , SetWaitingForReply] = useState(true)
+  let WaitingForPostRef = useRef(WaitingForPost)
+  let WaitingForCommentRef = useRef(WaitingForComment)
+  let WaitingForReplyRef = useRef(WaitingForReply)
+
+
   type Profile = {
     picToken: string,
     profilePicType: number,
@@ -46,11 +70,6 @@ export default function ProfileTab({userEmail , ...props}) {
     friendRequest: number,
     myRequest: number
   }
-  let [CurrentProfile, SetCurrentProfile] = useState<Profile>(null)
-  let [picToken, SetPicToken] = useState('')
-
-  let [postPage , SetPostPage]  = useState(1);
-  let [commentPage , SetCommentPage]  = useState(1);
 
   useEffect(() => {
     if (socket) {
@@ -66,14 +85,29 @@ export default function ProfileTab({userEmail , ...props}) {
         });
       })
       socket.on('createProfileComment', function(data) {
-          console.log(data)
+        let newArr = {socket, id: data.id, picToken : user.picToken, picType : user.profilePicType, text : data.text, username : user.name, userCode : user.code, name: user.name, code : user.name, date : data.date, count : 0, agree : 0, disagree : 0, interact : 0}
+          SetReplies(oldArray => [newArr, ...oldArray]);
+        document.getElementsByClassName("WindowTab")[0].scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "smooth"
+        });
       })
       socket.on('getProfileTopPosts', function (data) {
         if (data.postsList != null) {
           let postsList = JSON.parse(data.postsList)
-          SetPosts(postsList);
+
+          SetPostPage(data.page)
+          
+          SetWaitingForPost(false)
+          WaitingForPostRef.current = false;
+          
+          let contentList = data.page != 6 ? postPrevListRef.current : null
+          postPrevListRef.current = contentList? contentList.concat(postsList) : postsList
+          SetPosts(postPrevListRef.current);
           SetLoadMorePosts(postsList.length > 4)
         } else {
+          postPrevListRef.current = null;
           SetPosts(null);
           SetLoadMorePosts(false)
         }
@@ -83,56 +117,155 @@ export default function ProfileTab({userEmail , ...props}) {
         let commentID = data.commentID;
         let commentsList = JSON.parse(data.commentsList);
         let count = commentsList ? commentsList.length : 0;
-
+        console.log(data)
         SetMainNav(false);
         SetPostNav(true);
-
         ShowCreateComment(!data.onlyView)
+        
+        SetShowComments(postID ? true : false)
+        SetShowReplies(commentID ? true : false)
 
+        if(!commentsList) return;
         if (postID) {
-          SetShowComments(true)
-          SetShowReplies(false)
-          SetComments(commentsList);
+          SetCurrentPostViewing(postID ? postID : commentID);
+          SetCommentPage(data.page)
+          SetWaitingForComment(false)
+          WaitingForCommentRef.current = false
+
+          let contentList = data.page != 6 ? commentPrevListRef.current : null
+          commentPrevListRef.current = contentList? contentList.concat(commentsList) : commentsList
+          SetComments(commentPrevListRef.current)
           SetLoadMoreComments(count > 4)
-        } else if (commentID) {
-          SetShowComments(false)
-          SetShowReplies(true)
-          SetReplies(commentsList);
+        } 
+        else if (commentID) {
+          SetCurrentCommentViewing(commentID)
+          SetReplyPage(data.page)
+          SetWaitingForReply(false)
+          WaitingForReplyRef.current = false;
+          let contentList = data.page != 6 ? replyPrevListRef.current : null
+          replyPrevListRef.current = contentList? contentList.concat(commentsList) : commentsList
+          SetReplies(replyPrevListRef.current)
           SetLoadMoreReplies(count > 4)
         }
       })
       socket.on('saveContent', function(data) {
-        if (data.answer == 1)  {
-          let element = null;
-          if (data.postID) 
-            element = document.getElementById("ContentID_"+data.postID)
-          else 
-            element = document.getElementById("ContentID_"+data.commentID)
-          element.getElementsByClassName("userProfileText")[0].textContent = data.text
+        if (data.answer == 1){
+          if (data.postID) {
+            let content = postPrevListRef.current.find(content => content.id == data.postID)
+            const contentIndex = postPrevListRef.current.indexOf(content)
+            content.text = data.text;
+            SetPosts(oldArray => {
+              return [
+                ...oldArray.slice(0, contentIndex),
+                content,
+                ...oldArray.slice(contentIndex + 1),
+              ]
+            })
+          }
+          else if(data.commentID){
+            let contentComment = commentPrevListRef.current.find(content => content.id == data.commentID)
+            let contentReply = replyPrevListRef.current.find(content => content.id == data.commentID)
+            if(contentComment){
+              const contentIndex = commentPrevListRef.current.indexOf(contentComment)
+              contentComment.text = data.text;
+              SetComments(oldArray => {
+                return [
+                  ...oldArray.slice(0, contentIndex),
+                  contentComment,
+                  ...oldArray.slice(contentIndex + 1),
+                ]
+              })
+            }else if(contentReply){
+              const contentIndex = replyPrevListRef.current.indexOf(contentReply)
+              contentReply.text = data.text;
+              SetReplies(oldArray => {
+                return [
+                  ...oldArray.slice(0, contentIndex),
+                  contentReply,
+                  ...oldArray.slice(contentIndex + 1),
+                ]
+              })
+            }
+          }
         }
         else 
-        ShowError("Error editing post")
+          ShowError("Error editing post")
       })
       socket.on('deleteContent', function(data) {
-        let element = data.postID ? document.getElementById("ContentID_"+data.postID) : document.getElementById("ContentID_"+data.commentID);
-        element.remove();
+        if(data.postID){
+          let content = postPrevListRef.current.find(content => content.id == data.postID)
+            const contentIndex = postPrevListRef.current.indexOf(content)
+            SetPosts(oldArray => {
+              return [
+              ...oldArray.slice(0, contentIndex),
+              ...oldArray.slice(contentIndex + 1),
+                  ]
+            })
+        }else if(data.commentID){
+          let contentComment = commentPrevListRef.current.find(content => content.id == data.commentID)
+            let contentReply = replyPrevListRef.current.find(content => content.id == data.commentID)
+            if(contentComment){
+              const contentIndex = commentPrevListRef.current.indexOf(contentComment)
+              SetComments(oldArray => {
+                return [
+                  ...oldArray.slice(0, contentIndex),
+                  ...oldArray.slice(contentIndex + 1),
+                ]
+              })
+            }else if(contentReply){
+              const contentIndex = replyPrevListRef.current.indexOf(contentReply)
+              SetReplies(oldArray => {
+                return [
+                  ...oldArray.slice(0, contentIndex),
+                  ...oldArray.slice(contentIndex + 1),
+                ]
+              })
+            }
+        } 
+        
       })
       socket.on('setUserOpinion', function(data) {
         if (data != null) {
-          let element = data.postID ? document.getElementById("ContentID_"+data.postID) : document.getElementById("ContentID_"+data.commentID);
-          console.log(element)
-          if (data.opinion == 1) {
-            element.getElementsByClassName("disagreeButton")[0].classList.remove("pickedInput");
-            element.getElementsByClassName("agreeButton")[0].classList.add("pickedInput");
-          } else if (data.opinion == 2) {
-            element.getElementsByClassName("agreeButton")[0].classList.remove("pickedInput");
-            element.getElementsByClassName("disagreeButton")[0].classList.add("pickedInput");
-          } else {
-            element.getElementsByClassName("disagreeButton")[0].classList.remove("pickedInput");
-            element.getElementsByClassName("agreeButton")[0].classList.remove("pickedInput");
+          if(data.postID){
+            let content = postPrevListRef.current.find(content => content.id == data.postID)
+            const contentIndex = postPrevListRef.current.indexOf(content)
+            content.interact = data.opinion;
+            content.agree = data.agree;
+            content.disagree = data.disagree;
+            SetPosts(oldArray => {
+              return [
+                ...oldArray.slice(0, contentIndex),
+                content,
+                ...oldArray.slice(contentIndex + 1),
+              ]
+            })
           }
-          element.getElementsByClassName("numberOfAgree")[0].textContent = (data.agree + " Likes")
-          element.getElementsByClassName("numberOfDisagree")[0].textContent = (data.disagree + " Dislikes")
+          else{
+            let contentComment = commentPrevListRef.current ? commentPrevListRef.current.find(content => content.id == data.commentID) : null
+            let contentReply = replyPrevListRef.current ? replyPrevListRef.current.find(content => content.id == data.commentID) : null
+            let content = contentComment ? contentComment : contentReply
+            let contentList = contentComment ? commentPrevListRef.current : replyPrevListRef.current
+            const contentIndex = contentList.indexOf(content)
+            content.interact = data.opinion;
+            content.agree = data.agree;
+            content.disagree = data.disagree;
+            if(contentComment)
+              SetComments(oldArray => {
+                return [
+                  ...oldArray.slice(0, contentIndex),
+                  content,
+                  ...oldArray.slice(contentIndex + 1),
+                ]
+              })
+            else
+              SetReplies(oldArray => {
+                return [
+                  ...oldArray.slice(0, contentIndex),
+                  content,
+                  ...oldArray.slice(contentIndex + 1),
+                ]
+              })
+          }
         } else {
           ShowError("User not signed in")
         }
@@ -140,6 +273,43 @@ export default function ProfileTab({userEmail , ...props}) {
       SetPicToken(user.picToken)
     }
   }, [socket]);
+
+  const handleContentScroll = (e) => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+
+    if(!bottom) return; 
+    if(mainNav && WaitingForPostRef) {
+      SetWaitingForPost(true)
+      WaitingForPostRef.current = true;
+      socket.emit('getProfileTopPosts',{
+        profileName : CurrentProfile.name,
+        profileCode : CurrentProfile.code,
+        page : postCurrentPage
+      })
+    } else if (postNav) {
+      if(showComments && WaitingForCommentRef){
+        SetWaitingForComment(true)
+        WaitingForCommentRef.current = true;
+        socket.emit('getProfileTopComments', {
+          contentID: CurrentPostViewing ,
+          page : commentCurrentPage ,
+          itsComment: showComments,
+          onlyView : true
+        })
+      }else if(showReplies && WaitingForReplyRef){
+        SetWaitingForReply(true);
+        WaitingForReplyRef.current = true;
+        socket.emit('getProfileTopComments', {
+          contentID: CurrentCommentViewing,
+          page : replyCurrentPage,
+          itsComment: showComments,
+          onlyView : true
+        })
+      }
+        
+    }
+  }
+
   const ShowEditProfile = e => {
     e.preventDefault();
     SetMainNav(false)
@@ -319,7 +489,7 @@ export default function ProfileTab({userEmail , ...props}) {
           </> : null
         }
       </div>
-      <>
+      <div className={`contentContainer`} onScroll={handleContentScroll}>
         {
           mainNav ? <>
             <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
@@ -331,14 +501,16 @@ export default function ProfileTab({userEmail , ...props}) {
                 </div>
               </div>
             </div>
-            {PostsView && PostsView.length > 0 ?
-              PostsView.map(data => {
-                return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
-              })
-              : (
-                loadMorePosts ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No posts yet</div> : null
-              )
-            }
+            <div>
+              {PostsView && PostsView.length > 0 ?
+                PostsView.map(data => {
+                  return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
+                })
+                : (
+                  loadMorePosts ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No posts yet</div> : "loading content"
+                )
+              }
+            </div>
           </> : null
         }
         {
@@ -351,7 +523,7 @@ export default function ProfileTab({userEmail , ...props}) {
                       return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
                     }) 
                     : 
-                      loadMoreComments ?  <div className={`${"secondLayer"} ${styles.loadingContent}`}>No comments yet</div> :null
+                      loadMoreComments ?  <div className={`${"secondLayer"} ${styles.loadingContent}`}>No comments yet</div> : "loading content"
                   } 
               </>
              : null}
@@ -363,14 +535,14 @@ export default function ProfileTab({userEmail , ...props}) {
                     return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
                   }) 
                   : (
-                    loadMoreReplies ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No replies yet</div> : null
+                    loadMoreReplies ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No replies yet</div> : "loading content"
                   )
                 }
             </>  : null
             }
             {
               showCreateComment ? <>
-                <div className="CommentTextCreation">
+                <div className="baseLayer CommentTextCreation">
                   <textarea rows={8} ref={CommentTextCreation} className="secondLayer" placeholder="Type here..."></textarea>
                   <div>
                     <input type="button" value="Discard" className={`secondLayer`}
@@ -516,7 +688,7 @@ export default function ProfileTab({userEmail , ...props}) {
             }
           </> : null
         }
-      </>
+      </div>
     </>
   )
 }
