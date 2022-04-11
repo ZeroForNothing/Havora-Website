@@ -73,6 +73,7 @@
     padding: 5px 12px;
     border-radius: 5px;
     margin-left: 10px;
+    height: 40px;
   }
   .InteractionDiv{
     display: flex;
@@ -84,10 +85,7 @@
     border-radius: 5px;
   }
   .userProfileName {
-    float: left;
     font-size: 19px;
-    text-decoration: none;
-    cursor: pointer;
   }
   .userProfileName span {
     font-size: 15px;
@@ -95,9 +93,8 @@
   }
   
  .userDateTime {
-    float: left;
-    clear: left;
     font-size: 13px;
+    color: #f9f9f9a6;
   }
   
  .userBoxTools {

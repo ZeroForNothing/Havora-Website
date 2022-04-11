@@ -31,7 +31,7 @@ export default function Login() {
                     email: "asd@asd.com",
                     password: "asdasdasd"
                 }}>{({ handleSubmit }) => (
-                    <form onSubmit={handleSubmit}>
+                    <form className={`${styles.formContainer}`} onSubmit={handleSubmit}>
                         <Field name="email" type="email" placeholder="My Email..." component={InputField} />
                         <Field name="password" type="password" placeholder="My Password..." component={InputField} />
                         <input value="Login" type="submit" key="Login" className={`${"secondLayer"} ${styles.Login}`} />

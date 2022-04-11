@@ -8,58 +8,38 @@ import { ShowError } from '../../fields/error';
 import axios from 'axios';
 
 export default function PostTab(){
-    let [postContainer , SetPostContainer] = useState(false)
     let [mediaUrl , SetMediaUrl] = useState(false)
     let [mediaUploaded , SetMediaUploaded] = useState([])
 
-    let postForProfile = useRef(null)
-    let postForCommunity = useRef(null)
-    let postForUser = useRef(null)
-    let PostTitle = useRef(null)
+    let [PostType,SetPostType] = useState(null)
     let youtubeIFrame = useRef(null)
     let PostText = useRef(null)
     let PostUrl = useRef(null)
-    let [itsCategory , SetItsCategory] = useState(null)
 
     let { user } = useSelector((state: any) => state.user)
     let { socket } = useSelector((state: any) => state.socket)
     let [picToken , SetPicToken] = useState(null)
     useEffect(() => {
       if(!socket) return;
-      socket.on("startCreatingPost", function(data) {
-        SetPostContainer(true)
-            if (data.type == 1) {
-              SetItsCategory(false)
-              PostTitle.current.textContent = 'Profile Post'
-            } else if (data.type == 2) {
-              SetItsCategory(true)
-              PostTitle.current.textContent = 'Community Post'
-            } else if (data.type == 3 && data.username != null && data.code != null) {
-              SetItsCategory(false)
-              PostTitle.current.textContent = data.username + "#" + data.code + " Post"
-            }       
-        });
+      socket.emit('fetchPostType')
+      socket.on("fetchPostType", function(data) {
+        if (data.type == 1) {
+          SetPostType(`My Profile Post`)
+        } else if (data.type == 2) {
+          SetPostType(`Community Post`)
+        } else if (data.type == 3 && data.name != null && data.code != null) {
+          SetPostType(`Post for ${data.name} #${data.code}`)
+        }       
+      });
       socket.on("discardPostCreation", ()=> {
-        SetPostContainer(false)
+        console.log("discardPostCreation")
       });
       socket.on("promptToDiscardPost",()=>{
-        console.log("Discard post")
+        console.log("promptToDiscardPost")
       })     
       SetPicToken(user.picToken)
     }, [socket]);
-    const handleClickInput = (e) => {
-      e.preventDefault();
-      postForProfile.current.classList.remove("pickedInput")
-      postForCommunity.current.classList.remove("pickedInput")
-      postForUser.current.classList.remove("pickedInput")
-      e.target.classList.add("pickedInput")
-    }
-    const handleClickDiv = (e) => {
-      e.preventDefault();
-      postForProfile.current.classList.remove("pickedInput")
-      postForCommunity.current.classList.remove("pickedInput")
-      postForUser.current.classList.add("pickedInput")
-    }
+
     const handleKeyUp = e =>{
       e.preventDefault();
       InsertYoutubeUrl(e ,youtubeIFrame)
@@ -137,96 +117,53 @@ export default function PostTab(){
     }
     return (  
       <>     
-      <div className={`Nav`}> 
-      <input type="button" className={`${styles.discard}`}
-         onClick={()=>{ socket.emit("discardPost") }}
-        />
-      {
-        !postContainer ?  <input type="button" className={`${styles.nextArrow}`}
-          onClick={() => {
-            let type = null;
-            let username = null;
-            let userCode = null;
-            if(postForProfile.current.classList.contains("pickedInput")){
-                type = 1
-            }
-            else if(postForCommunity.current.classList.contains("pickedInput")){
-                type = 2
-            }
-            else if(postForUser.current.classList.contains("pickedInput")){
-                type = 3
-                let value : string = (document.getElementById("createPostForUserName") as any).value;
-                username = value.substr(0, value.indexOf('#'));
-                userCode = value.substr(value.indexOf('#') + 1, 4);
-            }
-            socket.emit('startCreatingPost', {
-                type: type,
-                username : username,
-                userCode : userCode
-            })
-          }}
-        /> :  <>
+      <div className={`${styles.mainNav}`}>
+        <input type="button" className={`secondLayer ${styles.discard}`}
+            onClick={()=>{ socket.emit("discardPost") }}
+            />
+
         <input type="file" id="mediaFileInsertPost" 
          onChange={UploadPostFile} 
         style={{display:"none"}} />
-        <label htmlFor="mediaFileInsertPost"  className={`${styles.insertFile}`}></label>
-        <input type="button"  className={`${styles.youtube}`}
+        <label htmlFor="mediaFileInsertPost"  className={`secondLayer ${styles.insertFile}`}></label>
+        <input type="button"  className={`secondLayer ${styles.youtube}`}
             onClick={()=>{ SetMediaUrl(!mediaUrl) }}
         /> 
-        <input type="button" className={`${styles.create}`}
+        <input type="button" className={`pickedInput secondLayer ${styles.create}`}
             onClick={()=>{         
-              let text = null;
-              let url = null;
-              if(PostText.current) text = PostText.current.value
-              if(PostUrl.current) url = PostUrl.current.value
               socket.emit("createPost",{
-                  text,
-                  url
+                  text : PostText.current ? PostText.current.value : null,
+                  url : PostUrl.current ? PostUrl.current.value : null
               }) }}
         />
-        </> 
-      }
-    </div>
+      </div>
+
         <div className={`${styles.PostContainer}`}>
-            {
-                !postContainer ? <>
-                <div  className={`borderColor ${styles.PostType}`}>
-                <input type="button" ref={postForProfile} className={`secondLayer`} value="For my Profile" 
-                  onClick={handleClickInput}
-                />
-                 <input type="button" ref={postForCommunity} className={`secondLayer`} value="For the Community"
-                 onClick={handleClickInput}
-                 />
-                </div>
-                <div ref={postForUser} className={`${styles.FriendPostType}`} onClick={handleClickDiv}>
-                <span>For a User</span>
-                <input type="text" className={`secondLayer`} placeholder="ex. Devils Dont Cry #3333" />
-                </div>
-                </> : null
-            }
-            {
-                postContainer ? <>
-            <span ref={PostTitle} className={`borderColor ${styles.postType}`} ></span>
+
+            <div className={`borderColor ${styles.postType}`} >{PostType}</div>
                 {
-                  itsCategory ? <div className={`${styles.divContainer}`}>
-                  <input type="button" className="secondLayer pickedInput" value="General" />
-                  <input type="button" className="secondLayer" value="Ability" />
-                  <input type="button" className="secondLayer" value="Character" />
-                  <input type="button" className="secondLayer" value="Skin"/>
-                  <input type="button" className="secondLayer" value="Story" />
-                  <input type="button" className="secondLayer" value="In-Game" />
-                  <input type="button" className="secondLayer" value="Feature Request" />
+                  PostType === "Community Post" ? 
+                  <div className={`${styles.divContainer}`}>
+                    <input type="button" className="secondLayer pickedInput" value="General" />
+                    <input type="button" className="secondLayer" value="Ability" />
+                    <input type="button" className="secondLayer" value="Character" />
+                    <input type="button" className="secondLayer" value="Skin"/>
+                    <input type="button" className="secondLayer" value="Story" />
+                    <input type="button" className="secondLayer" value="In-Game" />
+                    <input type="button" className="secondLayer" value="Feature Request" />
                   </div> : null
                 }
               {
-                itsCategory ? <div className={`${styles.divContainer}`}> <input type="text" placeholder="Title or Topic you wana discuss" maxLength={150} className={`secondLayer ${styles.postTitle}`}/> </div> : null
+                PostType === "Community Post" ? 
+                <InputField type="text" placeholder="Title or Topic you wana discuss" maxLength={150}/> 
+                : null
               }   
             <div className={`${styles.divContainer}`} style={{marginTop:"0"}}>
                 {
                   mediaUrl ? 
                   <div className={`${styles.mediaUrlPostDiv}`}>
-                  <input type="text" ref={PostUrl} placeholder="Insert Url here" className="secondLayer" onKeyUp={handleKeyUp}/>
-                  <iframe ref={youtubeIFrame} className={`secondLayer`} typeof="text/html" frameBorder={0} allowFullScreen></iframe>
+                    <InputField type="text" ref={PostUrl} placeholder="Insert Url here" onKeyUp={handleKeyUp}/>
+                    <iframe ref={youtubeIFrame} className={`secondLayer`} typeof="text/html" frameBorder={0} allowFullScreen></iframe>
                   </div> : null
                 }
                   {mediaUploaded && mediaUploaded.length > 0 ?
@@ -271,11 +208,8 @@ export default function PostTab(){
                     ) 
                   }) :  null}
             </div>
-            <div className={`${styles.divContainer}`}>
-                <textarea rows={8} ref={PostText} className="secondLayer" placeholder="Type here..."></textarea>
-            </div>
-                </> : null
-            }
+            <textarea rows={8} ref={PostText} className={`secondLayer`} placeholder="Type here..."></textarea>
+               
         </div>
         </>
     )

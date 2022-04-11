@@ -15,8 +15,10 @@ const PostForm = ({socket, contentID, picToken, profilePicType, categoryType, ti
               : categoryType == 6 ? categoryType = "In-Game"
                 : categoryType == 7 ? categoryType = "Feature Request"
                   : null
+
+    console.log(mediaFiles)
     return (
-      <div  id={`ContentID_` + contentID} className="postContainer borderColor">
+      <div className="postContainer borderColor">
         {
           categoryType ? <div className="postCategory">{categoryType}</div> : null
         }
@@ -26,10 +28,10 @@ const PostForm = ({socket, contentID, picToken, profilePicType, categoryType, ti
         <div className="userProfilePic secondLayer" style={{
           backgroundImage: profilePicType ? `url(/MediaFiles/ProfilePic/${picToken}/file.${profilePicType})` : 'none'
         }}></div>
-        <div className="userContentData secondLayer">
-          <span className="userProfileName"
-            onClick={() => { socket.emit('showUserProfile', { username, userCode }) }}
-          >{username}
+        <div className="userContentData secondLayer"
+           onClick={() => { socket.emit('showUserProfile', { username, userCode }) }}
+        >
+          <span className="userProfileName">{username}
             <span>#{userCode}</span></span>
           <div className="userDateTime">{moment(postDate).format('MMMM Do YYYY, hh:mm a')}</div>
         </div>
@@ -60,19 +62,24 @@ const PostForm = ({socket, contentID, picToken, profilePicType, categoryType, ti
           </div> : null
         }
         {
-          !textBeingEdited ? <div className="userUploadedMedia">{
-            
-            mediaFiles ? mediaFiles.map((media,indexMedia) => {
-              
-              (/\.png$/.test(media) || /\.jpg$/.test(media)) ?
-                <img key={indexMedia} className="secondLayer" src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
+          !textBeingEdited ? 
+          <div className="userUploadedMedia">
+            {   
+            mediaFiles ? 
+            mediaFiles.map((media) => {
+              return (media.endsWith(".png") || media.endsWith(".jpg")) ?
+                <img key={1} className="secondLayer" src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
                 : (
-                  (/\.mp4$/.test(media) || /\.mov$/.test(media)) ?
-                    <video key={indexMedia} className="secondLayer" controls><source src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />Your browser does not support the video tag.</video> : null)
-            }) : null
-          }
+                  (media.endsWith(".mp4") || media.endsWith(".MP4") || media.endsWith(".mov")) ?
+                    <video key={1} className="secondLayer" controls>
+                      <source src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
+                    </video> : "Your browser does not support showing this")
+              }) : null
+            }
             {
-              mediaUrl ? <iframe className="secondLayer" src={`https://www.youtube.com/embed/${mediaUrl}?enablejsapi=1&modestbranding=1`} frameBorder={0} allowFullScreen></iframe> : null
+              mediaUrl ? 
+              <iframe className="secondLayer" src={`https://www.youtube.com/embed/${mediaUrl}?enablejsapi=1&modestbranding=1`} frameBorder={0} allowFullScreen></iframe>
+              : null
             }
           </div> : null
         }
@@ -161,19 +168,19 @@ const PostForm = ({socket, contentID, picToken, profilePicType, categoryType, ti
                 })
               }}
             />
+              {
+                !itsReply && !itsComment ?
+                  <>
+                    <input type="button" value="Share" className="secondLayer" />
+    
+                  </> : null
+              }
             {
               !itsReply ?
                 <input type="button" value={`View ${itsComment ? "Replies" : "Comments"}`} className="secondLayer"
                   onClick={() =>  ShowCommentsFunc(socket, contentID, true, itsComment) }
                 />
                 : null
-            }
-            {
-              !itsReply && !itsComment ?
-                <>
-                  <input type="button" value="Share" className="secondLayer" />
-  
-                </> : null
             }
             {
               !itsReply ?

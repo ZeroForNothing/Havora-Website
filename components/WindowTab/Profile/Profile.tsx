@@ -2,15 +2,14 @@ import { Field, Formik } from "formik"
 import { InputField } from '../../fields/InputField'
 import styles from '../../../styles/WindowTab/Profile.module.css'
 import { useState, useRef, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { ShowError } from "../../fields/error"
 import axios from "axios"
 import PostForm from '../../fields/PostForm'
+import moment from "moment"
 
 export default function ProfileTab({userEmail , ...props}) {
   
-  const dispatch = useDispatch();
-
   const [mainNav, SetMainNav] = useState(true);
   const [postNav, SetPostNav] = useState(false);
   const [editProfileNav, SetEditProfileNav] = useState(false);
@@ -26,9 +25,9 @@ export default function ProfileTab({userEmail , ...props}) {
   let [CommentsView, SetComments] = useState(null);
   let [RepliesView, SetReplies] = useState(null);
   
-  const [loadMorePosts, SetLoadMorePosts] = useState(true);
-  const [loadMoreComments, SetLoadMoreComments] = useState(true);
-  const [loadMoreReplies, SetLoadMoreReplies] = useState(true);
+  let [JustScrolledToBottomPost , SetJustScrolledToBottomPost] = useState(false)
+  let [JustScrolledToBottomComment , SetJustScrolledToBottomComment] = useState(false)
+  let [JustScrolledToBottomReply , SetJustScrolledToBottomReply] = useState(false)
 
   let [showComments, SetShowComments] = useState(true)
   let [showReplies, SetShowReplies] = useState(false)
@@ -40,6 +39,10 @@ export default function ProfileTab({userEmail , ...props}) {
   const commentPrevListRef = useRef(null)
   const replyPrevListRef = useRef(null)
 
+  const [oldPassword,SetOldPassword] = useState(false)
+  const [newPassword,SetNewPassword] = useState(false)
+  const [confPassword,SetConfPassword] = useState(false)
+  
   const [CurrentPostViewing, SetCurrentPostViewing] = useState(null)
   const [CurrentCommentViewing, SetCurrentCommentViewing] = useState(null)
   
@@ -53,13 +56,26 @@ export default function ProfileTab({userEmail , ...props}) {
   let [CurrentProfile, SetCurrentProfile] = useState<Profile>(null)
   let [picToken, SetPicToken] = useState('')
 
-  let [WaitingForPost , SetWaitingForPost] = useState(true)
-  let [WaitingForComment , SetWaitingForComment] = useState(true)
-  let [WaitingForReply , SetWaitingForReply] = useState(true)
-  let WaitingForPostRef = useRef(WaitingForPost)
-  let WaitingForCommentRef = useRef(WaitingForComment)
-  let WaitingForReplyRef = useRef(WaitingForReply)
+  let [WaitingForPost,SetWaitingForPost] = useState(true)
+  let [WaitingForComment,SetWaitingForComment] = useState(true)
+  let [WaitingForReply,SetWaitingForReply] = useState(true)
 
+  //const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,4}))$/;    
+  //const strongPasswordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+  //const mediumPasswordRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})");
+
+  //const nameRegex = new RegExp("^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$");
+
+  let [UserInformation, SetUserInformation] = useState<UserInformation>(null)
+
+  type UserInformation = {
+    firstName: string,
+    lastName: string,
+    username: string,
+    email: string,
+    gender: number,
+    date: string
+  }
 
   type Profile = {
     picToken: string,
@@ -73,6 +89,7 @@ export default function ProfileTab({userEmail , ...props}) {
 
   useEffect(() => {
     if (socket) {
+      socket.emit('showUserProfile')
       socket.on('setProfileData', (data) => {
         SetCurrentProfile({
           name: data.username,
@@ -83,10 +100,27 @@ export default function ProfileTab({userEmail , ...props}) {
           friendRequest: data.friendRequest,
           myRequest: data.myRequest
         });
+        SetWaitingForPost(true);
+        socket.emit('getProfileTopPosts',{
+          profileName : data.username,
+          profileCode : data.userCode,
+          page : 1
+        })
       })
       socket.on('createProfileComment', function(data) {
         let newArr = {socket, id: data.id, picToken : user.picToken, picType : user.profilePicType, text : data.text, username : user.name, userCode : user.code, name: user.name, code : user.name, date : data.date, count : 0, agree : 0, disagree : 0, interact : 0}
-          SetReplies(oldArray => [newArr, ...oldArray]);
+
+        if(data.itsComment){
+          SetCommentPage(commentCurrentPage);
+          commentPrevListRef.current = commentPrevListRef.current ? [newArr].concat(commentPrevListRef.current) : [newArr];
+          commentPrevListRef.current.length > 1 ? SetComments(oldArray => [newArr, ...oldArray]) :  SetComments(commentPrevListRef.current);
+        }
+        else{
+          SetReplyPage(commentCurrentPage);
+          replyPrevListRef.current = replyPrevListRef.current ? [newArr].concat(replyPrevListRef.current) : [newArr];
+          replyPrevListRef.current.length > 1 ? SetReplies(oldArray => [newArr, ...oldArray]) :  SetReplies(replyPrevListRef.current);
+        }
+          
         document.getElementsByClassName("WindowTab")[0].scrollTo({
           top: 0,
           left: 0,
@@ -94,30 +128,24 @@ export default function ProfileTab({userEmail , ...props}) {
         });
       })
       socket.on('getProfileTopPosts', function (data) {
-        if (data.postsList != null) {
-          let postsList = JSON.parse(data.postsList)
 
+        SetWaitingForPost(false) 
+
+        if (data == null || !data.postsList) return;
+
+          let postsList = JSON.parse(data.postsList)
           SetPostPage(data.page)
-          
-          SetWaitingForPost(false)
-          WaitingForPostRef.current = false;
           
           let contentList = data.page != 6 ? postPrevListRef.current : null
           postPrevListRef.current = contentList? contentList.concat(postsList) : postsList
           SetPosts(postPrevListRef.current);
-          SetLoadMorePosts(postsList.length > 4)
-        } else {
-          postPrevListRef.current = null;
-          SetPosts(null);
-          SetLoadMorePosts(false)
-        }
+          SetJustScrolledToBottomPost(false)
       })
       socket.on('getProfileTopComments', function (data) {
         let postID = data.postID;
         let commentID = data.commentID;
         let commentsList = JSON.parse(data.commentsList);
-        let count = commentsList ? commentsList.length : 0;
-        console.log(data)
+
         SetMainNav(false);
         SetPostNav(true);
         ShowCreateComment(!data.onlyView)
@@ -125,27 +153,25 @@ export default function ProfileTab({userEmail , ...props}) {
         SetShowComments(postID ? true : false)
         SetShowReplies(commentID ? true : false)
 
+        SetWaitingForComment(false) 
+        SetWaitingForReply(false)
+
         if(!commentsList) return;
         if (postID) {
           SetCurrentPostViewing(postID ? postID : commentID);
           SetCommentPage(data.page)
-          SetWaitingForComment(false)
-          WaitingForCommentRef.current = false
-
           let contentList = data.page != 6 ? commentPrevListRef.current : null
           commentPrevListRef.current = contentList? contentList.concat(commentsList) : commentsList
           SetComments(commentPrevListRef.current)
-          SetLoadMoreComments(count > 4)
+          SetJustScrolledToBottomComment(false)
         } 
         else if (commentID) {
           SetCurrentCommentViewing(commentID)
           SetReplyPage(data.page)
-          SetWaitingForReply(false)
-          WaitingForReplyRef.current = false;
           let contentList = data.page != 6 ? replyPrevListRef.current : null
           replyPrevListRef.current = contentList? contentList.concat(commentsList) : commentsList
           SetReplies(replyPrevListRef.current)
-          SetLoadMoreReplies(count > 4)
+          SetJustScrolledToBottomReply(false)
         }
       })
       socket.on('saveContent', function(data) {
@@ -270,6 +296,68 @@ export default function ProfileTab({userEmail , ...props}) {
           ShowError("User not signed in")
         }
       })
+      socket.on("editPassword", function(error) {
+        SetOldPassword(false);
+        SetNewPassword(false);
+        SetConfPassword(false);
+        if (error == null) {
+          alert("Success changing password")
+        } else {
+          let text = '';
+          if (error == 1){
+            text = "All fields must be filled and at least 8 characters"
+            SetOldPassword(false);
+            SetNewPassword(false);
+            SetConfPassword(false);
+          }
+          else if (error == 2) {
+            text = "Old password is Incorrect"
+            SetOldPassword(true)
+          }
+          else if (error == 3){
+            text = "New Password must be different than old password"
+            SetNewPassword(false)
+          }
+          else if (error == 4){
+            text = "Confirmation Password doesn't match"
+            SetConfPassword(false)
+          }
+          else {
+            text = "Something went wrong. Try refreshing page";
+          }
+          ShowError(text)
+        }
+      })
+      socket.on('editProfileInfo', function(data) {
+        console.log(data)
+        if (data.error == null) {
+          alert("Profile edited successfully")
+        } else {
+          let text = ''
+          if (data.error == 1) {
+            text = "One of the fields is empty"
+          } else {
+            text = "Error connection. Check with support"
+          }
+          ShowError(text)
+        }
+      })
+    
+      socket.on('getUserInformation', function(data) {
+   
+        if (data != null) {
+          SetUserInformation({
+            firstName: data.firstname,
+            lastName: data.lastname,
+            username: data.username,
+            email: data.email,
+            gender: data.gender,
+            date: moment(data.birthDate).format('YYYY-MM-DD')
+          })
+        } else {
+          ShowError("Couldn't get user information")
+        }
+      })
       SetPicToken(user.picToken)
     }
   }, [socket]);
@@ -277,28 +365,29 @@ export default function ProfileTab({userEmail , ...props}) {
   const handleContentScroll = (e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
 
-    if(!bottom) return; 
-    if(mainNav && WaitingForPostRef) {
-      SetWaitingForPost(true)
-      WaitingForPostRef.current = true;
-      socket.emit('getProfileTopPosts',{
-        profileName : CurrentProfile.name,
-        profileCode : CurrentProfile.code,
-        page : postCurrentPage
-      })
+    if(!bottom) return;
+    
+    if(mainNav && !WaitingForPost && !JustScrolledToBottomPost) {
+      SetWaitingForPost(true);
+      SetJustScrolledToBottomPost(true)
+        socket.emit('getProfileTopPosts',{
+          profileName : CurrentProfile.name,
+          profileCode : CurrentProfile.code,
+          page : postCurrentPage
+        })
     } else if (postNav) {
-      if(showComments && WaitingForCommentRef){
+      if(showComments && !WaitingForComment && !JustScrolledToBottomComment){
         SetWaitingForComment(true)
-        WaitingForCommentRef.current = true;
+        SetJustScrolledToBottomComment(true)
         socket.emit('getProfileTopComments', {
           contentID: CurrentPostViewing ,
           page : commentCurrentPage ,
           itsComment: showComments,
           onlyView : true
         })
-      }else if(showReplies && WaitingForReplyRef){
-        SetWaitingForReply(true);
-        WaitingForReplyRef.current = true;
+      }else if(showReplies && !WaitingForReply && !JustScrolledToBottomReply){
+        SetWaitingForReply(true)
+        SetJustScrolledToBottomReply(true)
         socket.emit('getProfileTopComments', {
           contentID: CurrentCommentViewing,
           page : replyCurrentPage,
@@ -314,6 +403,7 @@ export default function ProfileTab({userEmail , ...props}) {
     e.preventDefault();
     SetMainNav(false)
     SetEditProfileNav(true)
+    socket.emit('getUserInformation');
   };
   const ShowEditPassword = e => {
     e.preventDefault();
@@ -449,7 +539,6 @@ export default function ProfileTab({userEmail , ...props}) {
                   onClick={ShowEditProfile}
                 />
             }
-            <input type="button" className={`${styles.matchHistory}`} />
             <input type="button" className={`${styles.profilePosts} pickedInput`} />
           </> : null
         }
@@ -458,40 +547,36 @@ export default function ProfileTab({userEmail , ...props}) {
             <input type="button" className={`${styles.ReturnBack}`}
               onClick={ReturnToProfile}
             />
-            <input type="button" className={`${styles.editPic}`}
+            <input type="button" className={`${styles.editPic} ${editPic ? "pickedInput" : null}`}
               onClick={ShowEditPic}
             />
-            <input type="button" className={`${styles.editInfo}`}
+            <input type="button" className={`${styles.editInfo} ${editInfo ? "pickedInput" : null}`}
               onClick={ShowEditInfo}
             />
-            <input type="button" className={`${styles.changePass}`}
+            <input type="button" className={`${styles.changePass} ${editPassword ? "pickedInput" : null}`}
               onClick={ShowEditPassword}
             />
           </> : null
         }
         {
           postNav ? <>
-            {
-              showComments ? <input type="button" className={`${styles.ReturnBack}`}
-                onClick={BackFromComments}
-              /> : null
-            }
-            {
-              showReplies ? <input type="button" className={`${styles.ReturnBack}`}
-                onClick={ BackFromReplies}
-              /> : null
-            }
-            {
-              !showCreateComment ? <input type="button" className={`${styles.showCreateComment}`}
-                onClick={() => {ShowCreateComment(true)}}
-              /> : null
-            }
+            <input type="button" className={`${styles.ReturnBack}`}
+                onClick={ showComments ? BackFromComments : showReplies ? BackFromReplies : null}
+              />
           </> : null
         }
       </div>
       <div className={`contentContainer`} onScroll={handleContentScroll}>
         {
           mainNav ? <>
+            <input type="button" value=""  className={`mainButton pickedInput ${styles.CreateContent}`} onClick={()=>{ 
+              socket.emit("startCreatingPost", { 
+                type : user.name === CurrentProfile.name && user.code === CurrentProfile.code ? 1 : 3,
+                username : CurrentProfile.name,
+                userCode : CurrentProfile.code
+              })
+            }}/>
+
             <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
               <div className={`${"secondLayer"} ${styles.userDataPosition}`}>
                 <div className={`${"secondLayer"} ${styles.profPic}`} style={{ backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}}></div>
@@ -507,14 +592,22 @@ export default function ProfileTab({userEmail , ...props}) {
                   return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
                 })
                 : (
-                  loadMorePosts ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No posts yet</div> : "loading content"
+                  <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`No posts yet`}</div>
                 )
+              }
+              {
+               WaitingForPost ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`Loading posts`}</div> : null
               }
             </div>
           </> : null
         }
         {
           postNav ? <>
+            {
+              !showCreateComment ? <input type="button" className={`${styles.CreateContent} mainButton pickedInput`}
+                onClick={() => {ShowCreateComment(true)}}
+              /> : null
+            }
             {showComments ? 
               <>
                  {
@@ -523,8 +616,11 @@ export default function ProfileTab({userEmail , ...props}) {
                       return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
                     }) 
                     : 
-                      loadMoreComments ?  <div className={`${"secondLayer"} ${styles.loadingContent}`}>No comments yet</div> : "loading content"
+                      <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`No posts yet`}</div>
                   } 
+                  {
+                    WaitingForComment ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`Loading comments`}</div> : null
+                  }
               </>
              : null}
             {
@@ -534,10 +630,11 @@ export default function ProfileTab({userEmail , ...props}) {
                   RepliesView.map(data=>{  
                     return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryType={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
                   }) 
-                  : (
-                    loadMoreReplies ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>No replies yet</div> : "loading content"
-                  )
+                  : <div className={`${"secondLayer"} ${styles.loadingContent}`}>No replies yet</div>
                 }
+                {
+                    WaitingForReply ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`Loading replies`}</div> : null
+                  }
             </>  : null
             }
             {
@@ -593,45 +690,52 @@ export default function ProfileTab({userEmail , ...props}) {
             }
             {
               editPassword ? <>
-                <div>
-                  <label htmlFor="oldPassword">Old Password</label>
-                  <input type="password" placeholder="Type your password..." id="oldPasswordEditProfile" />
-                </div>
-                <div>
-                  <label htmlFor="newPassword">New Password</label>
-                  <input type="password" placeholder="ex. bG0J5GW2g^16%klm" id="newPasswordEditProfile" />
-                </div>
-                <div>
-                  <label htmlFor="confPassword">Confirm Password</label>
-                  <input type="password" placeholder="Re-type your password..." id="confPasswordEditProfile" />
-                </div>
-                <input type="button" value="Save" />
+                <Formik onSubmit={(values) => {  }} initialValues={{
+                  oldPassword: "",
+                  newPassword: "",
+                  confPassword: ""
+                }}>{({ values }) => (
+                  <form className={`${styles.formContainer}`}>
+                    
+                      
+                        <label>Old Password</label>
+                        <Field name="oldPassword" type="password" placeholder="Type your password..." maxLength={50} component={InputField}  errorState={oldPassword}/>
+                      
+                        <label>New Password</label>
+                        <Field name="newPassword" type="password" placeholder="ex. bG0J5GW2g^16%klm" maxLength={50} component={InputField} errorState={newPassword}/>
+
+                        <label>Confirm Password</label>
+                        <Field name="confPassword" type="password" placeholder="Re-type your new password..." maxLength={50} component={InputField} disabled={false}  errorState={confPassword}/>
+
+                        <input type="button" value=""  className={`mainButton pickedInput ${styles.saveProfileData}`} onClick={()=>{ 
+                          socket.emit("editPassword", {
+                            oldPassword: values.oldPassword,
+                            confPassword: values.confPassword,
+                            newPassword: values.newPassword
+                          }); 
+                      }}/>
+                  </form>
+                )}</Formik>
               </> : null
             }
             {
               editInfo ?
-                <Formik onSubmit={(values) => { {/*EditUser(values) */ } }} initialValues={{
-                  firstName: "asd",
-                  lastName: "asd",
-                  username: "asd",
-                  email: userEmail,
-                  gender: "1",
-                  year: "",
-                  month: "1",
-                  day: "1"
-                }}>{({ handleSubmit }) => (
-                  <form id="myForm"  className={`${styles.formContainer}`} onSubmit={handleSubmit}>
-                    
-                      
+                <Formik onSubmit={(values) => {  }} initialValues={{
+                  firstName: UserInformation.firstName,
+                  lastName: UserInformation.lastName,
+                  username: UserInformation.username,
+                  email: UserInformation.email,
+                  gender: UserInformation.gender,
+                  date: UserInformation.date
+                }}>{({ values }) => (
+                  <form className={`${styles.formContainer}`}>
+
                         <label htmlFor="firstName">First Name</label>
                         <Field name="firstName" type="text" placeholder="ex. Axel" maxLength={26} component={InputField} />
                       
                         <label htmlFor="lastName">Last Name</label>
                         <Field name="lastName" type="text" placeholder="ex. Brock" maxLength={26} component={InputField} />
-                      
-                   
 
-                    
                         <label htmlFor="email">Email</label>
                         <Field name="email" type="email" placeholder="ex. whatever@whatever.com" maxLength={50} component={InputField} disabled />
                       
@@ -639,49 +743,18 @@ export default function ProfileTab({userEmail , ...props}) {
                         <Field name="username" type="text" placeholder="ex. DevilsDontCry" maxLength={26} component={InputField} />
                       
                     
-                    {/* <div className={`${styles.divContainer}`}>
-              <label htmlFor="password">Password</label>
-              <Field name="password" type="password" placeholder="ex. bG0J5GW2g^16%klm" maxLength={50} component={InputField} />
-              <label htmlFor="confPassword">Confirm Password</label>
-              <Field name="confPassword" type="password" placeholder="Re-type password..." maxLength={50} component={InputField} />
-            </div> */}
-                    
-                      <label className="title">Pick your Gender</label>
-                      <div>
-                        
-                          <label id="maleLabel" htmlFor="male" className={`${"secondLayer"} ${"pickedInput"} ${styles.radioLabel} `}>Male</label>
-                          <Field type="radio" id="male" name="gender" onClick={() => { {/*SetGender(false) */ } }} className={styles.radioInput} value={1} />
-                     
-                        
-                          <label id="femaleLabel" htmlFor="female" className={`${"secondLayer"} ${styles.radioLabel} `} style={{ float: "right" }}>Female</label>
-                          <Field type="radio" id="female" name="gender" onClick={() => { {/*SetGender(true) */ } }} className={styles.radioInput} value={0} />
-                        
+                      <label className="title">Gender</label>
+                      <div  className={`${styles.radioContainer} `}>
+                        <label htmlFor="male" className={`${"secondLayer"} ${values.gender == 1 ? "pickedInput" : null} ${styles.radioLabel} `}>Male</label>
+                        <Field type="radio" id="male" name="gender" className={styles.radioInput} value={1} />
+                        <label htmlFor="female" className={`${"secondLayer"} ${values.gender == 0 ? "pickedInput" : null} ${styles.radioLabel} `}>Female</label>
+                        <Field type="radio" id="female" name="gender" className={styles.radioInput} value={0} />
                       </div>
+
                       <label>Birth Date</label>
-                      <div className={styles.dateDiv}>
-                        <Field as="select" name="year" className={styles.dateList} id="year" >
-                          <option hidden>Year</option>
-                        </Field>
-                        <Field as="select" name="month" className={styles.dateList} id="month">
-                          <option value="1">Jan</option>
-                          <option value="2">Feb</option>
-                          <option value="3">Mar</option>
-                          <option value="4">Apr</option>
-                          <option value="5">May</option>
-                          <option value="6">Jun</option>
-                          <option value="7">Jul</option>
-                          <option value="8">Aug</option>
-                          <option value="9">Sep</option>
-                          <option value="10">oct</option>
-                          <option value="11">Nov</option>
-                          <option value="12">Dec</option>
-                        </Field>
-                        <Field as="select" name="day" className={styles.dateList} id="day" >
-                          <option hidden>Day</option>
-                        </Field>
-                      </div>
-                    
-                    <input type="button" value="Save"  className={`pickedInput ${styles.saveProfileData}`}/>
+                      <Field type="date" name="date" className={styles.dateList}></Field>
+
+                    <input type="button" value=""  className={`mainButton pickedInput ${styles.saveProfileData}`} onClick={()=>{socket.emit('editProfileInfo', values)}}/>
                   </form>
                 )}</Formik>
                 : null

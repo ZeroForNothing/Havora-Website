@@ -13,7 +13,6 @@ export default function signup() {
       fetchAPI('/CreateUser', data)
         .then(dataD => {
           if (dataD.error != null){
-            console.log(dataD);
             ShowError(dataD.error)
           }
           else window.location.href = "/"

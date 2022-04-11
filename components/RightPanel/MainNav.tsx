@@ -25,7 +25,7 @@ export default function MainNav(){
                 <input type="button" id="AccountLink" className={`${`WindowButton`} ${styles.AccountLink}`} onClick={OpenWindow} />
                 <input type="button" id="Community" className={`${`WindowButton`} ${styles.community}`} onClick={OpenWindow} />
                 <input type="button" id="Profile" className={`${`WindowButton`} ${styles.profile}`} onClick={OpenWindow} />
-                <input type="button" id="Post" className={`${`WindowButton`} ${styles.Post}`} onClick={OpenWindow} />
+                {/* <input type="button" id="Post" className={`${`WindowButton`} ${styles.Post}`} onClick={OpenWindow} /> */}
                 <input type="button" id="MusicPlayer" className={`${`WindowButton`} ${styles.MusicPlayer}`} onClick={OpenWindow} />
                 <input type="button" id="Store" className={`${`WindowButton`} ${styles.store}`} onClick={OpenWindow} />
                 <input type="button" id="Lobby" className={`${`WindowButton`} ${styles.lobby}`} onClick={OpenWindow} />

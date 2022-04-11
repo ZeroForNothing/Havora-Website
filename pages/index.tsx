@@ -43,10 +43,11 @@ const Index = ({ user })=> {
               let selectedButton = document.getElementById(window);
               let allButtons = document.getElementsByClassName("WindowButton");
               
-              for (let i = 0; i < allButtons.length; i++) 
-              allButtons[i].classList.remove("pickedInput");
-              
-              selectedButton.classList.add("pickedInput");
+              if(window !== "Post"){
+                for (let i = 0; i < allButtons.length; i++) 
+                  allButtons[i].classList.remove("pickedInput");
+                selectedButton.classList.add("pickedInput");
+              }
               
               SetHomeTab(false)
               SetProfileTab(false)
@@ -64,7 +65,7 @@ const Index = ({ user })=> {
         <Layout title="Zero for Nothing">
           <MainNav />
           <FriendsList />
-          <div className={`WindowTab`}>
+          <div id="WindowTab" className={`WindowTab`}>
             { homeTab ? <HomeTab /> : null }
             { profileTab ? <ProfileTab userEmail={user.email}/> : null }
             { postTab ? <PostTab /> : null }
