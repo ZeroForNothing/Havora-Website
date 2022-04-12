@@ -355,10 +355,10 @@
     background-image: url("../../sharedComponents/Media/backArrow.png");
   }
   .showCreateComment{
-    background-image: url("../../sharedComponents/Media/createPost.png");
+    background-image: url("../../sharedComponents/Media/create.png");
   }
   .CreateContent{
-    background-image: url("../../sharedComponents/Media/createPost.png");
+    background-image: url("../../sharedComponents/Media/create.png");
   }
   .formContainer{
     width: 96%;

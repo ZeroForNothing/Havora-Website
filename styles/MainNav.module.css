@@ -332,7 +332,7 @@
   
   .Post {
     background-size: 37px !important;
-    background-image: url(../sharedComponents/Media/createPost.png);
+    background-image: url(../sharedComponents/Media/create.png);
   }
   .AccountLink{
     background-image: url("../sharedComponents/Media/AccountLink.png");

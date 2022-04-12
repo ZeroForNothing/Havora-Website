@@ -16,7 +16,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType, categoryType, ti
                 : categoryType == 7 ? categoryType = "Feature Request"
                   : null
 
-    console.log(mediaFiles)
+
     return (
       <div className="postContainer borderColor">
         {
@@ -66,14 +66,14 @@ const PostForm = ({socket, contentID, picToken, profilePicType, categoryType, ti
           <div className="userUploadedMedia">
             {   
             mediaFiles ? 
-            mediaFiles.map((media) => {
+            mediaFiles.map((media , index) => {
               return (media.endsWith(".png") || media.endsWith(".jpg")) ?
-                <img key={1} className="secondLayer" src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
+                <img key={index} className="secondLayer" src={`localhost/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
                 : (
                   (media.endsWith(".mp4") || media.endsWith(".MP4") || media.endsWith(".mov")) ?
-                    <video key={1} className="secondLayer" controls>
-                      <source src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
-                    </video> : "Your browser does not support showing this")
+                    <video key={index} className="secondLayer" controls>
+                      <source src={`http://localhost/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
+                    </video> : null)
               }) : null
             }
             {

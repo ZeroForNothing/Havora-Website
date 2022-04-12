@@ -86,7 +86,6 @@ export default function ProfileTab({userEmail , ...props}) {
     friendRequest: number,
     myRequest: number
   }
-
   useEffect(() => {
     if (socket) {
       socket.emit('showUserProfile')
