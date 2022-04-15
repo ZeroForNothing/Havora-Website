@@ -19,10 +19,12 @@ export const InsertYoutubeUrl = (e ,youtubeIFrame) => {
         HideError()
         frameDoc.src = 'https://www.youtube.com/embed/' + match[2] + '?enablejsapi=1&modestbranding=1';
         frameDoc.style.display = 'inline-block'
+        return true
       } else {
         ShowError("Invalid Youtube Url")
-          frameDoc.src = 'about:blank';
-          frameDoc.style.display = 'none'
+        frameDoc.src = 'about:blank';
+        frameDoc.style.display = 'none'
+        return false
       }
     }
     if(url.trim().length < 1) HideError()

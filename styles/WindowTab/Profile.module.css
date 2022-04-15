@@ -1,103 +1,5 @@
-.profileView {
-    display: none;
-  }
-.ProfileTab{
-  padding: 14px;
-}
-  .profilePanel {
-    padding: 40px;
-    display: none;
-  }
-  .selectedProfileButton {
-    border-bottom-color: grey !important;
-  }
-  .loadingContent {
-    user-select: none;
-    display: table;
-    font-size: 25px;
-    text-align: center;
-    margin: 20px auto;
-    padding: 16px 44px;
-    border-radius: 5px;
-  }
-  .editProfileDiv {
-    margin-bottom: 20px;
-  }
-  
-  .editProfileDiv input {
-    cursor: pointer;
-    width: 25%;
-    font-size: 20px;
-    margin-right: 3%;
-    padding: 2% 0%;
-    border: 0px;
-    border-bottom: 3px solid transparent;
-    outline: none;
-  }
-  
-  .editProfileDiv input:last-child {
-    margin-right: 0;
-  }
-  
-  .profilePanel div {
-    width: 94%;
-    display: inline-block;
-    margin-bottom: 20px;
-    padding: 20px 3%;
-    border-radius: 5px;
-    border-radius: 5px;
-  }
-  
-  .profilePanel div label{
-    width: 97%;
-    min-width: 150px;
-    user-select: none;
-    margin: auto;
-    margin-bottom: 10px;
-    display: block;
-    font-size: 20px;
-  }
-  
-  .profilePanel div input:focus {
-    border: 2px solid #0000001f;
-  }
-  
-  .profilePanel div input {
-    min-width: 45%;
-    border-radius: 6px;
-    outline: none;
-    float: left;
-    clear: left;
-    width: 94%;
-    border: 2px solid transparent;
-    padding: 12px 3%;
-    font-size: 20px;
-  }
-  
-  .profilePanel div textarea:focus {
-    border: 2px solid #0000001f;
-  }
-  
-  .profilePanel div textarea {
-    border-radius: 6px;
-    width: 93%;
-    resize: none;
-    outline: none;
-    border: 2px solid transparent;
-    padding: 2% 3%;
-    font-size: 20px;
-  }
-  
-  .profilePanel div input[type='button']:focus {
-    border: none;
-  }
-  
-  .inputGroup {
-    display: block;
-    margin: 10px 0;
-    position: relative;
-  }
-  
+
+
   .radioLabel{
     border-radius: 5px;
     padding: 2% 3%;
@@ -113,12 +15,6 @@
     display: flex;
     justify-content: space-between;
   }
-  .dateDiv {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%
-  }
 
   .dateList {
     -moz-text-align-last: center;
@@ -133,40 +29,35 @@
   }
   
   .saveProfileData {
-    margin: 0 !important;
     background-image: url("../../sharedComponents/Media/save.png");
   }
   .editPicContainer{
     display: flex;
     align-items: center;
-    width: 92%;
-    padding: 4%;
+    width: 100%;
     justify-content: space-between;
+    max-width: 600px;
+    margin:0 auto;
+    margin-bottom:20px
   }
   .editPicContainer label{
     padding: 15px 12px;
-    width: 250px;
+    width: 126px;
     text-align: center;
     border-radius: 5px;
     cursor: pointer;
   }
-  .profPicContianer {
-    margin: 0 !important;
-  }
-  
-  .profPicContianer div {
-    margin: auto;
-    float: none;
-  }
   
   .headerView {
-    height: 360px;
-    padding: 10px;
+    height: 254px;
     border-radius: 5px;
     position: relative;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
   }
   
   .wallpaperPic {
@@ -190,33 +81,7 @@
     min-width: 174px;
   }
   
-  
-  #successSavingPassword {
-    display: none;
-    padding: 3%;
-    border-radius: 6px;
-    width: 94%;
-    margin-bottom: 3%;
-    text-align: center;
-    font-size: 18px;
-  }
-  
-  .takenUserOrEmail p {
-    border-radius: 6px;
-    padding: 2% 0%;
-    margin: 0;
-    margin-top: 2%;
-  }
-  
-  .takenUserOrEmail {
-    display: none;
-    padding: 3%;
-    border-radius: 6px;
-    width: 94%;
-    margin-bottom: 3%;
-    text-align: center;
-    font-size: 18px;
-  }
+
   .profPic {
     background-size: cover;
     background-repeat: no-repeat;
@@ -226,9 +91,7 @@
     border-radius: 5px;
     float: left;
   }
-  .createCommentContainer{
-    display: none;
-  }
+ 
   .userInfoContainer {
     margin-left: 15px;
     margin-right: 10px;
@@ -277,59 +140,7 @@
   .unFriendRelation {
     background-image: url("../../sharedComponents/Media/removePlayer.png");
   }
-  
-  .loadingProfile span {
-    position: absolute;
-    bottom: 17%;
-    font-size: 30px;
-    text-align: center;
-    width: 100%;
-  }
-  
-  #EditUserPicPanel label {
-    font-size: 21px;
-    cursor: pointer;
-    margin: 0;
-    text-align: center;
-    width: unset;
-    padding: 10px 16px;
-    border-radius: 5px;
-  }
-  
-  #EditUserPicPanel div {
-    position: relative;
-    margin-bottom: 0
-  }
-  
-  .EditUserProfilePicDiv {
-    width: 47%;
-    height: 100%;
-    float: right;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
-  }
-  
-  .EditUserProfilePicDiv input {
-    width: 70px;
-    cursor: pointer;
-    display: none;
-  }
-  
-  .EditUserProfilePicDiv span {
-    display: none;
-    font-size: 21px;
-  }
-  
-  #EditUserProfilePicContainer, #EditUserWallpaperPicContainer {
-    height: 174px;
-  }
-  
-  
-  .ViewingFriendProfile input {
-    height: 24% !important;
-  }
+
 
   .profilePosts {
     background-image: url(../../sharedComponents/Media/postView.png);
@@ -351,20 +162,10 @@
     background-image: url("../../sharedComponents/Media/passwordConf.png");
   }
   
-  .ReturnBack {
-    background-image: url("../../sharedComponents/Media/backArrow.png");
-  }
-  .showCreateComment{
-    background-image: url("../../sharedComponents/Media/create.png");
-  }
-  .CreateContent{
-    background-image: url("../../sharedComponents/Media/create.png");
-  }
   .formContainer{
     width: 96%;
     max-width: 600px;
-    margin: auto;
-    margin-top: 40px;
+    margin: 0 auto;
   }
   .formContainer :is(input,select){
     margin-bottom: 30px;

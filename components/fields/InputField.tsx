@@ -1,10 +1,9 @@
-import { FieldProps } from "formik"
-import React, { DetailedHTMLProps, InputHTMLAttributes } from "react"
+import React from "react"
 
-type InputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement> , HTMLInputElement>
-// export const InputField = ({ field  , errorState , ...props }: FieldProps & InputProps)=>{
-export const InputField = ({ field  , errorState , ...props }: any)=>{
+export const InputField = ({ field  , errorState , icon, ...props }: any)=>{
     return (
-        <input {...field} {...props} className={`${"secondLayer"} ${"borderColor"} ${"InputField"} ${errorState ? 'inputError' : null}`}/>
+        <input {...field} {...props} 
+        className={`secondLayer borderColor inputIcon InputField ${errorState ? 'inputError' : ' '} ${ icon === 'search' ? 'searchIcon' : ' ' }`}
+        autoComplete={`off`}/>
     )
 }

@@ -4,31 +4,17 @@
 .PostContainer{
   max-width: 600px;
   margin: auto;
+  width: 100%;
   margin-top: 40px;
 }
 .postType{
   width: 100%;
   border-bottom: 1px solid;
   font-size: 28px;
-  padding-bottom: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
 }
-.mainNav{
-  position: absolute;
-  bottom: 30px;
-  right: 30px;
-  display: flex;
-  flex-direction: column;
-}
-.mainNav :is(input[type=button], label){
-  height: 64px;
-  width: 64px;
-  margin-top: 14px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 36px;
-  cursor: pointer;
-  border-radius: 50%;
-}
+
   .divContainer {
     display: flex;
     flex-direction: row;
@@ -52,7 +38,7 @@
   .mediaUrlPostDiv {
     text-align: center;
     width: 100%;
-    margin-top: 14px;
+    margin-top: 20px;
   }
   .mediaUrlPostDiv iframe{
     display: none;
@@ -61,20 +47,9 @@
     margin-top: 14px;
     border-radius: 5px;
   }
-  .mediaUrlPostDiv input{
-    width: 95%;
-    font-size: 18px;
-    padding: 14px 2%;
-    border-radius: 5px;
-  }
+
 .PostContainer textarea {
-  outline: none;
-  width: 94.4%;
-  padding: 14px;
-  border-radius: 5px;
-  font-size: 18px;
-  resize: none;
-  margin-top: 14px;
+margin-top: 20px;
 }
 
 .discard{
@@ -96,15 +71,15 @@
   height: 264px;
 }
 .mediaFileDetails{
-  width: 96%;
+  width: 100%;
   display: flex;
   max-height: 200px;
   flex-direction: row-reverse;
   justify-content: space-between;
   padding: 2%;
-  border:2px solid;
+  border: 2px solid;
   border-radius: 5px;
-  margin-top: 14px;
+  margin-top: 20px;
 }
 .mediaFileDetails img {
   max-width: 46%;

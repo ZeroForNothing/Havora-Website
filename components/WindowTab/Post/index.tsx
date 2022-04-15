@@ -1,4 +1,3 @@
-import {Field, Formik} from "formik"
 import { InputField } from '../../fields/InputField'
 import styles from '../../../styles/WindowTab/Post.module.css'
 import { useState,useRef, useEffect } from 'react'
@@ -6,6 +5,7 @@ import { useSelector } from 'react-redux'
 import {InsertYoutubeUrl , checkAcceptedExtensions} from './PostData';
 import { ShowError } from '../../fields/error';
 import axios from 'axios';
+import CategorySearch  from "../../fields/CategorySearch"
 
 export default function PostTab(){
     let [mediaUrl , SetMediaUrl] = useState(false)
@@ -14,11 +14,16 @@ export default function PostTab(){
     let [PostType,SetPostType] = useState(null)
     let youtubeIFrame = useRef(null)
     let PostText = useRef(null)
-    let PostUrl = useRef(null)
+    let [PostUrl,SetPostUrl] = useState(null)
+    let [PostTitle,SetPostTitle] = useState(null)
 
     let { user } = useSelector((state: any) => state.user)
     let { socket } = useSelector((state: any) => state.socket)
     let [picToken , SetPicToken] = useState(null)
+
+    const [currentCategoryID, SetCurrentCategoryID] = useState<number>(null);
+
+
     useEffect(() => {
       if(!socket) return;
       socket.emit('fetchPostType')
@@ -40,9 +45,13 @@ export default function PostTab(){
       SetPicToken(user.picToken)
     }, [socket]);
 
-    const handleKeyUp = e =>{
+    const handlePostUrl = e =>{
       e.preventDefault();
-      InsertYoutubeUrl(e ,youtubeIFrame)
+      if(InsertYoutubeUrl(e ,youtubeIFrame)) SetPostUrl(e.target.value.trim())
+    }
+    const handlePostTitle = e =>{
+      e.preventDefault();
+      SetPostTitle(e.target.value.trim())
     }
     const ShowDetail = index => e =>{
       e.preventDefault();
@@ -117,14 +126,9 @@ export default function PostTab(){
     }
     return (  
       <>     
-      <div className={`${styles.mainNav}`}>
-        <input type="button" className={`secondLayer ${styles.discard}`}
-            onClick={()=>{ socket.emit("discardPost") }}
-            />
-
-        <input type="file" id="mediaFileInsertPost" 
-         onChange={UploadPostFile} 
-        style={{display:"none"}} />
+      <div className={`subNav`}>
+        <input type="button" className={`secondLayer ${styles.discard}`} onClick={()=>{ socket.emit("discardPost") }} />
+        <input type="file" id="mediaFileInsertPost" onChange={UploadPostFile} style={{display:"none"}} />
         <label htmlFor="mediaFileInsertPost"  className={`secondLayer ${styles.insertFile}`}></label>
         <input type="button"  className={`secondLayer ${styles.youtube}`}
             onClick={()=>{ SetMediaUrl(!mediaUrl) }}
@@ -132,8 +136,10 @@ export default function PostTab(){
         <input type="button" className={`pickedInput secondLayer ${styles.create}`}
             onClick={()=>{         
               socket.emit("createPost",{
+                  categoryType : currentCategoryID,
+                  title : PostTitle,
                   text : PostText.current ? PostText.current.value : null,
-                  url : PostUrl.current ? PostUrl.current.value : null
+                  url : PostUrl && PostUrl.trim().length != 0 ? PostUrl.trim() : null
               }) }}
         />
       </div>
@@ -142,27 +148,17 @@ export default function PostTab(){
 
             <div className={`borderColor ${styles.postType}`} >{PostType}</div>
                 {
-                  PostType === "Community Post" ? 
-                  <div className={`${styles.divContainer}`}>
-                    <input type="button" className="secondLayer pickedInput" value="General" />
-                    <input type="button" className="secondLayer" value="Ability" />
-                    <input type="button" className="secondLayer" value="Character" />
-                    <input type="button" className="secondLayer" value="Skin"/>
-                    <input type="button" className="secondLayer" value="Story" />
-                    <input type="button" className="secondLayer" value="In-Game" />
-                    <input type="button" className="secondLayer" value="Feature Request" />
-                  </div> : null
-                }
-              {
-                PostType === "Community Post" ? 
-                <InputField type="text" placeholder="Title or Topic you wana discuss" maxLength={150}/> 
-                : null
-              }   
+                  PostType === "Community Post" ? <>
+                    <CategorySearch socket={socket} currentCategoryID={currentCategoryID} SetCurrentCategoryID={SetCurrentCategoryID} fetchPosts={false}/>
+                    <InputField type="text" placeholder="Title or Topic you wana discuss" maxLength={150} onKeyUp={handlePostTitle} style={{marginTop:"20px"}}/> 
+                  </>
+                  : null
+                } 
             <div className={`${styles.divContainer}`} style={{marginTop:"0"}}>
                 {
                   mediaUrl ? 
                   <div className={`${styles.mediaUrlPostDiv}`}>
-                    <InputField type="text" ref={PostUrl} placeholder="Insert Url here" onKeyUp={handleKeyUp}/>
+                    <InputField type="text" placeholder="Insert Url here" onKeyUp={handlePostUrl}/>
                     <iframe ref={youtubeIFrame} className={`secondLayer`} typeof="text/html" frameBorder={0} allowFullScreen></iframe>
                   </div> : null
                 }
@@ -208,7 +204,7 @@ export default function PostTab(){
                     ) 
                   }) :  null}
             </div>
-            <textarea rows={8} ref={PostText} className={`secondLayer`} placeholder="Type here..."></textarea>
+            <textarea rows={8} ref={PostText} className={`secondLayer InputField`} placeholder="Type here..."></textarea>
                
         </div>
         </>

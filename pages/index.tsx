@@ -1,17 +1,20 @@
-import Layout from '../components/fields/Layout'
-import MainNav from '../components/RightPanel/MainNav'
-import FriendsList from '../components/RightPanel/FriendsList'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { fetchSocket } from '../store/actions/socketAction'
 import { fetchUser } from '../store/actions/userAction'
-import { ShowError } from '../components/fields/error'
-import HomeTab from '../components/WindowTab/Home'
-import ProfileTab from '../components/WindowTab/Profile/Profile'
-import PostTab from '../components/WindowTab/Post/Post'
-import StoreTab from '../components/WindowTab/Store/Store'
 import { withIronSession } from "next-iron-session";
+
+import Layout from '../components/fields/Layout'
+import MainNav from '../components/RightPanel/MainNav'
+import FriendsList from '../components/RightPanel/FriendsList'
+import { ShowError } from '../components/fields/error'
 import LoginForm from "../components/NoAuth/LoginForm"
+
+import HomeTab from '../components/WindowTab/Home'
+import ProfileTab from '../components/WindowTab/Profile'
+import PostTab from '../components/WindowTab/Post'
+import CommunityTab from '../components/WindowTab/Community'
+
 
 const Index = ({ user })=> {
 
@@ -20,7 +23,7 @@ const Index = ({ user })=> {
   let [homeTab, SetHomeTab] = useState(true)
   let [profileTab, SetProfileTab] = useState(false)
   let [postTab, SetPostTab] = useState(false)
-  let [storeTab, SetStoreTab] = useState(false)
+  let [communityTab, SetCommunityTab] = useState(false)
 
    useEffect(()=>{  
      if(user){
@@ -52,9 +55,11 @@ const Index = ({ user })=> {
               SetHomeTab(false)
               SetProfileTab(false)
               SetPostTab(false)
+              SetCommunityTab(false)
               if(window === "Home") SetHomeTab(true)
               else if(window === "Profile") SetProfileTab(true)
               else if(window === "Post") SetPostTab(true)
+              else if(window === "Community") SetCommunityTab(true)
           })
         }
       }
@@ -69,7 +74,7 @@ const Index = ({ user })=> {
             { homeTab ? <HomeTab /> : null }
             { profileTab ? <ProfileTab userEmail={user.email}/> : null }
             { postTab ? <PostTab /> : null }
-            { storeTab ? <StoreTab /> : null }
+            { communityTab ? <CommunityTab /> : null }
           </div>
         </Layout>
         : <LoginForm />}

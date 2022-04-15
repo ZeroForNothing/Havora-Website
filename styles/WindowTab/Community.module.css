@@ -1,0 +1,55 @@
+.categoryListPicker {
+    width: 100%;
+    max-width: 560px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding: 20px 20px;
+    position: absolute;
+    padding-bottom: 0;
+    z-index: 1;
+  }
+  .categoryListPicker input{
+    padding: 8px 8px;
+    border-radius: 5px;
+    width: 176px;
+    font-size: 18px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  .categoryList {
+    background-image: url("../../sharedComponents/Media/grid.png");
+  }
+  .categoryTypeDiv{
+    padding: 8px 24px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  .categoryTypeDiv div{
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .categoryTypeDiv p{
+    margin: 0;
+    font-size: 14px;
+    font-style: italic;
+  }
+  .categoryContainer{
+    max-width:600px;
+    width: 100%;
+    margin:auto;
+  }
+  .suggest{
+    margin-bottom: 20px;
+  }
+  .removeCategory{
+    background-image: url("../../sharedComponents/Media/close.png");
+    width: 100%;
+    padding: 12px 28px;
+    border-radius: 5px;
+    font-size: 22px;
+    text-align: left;
+    cursor: pointer;
+  }

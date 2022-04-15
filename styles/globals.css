@@ -6,9 +6,12 @@ body {
   position: fixed;
 }
 
-input {
+input , textarea {
   outline: none;
-  border: 1px solid transparent;
+  border-width: 0px;
+}
+input:focus, textarea:focus{
+  border-color: #ff3232 !important;
 }
 
 /* @font-face {
@@ -17,10 +20,6 @@ input {
 
 * {
   font-family: 'Ubuntu';
-}
-
-.hideTab {
-  display: none;
 }
 
 .modelStats {
@@ -65,7 +64,7 @@ input {
   font-size: 18px;
 }
 .WindowTab{
-  top: 86px;
+  top: 14px;
   bottom: 14px;
   z-index: -1;
   left: 92px;
@@ -75,66 +74,81 @@ input {
   overflow: auto;
   max-width: 900px;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
 }
 .InputField{
-  /* outline: none; */
-  width: 92%;
-  /* margin-left: 0%; */
+  width: 100%;
+  max-width: 556px;
   font-size: 21px;
-  /* margin-bottom: 30px; */
-  border: 3px solid #f3f3f3;
-  padding: 12px 4%;
+  border: 2px solid #f3f3f3;
+  padding: 12px 20px;
   border-radius: 5px;
+  resize: none;
+}
+.inputIcon{
+  background-repeat: no-repeat;
+  background-position: center;
+  background-position-x: 555px;
+  background-size: 24px;
 }
 .InputField:disabled{
   user-select: none;
   background-color: #828282 !important;
 }
 .Nav {
-  position: fixed;
-  height: 58px;
-  top: 14px;
-  right: 252px;
-  margin: auto;
-  left: 92px;
-  max-width: 900px;
-  border-radius: 5px;
-  display: -webkit-flex;
-  display: -moz-box;
+  position: absolute;
+  top: 20px;
+  left: 20px;
   display: flex;
-  -webkit-flex-direction: row;
-  -moz-box-orient: horizontal;
-  -moz-box-direction: normal;
-  flex-direction: row;
+  flex-direction: column;
+  z-index: 1;
 }
 
 .Nav :is(input , label) {
   border-radius: 5px;
-  background-color: #2d2d2d;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 36px;
-  cursor: pointer;
-  height: 100%;
-  margin-right: 14px;
-  width: 100%;
-  max-width: 140px;
-}
-.Nav :is(input:last-child , label:last-child) {
-  margin-right: 0;
-}
-.mainButton{
-  height: 64px;
-  width: 64px;
+  height: 60px;
+  width: 60px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: 36px;
-  position: absolute;
-  bottom: 30px;
-  right: 30px;
   cursor: pointer;
+  margin-bottom: 14px;
 }
-
+.returnBack {
+  background-image: url("../sharedComponents/Media/backArrow.png");
+}
 .inputError {
   border-color: #ff3232 !important;
+}
+.subNav{
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.subNav :is(input[type=button], label){
+  height: 60px;
+  width: 60px;
+  margin-top: 14px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 36px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.pickedBorderColor {
+  border-color: #ff3232;
+}
+.pickedInput , input[type=submit]{
+  background-color: #ff3232 !important;
+  color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
+}
+
+.searchIcon{
+  background-image: url("../sharedComponents/Media/search.png");
 }
