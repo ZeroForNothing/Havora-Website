@@ -26,7 +26,12 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
           backgroundImage: profilePicType ? `url(/MediaFiles/ProfilePic/${picToken}/file.${profilePicType})` : 'none'
         }}></div>
         <div className={`secondLayer ${contentStyles.userContentData}`}
-           onClick={() => { socket.emit('showUserProfile', { username, userCode }) }}
+           onClick={() => { 
+              window.history.pushState({}, document.title, `/?user=${username}&code=${userCode}`);
+              socket.emit('OpenWindow',{
+                window : 'Profile'
+              })
+            }}
         >
           <span className={`${contentStyles.userProfileName}`}>{username}
             <span>#{userCode}</span></span>

@@ -59,10 +59,18 @@ export default function ProfileTab({userEmail , ...props}) {
     friendRequest: number,
     myRequest: number
   }
+
   useEffect(() => {
-      if (!socket) return;
-      socket.emit('showUserProfile')
+    if (!socket) return;
+    const queryParams = new URLSearchParams(window.location.search);
+    const userParam = queryParams.get('user');
+    const codeParam = queryParams.get('code');
+      socket.emit('showUserProfile',{
+        username : userParam,
+        userCode : codeParam
+      })
       socket.on('setProfileData', (data) => {
+        console.log(data)
         SetCurrentProfile({
           name: data.username,
           code: data.userCode,
@@ -137,8 +145,7 @@ export default function ProfileTab({userEmail , ...props}) {
           ShowError("Couldn't get user information")
         }
       })
-      SetPicToken(user.picToken)
-    
+      SetPicToken(user.picToken);
   }, [socket]);
 
   const ShowEditProfile = e => {
@@ -191,7 +198,7 @@ export default function ProfileTab({userEmail , ...props}) {
 
     if (!checkAcceptedExtensions(files[0])) {
       e.target.value = "";
-      ShowError("File type must be jpeg/jpg/png/mp4/mp3/mov/avi/mkv");
+      ShowError("File type must be jpeg, jpg, png");
       return;
     }
     form.append('files', files[0], files[0].name)
@@ -255,7 +262,13 @@ export default function ProfileTab({userEmail , ...props}) {
           mainNav ? <>
             {
               (user.name != CurrentProfile.name || user.code != CurrentProfile.code) ? <>
-                <input type="button" className={`secondLayer returnBack`} />
+                <input type="button" className={`secondLayer returnBack`} onClick={()=>{
+                  window.history.pushState({}, document.title, `/?user=${user.name}&code=${user.code}`);
+                  socket.emit('showUserProfile',{
+                    username : user.name,
+                    userCode : user.code
+                  })
+                 }}/>
                 <input type="button" className={`secondLayer ${profileStyles.RelationWithCurrentUser}`} />
               </>
                 : <input type="button" className={`secondLayer ${profileStyles.editProfile}`}
