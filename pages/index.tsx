@@ -42,14 +42,13 @@ const Index = ({ user })=> {
           })
           socket.on('OpenWindow',(data)=>{
               let window : string = data.window;
-                    
-              let selectedButton = document.getElementById(window);
-              let allButtons = document.getElementsByClassName("WindowButton");
-              
+
               if(window !== "Post"){
+                let allButtons = document.getElementsByClassName("WindowButton");
                 for (let i = 0; i < allButtons.length; i++) 
-                  allButtons[i].classList.remove("pickedInput");
-                selectedButton.classList.add("pickedInput");
+                   allButtons[i].classList.remove("pickedInput");
+                let selectedButton = document.getElementById(window);
+                if(selectedButton) selectedButton.classList.add("pickedInput");
               }
               
               SetHomeTab(false)
@@ -70,7 +69,7 @@ const Index = ({ user })=> {
         <Layout title="Zero for Nothing">
           <MainNav />
           <FriendsList />
-          <div id="WindowTab" className={`WindowTab`}>
+          <div className={`baseLayer WindowTab`}>
             { homeTab ? <HomeTab /> : null }
             { profileTab ? <ProfileTab userEmail={user.email}/> : null }
             { postTab ? <PostTab /> : null }
@@ -85,7 +84,7 @@ export const getServerSideProps = withIronSession(
   async ({ req, res }) => {
     const user = req.session.get("user");
     if (!user) {
-      //res.statusCode = 404;
+      //res.statusCode = 403;
       //res.end();
       return { props: {} };
     }

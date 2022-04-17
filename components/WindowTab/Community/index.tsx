@@ -21,16 +21,18 @@ export default function CommunityTab(){
     },[socket])
     return (  
     <>
-        <div className={`Nav`}>
+        {/* <div className={`Nav`}>
             {
                 mainNav ? null : null
             }
-        </div>
+        </div> */}
         
+        <div className={`MainDisplay`}>
         {
             !postNav ? <CategorySearch socket={socket} currentCategoryID={currentCategoryID} SetCurrentCategoryID={SetCurrentCategoryID} fetchPosts={true}/> : null
         }         
             <Content socket={socket} user={user} currentCategoryID={currentCategoryID} SetCurrentCategoryID={SetCurrentCategoryID} CurrentProfile={null} mainNav={mainNav} postNav={postNav} SetMainNav={SetMainNav} SetPostNav={SetPostNav}/>
+        </div>
         
     </>
     )

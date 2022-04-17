@@ -64,57 +64,57 @@ input:focus, textarea:focus{
   font-size: 18px;
 }
 .WindowTab{
-  top: 14px;
-  bottom: 14px;
+  top: 54px;
+  bottom: 0;
   z-index: -1;
-  left: 92px;
-  right: 252px;
+  left: 0;
+  right: 270px;
   position: fixed;
-  border-radius: 5px;
   overflow: auto;
-  max-width: 900px;
   margin: auto;
   display: flex;
-  flex-direction: column;
-  padding: 20px 0;
+  flex-direction: row;
+  padding: 20px;
+  padding-top: 40px;
+  padding-bottom: 0;
 }
+
 .InputField{
-  width: 100%;
-  max-width: 556px;
+  width: 94%;
   font-size: 21px;
   border: 2px solid #f3f3f3;
-  padding: 12px 20px;
+  padding: 12px 3%;
   border-radius: 5px;
   resize: none;
 }
 .inputIcon{
   background-repeat: no-repeat;
-  background-position: center;
-  background-position-x: 555px;
+  background-position: left;
+  background-position-x: 20px;
   background-size: 24px;
+  padding-left: 9%;
+  width: 88%;
 }
 .InputField:disabled{
   user-select: none;
   background-color: #828282 !important;
 }
 .Nav {
-  position: absolute;
-  top: 20px;
-  left: 20px;
   display: flex;
   flex-direction: column;
-  z-index: 1;
+  width: 280px;
+  margin-right: 36px;
 }
-
-.Nav :is(input , label) {
+.MainDisplay{
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+}
+.Nav :is(div , label) {
   border-radius: 5px;
-  height: 60px;
-  width: 60px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 36px;
-  cursor: pointer;
   margin-bottom: 14px;
+  padding: 10px 0;
 }
 .returnBack {
   background-image: url("../sharedComponents/Media/backArrow.png");
@@ -123,9 +123,9 @@ input:focus, textarea:focus{
   border-color: #ff3232 !important;
 }
 .subNav{
-  position: absolute;
+  position: fixed;
   bottom: 20px;
-  right: 20px;
+  right: 300px;
   display: flex;
   flex-direction: column;
 }
@@ -151,4 +151,26 @@ input:focus, textarea:focus{
 
 .searchIcon{
   background-image: url("../sharedComponents/Media/search.png");
+}
+
+.NavButton p{
+  font-size: 18px;
+  width: 100%;
+  margin: 0;
+}
+.NavButton{
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  user-select: none;
+}
+.NavButton span {
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 32px;
+  height: 32px;
+  width: 120px;
 }

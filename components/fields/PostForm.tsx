@@ -18,7 +18,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
           {
             categoryID !== currentCategoryID ? <div className={`secondLayer ${contentStyles.postCategory}`} onClick={()=>{ socket.emit('getTopPosts',{ categoryID, name : null, code : null, page : 1 }) }} >{categoryName}</div> : null
           }
-            <div className={`borderColor ${contentStyles.userProfileTitle}`}>{title}</div>
+            <div className={`${contentStyles.userProfileTitle}`}>{title}</div>
           </> 
           : null
         }

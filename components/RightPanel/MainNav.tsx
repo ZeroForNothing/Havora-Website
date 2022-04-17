@@ -1,39 +1,80 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
-import styles from '../../styles/MainNav.module.css'
+import styles from '../../styles/Nav.module.css'
+import { withIronSession } from "next-iron-session";
+import { ShowError } from '../fields/error';
+
 export default function MainNav(){
     let { socket } = useSelector((state: any) => state.socket)
+    let { user } = useSelector((state: any) => state.user)
 
     useEffect(() => {
         if(!socket) return;
     }, [socket]);
 
-    const OpenWindow = e => {
-        e.preventDefault();
+    const OpenWindow = (window) => {
         if(!socket) return;
         socket.emit('OpenWindow',{
-            window : e.target.id
+            window
         })
     };
     return (
-        <div  className={`${styles.RightPanel}`}>
-            <div className={`${"baseLayer"} ${styles.UtilityTools}`}>
-                <input type="button" id="Home" className={`${`pickedInput WindowButton`} ${styles.home}`} onClick={OpenWindow} />
-                <input type="button" id="Settings" className={`${`WindowButton`} ${styles.Settings}`} onClick={OpenWindow} />
-                {/* <input type="button" id="Notification" className={`${`WindowButton`} ${styles.Notification}`} onClick={OpenWindow}  /> */}
-                <input type="button" id="FindPlayer" className={`${`WindowButton`} ${styles.FindPlayer}`} onClick={OpenWindow} />
-                <input type="button" id="AccountLink" className={`${`WindowButton`} ${styles.AccountLink}`} onClick={OpenWindow} />
-                <input type="button" id="Community" className={`${`WindowButton`} ${styles.community}`} onClick={OpenWindow} />
-                <input type="button" id="Profile" className={`${`WindowButton`} ${styles.profile}`} onClick={OpenWindow} />
-                {/* <input type="button" id="MusicPlayer" className={`${`WindowButton`} ${styles.MusicPlayer}`} onClick={OpenWindow} /> */}
-                <input type="button" id="Store" className={`${`WindowButton`} ${styles.store}`} onClick={OpenWindow} />
-                <input type="button" id="Lobby" className={`${`WindowButton`} ${styles.lobby}`} onClick={OpenWindow} />
-                {/* <input type="button" id="Inventory" className={`${`WindowButton`} ${styles.inventory}`} /> */}
-                {/* <input type="button" id="Clan" className={`${`WindowButton`} ${styles.clan}`} /> */}
-                {/* <input type="button" id="PartyGroup" className={`${`WindowButton`} ${styles.partyGroup}`} /> */}
-                {/* <input type="button" id="Friends" className={`${`WindowButton`} ${styles.friends}`} /> */}
+        <div  className={`baseLayer ${styles.TopPanel}`}>
+            <div className={`${styles.UtilityTools}`}>
+                <div id="Home" onClick={()=> OpenWindow("Home")} className={`WindowButton pickedInput NavButton`}>
+                    <span className={`${styles.home}`}></span>
+                    <p>Home</p>
+                </div>
+                <div id="Community" onClick={()=> OpenWindow("Community")} className={`WindowButton NavButton`}>
+                    <span className={`${styles.community}`}></span>
+                    <p>Community</p>
+                </div>
+                <div id="Store" onClick={()=> OpenWindow("Store")} className={`WindowButton NavButton`}>
+                    <span className={`${styles.store}`}></span>
+                    <p>Store</p>
+                </div>
+                <div id="Lobby" onClick={()=> OpenWindow("Lobby")} className={`WindowButton NavButton`}>
+                    <span className={`${styles.lobby}`}></span>
+                    <p>Lobby</p>
+                </div>
+                {/* <input type="button" id="Settings" className={`${styles.Settings}`} onClick={OpenWindow} /> */}
+                {/* <input type="button" id="Notification" className={`${styles.Notification}`} onClick={OpenWindow}  /> */}
+                {/* <input type="button" id="FindPlayer" className={`${styles.FindPlayer}`} onClick={OpenWindow} /> */}
+                {/* <input type="button" id="AccountLink" className={`${styles.AccountLink}`} onClick={OpenWindow} /> */}
+                {/* <input type="button" id="Profile" className={` ${styles.profile}`} onClick={OpenWindow} /> */}
+                {/* <input type="button" id="MusicPlayer" className={` ${styles.MusicPlayer}`} onClick={OpenWindow} /> */}
+                {/* <input type="button" id="Inventory" className={` ${styles.inventory}`} /> */}
+                {/* <input type="button" id="Clan" className={` ${styles.clan}`} /> */}
+                {/* <input type="button" id="PartyGroup" className={` ${styles.partyGroup}`} /> */}
+                {/* <input type="button" id="Friends" className={` ${styles.friends}`} /> */}
             </div>
-            {/* <div id="Profile" className={`${"baseLayer"} ${`WindowButton`} ${styles.Profile}`} >
+            <div className={`${styles.profileHolder}`}>
+                <div className={`${styles.profileButton}`} onClick={()=> {
+                    window.history.pushState({}, document.title, `/?user=${user.name}&code=${user.code}`);
+                    OpenWindow("Profile")
+                }}>
+                    <span className={`${styles.image}`}></span>
+                    <div>
+                        <p>{user.name}</p>
+                        <span>#{user.code}</span>
+                    </div>
+                </div>
+                <div onClick={async ()=> {        
+                    const response = await fetch("/api/logout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                    });
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        ShowError("Signout failed")
+                    }
+                }} className={`NavButton ${styles.signoutButton}`}>
+                    <span className={`${styles.signout}`}></span>
+                    <p>Sign Out</p>
+                </div>
+            </div>
+            {/* <div id="Profile" className={`${"baseLayer"}  ${styles.Profile}`} >
                 <input type="button" className={`${"secondLayer"} ${"outsideShadow"}`}/>
                 <div>
                     <span id="CurrentUserName" className={`${styles.CurrentUserName}`}>username</span>
@@ -53,6 +94,5 @@ export default function MainNav(){
             
         </div>
     )
-}
-
     
+}

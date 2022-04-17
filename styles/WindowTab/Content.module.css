@@ -1,7 +1,5 @@
 .postContainer {
-    margin: auto;
-    width: 100%;
-    max-width: 600px;
+    width: 96%;
     position: relative;
     padding: 20px 0%;
     border-bottom: 1px solid;
@@ -25,7 +23,6 @@
     }
     .CommentTextCreation {
       padding: 2%;
-      max-width: 600px;
       border-radius: 5px;
       position: fixed;
       bottom: 34px;
@@ -58,8 +55,6 @@
       width: 100%;
       float: left;
       font-size: 26px;
-      border-bottom: 1px solid #d8d8d8;
-      margin-bottom: 14px;
       padding-bottom: 14px;
     }
     .userProfilePic {
@@ -253,6 +248,12 @@
     .contentContainer{
       height: 100%;
       overflow-y: auto;
+      position: absolute;
+      height: auto;
+      bottom: 0;
+      top: 66px;
+      right: 0;
+      left: 0;
     } 
     .loadingContent{
       text-align: center;
@@ -262,4 +263,7 @@
       font-size: 22px;
       border-radius: 5px;
       margin: auto;
+    }
+    .isProfile{
+      top: 262px;
     }

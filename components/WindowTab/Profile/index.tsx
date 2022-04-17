@@ -1,6 +1,6 @@
 import { Field, Formik } from "formik"
 import { InputField } from '../../fields/InputField'
-import profileStyles from '../../../styles/WindowTab/Profile.module.css'
+import styles from '../../../styles/WindowTab/Profile.module.css'
 import { useState, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { ShowError } from "../../fields/error"
@@ -31,7 +31,7 @@ export default function ProfileTab({userEmail , ...props}) {
   let [CurrentProfile, SetCurrentProfile] = useState<Profile>(null)
   let [picToken, SetPicToken] = useState('')
 
-  const [currentCategoryID, SetCurrentCategoryID] = useState<number>(null);
+  const [currentCategoryID, SetCurrentCategoryID] = useState<number>(1);
 
   //const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,4}))$/;    
   //const strongPasswordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
@@ -56,8 +56,7 @@ export default function ProfileTab({userEmail , ...props}) {
     wallpaperPicType: number,
     code: number,
     name: string,
-    friendRequest: number,
-    myRequest: number
+    friendRequest: number
   }
 
   useEffect(() => {
@@ -77,8 +76,7 @@ export default function ProfileTab({userEmail , ...props}) {
           picToken: data.picToken,
           wallpaperPicType: data.wallpaperPicType,
           profilePicType: data.profilePicType,
-          friendRequest: data.friendRequest,
-          myRequest: data.myRequest
+          friendRequest: data.friendRequest
         });
         //SetWaitingForPost(true);
       })
@@ -145,38 +143,20 @@ export default function ProfileTab({userEmail , ...props}) {
           ShowError("Couldn't get user information")
         }
       })
+      socket.on('manageFriendRequest', function(data) {
+        if (CurrentProfile.name == data.username && CurrentProfile.code == data.userCode && data.relation == 1) {
+          SetCurrentProfile({
+            name: CurrentProfile.name,
+            code: CurrentProfile.code,
+            picToken: CurrentProfile.picToken,
+            wallpaperPicType: CurrentProfile.wallpaperPicType,
+            profilePicType: CurrentProfile.profilePicType,
+            friendRequest: 1
+          });
+        }
+      });
       SetPicToken(user.picToken);
   }, [socket]);
-
-  const ShowEditProfile = e => {
-    e.preventDefault();
-    SetMainNav(false)
-    SetEditProfileNav(true)
-    socket.emit('getUserInformation');
-  };
-  const ShowEditPassword = e => {
-    e.preventDefault();
-    SetEditInfo(false)
-    SetEditPic(false)
-    SetEditPassword(true)
-  };
-  const ShowEditInfo = e => {
-    e.preventDefault();
-    SetEditPassword(false)
-    SetEditPic(false)
-    SetEditInfo(true)
-  };
-  const ShowEditPic = e => {
-    e.preventDefault();
-    SetEditPassword(false)
-    SetEditInfo(false)
-    SetEditPic(true)
-  };
-  const ReturnToProfile = e => {
-    e.preventDefault();
-    SetEditProfileNav(false)
-    SetMainNav(true)
-  };
 
 
   function checkAcceptedExtensions (file) {
@@ -262,48 +242,93 @@ export default function ProfileTab({userEmail , ...props}) {
           mainNav ? <>
             {
               (user.name != CurrentProfile.name || user.code != CurrentProfile.code) ? <>
-                <input type="button" className={`secondLayer returnBack`} onClick={()=>{
+                <div className={`NavButton`} onClick={()=>{
                   window.history.pushState({}, document.title, `/?user=${user.name}&code=${user.code}`);
                   socket.emit('showUserProfile',{
                     username : user.name,
                     userCode : user.code
                   })
-                 }}/>
-                <input type="button" className={`secondLayer ${profileStyles.RelationWithCurrentUser}`} />
+                 }}>
+                    <span className={`returnBack`}></span>
+                    <p>Back</p>
+                </div>
+                {
+                  
+                  <div className={`NavButton`} onClick={()=>{
+                    socket.emit('manageFriendRequest')
+                   }}>
+                    <span className={`${styles.addFriendRelation}`}></span>
+                    <p>
+                      { CurrentProfile.friendRequest == null || CurrentProfile.friendRequest == 1 ? 'Add Friend':''}
+                      { CurrentProfile.friendRequest == 1 ? 'Cancel Request':''}
+                      { CurrentProfile.friendRequest == 2 ? 'Accept Request':''}
+                      { CurrentProfile.friendRequest == 3 ? 'Unfriend':''}
+                    </p>
+                  </div>
+                }
               </>
-                : <input type="button" className={`secondLayer ${profileStyles.editProfile}`}
-                  onClick={ShowEditProfile}
-                />
+                : 
+                <div className={`NavButton`} onClick={()=>{    
+                  SetMainNav(false)
+                  SetEditProfileNav(true)
+                  socket.emit('getUserInformation');
+                }}>
+                    <span className={`${styles.editProfile}`}></span>
+                    <p>Edit profile</p>
+                </div>
             }
-            <input type="button" className={`secondLayer ${profileStyles.profilePosts} pickedInput`} />
+            <div className={`NavButton pickedInput`}>
+                    <span className={`${styles.profilePosts}`}></span>
+                    <p>Posts</p>
+            </div>
           </> : null
         }
         {
           editProfileNav ? <>
-            <input type="button" className={`secondLayer returnBack`}
-              onClick={ReturnToProfile}
-            />
-            <input type="button" className={`secondLayer ${profileStyles.editPic} ${editPic ? "pickedInput" : null}`}
-              onClick={ShowEditPic}
-            />
-            <input type="button" className={`secondLayer ${profileStyles.editInfo} ${editInfo ? "pickedInput" : null}`}
-              onClick={ShowEditInfo}
-            />
-            <input type="button" className={`secondLayer ${profileStyles.changePass} ${editPassword ? "pickedInput" : null}`}
-              onClick={ShowEditPassword}
-            />
+            <div className={`NavButton`} onClick={()=>{    
+                  SetEditProfileNav(false)
+                  SetMainNav(true)
+                }}>
+                    <span className={`returnBack`}></span>
+                    <p>Back</p>
+            </div>
+            <div className={`NavButton ${editPic ? "pickedInput" : ""}`} onClick={()=>{    
+                  SetEditPassword(false)
+                  SetEditInfo(false)
+                  SetEditPic(true)
+            }}>
+                    <span className={`${styles.editPic}`}></span>
+                    <p>Edit Picture</p>
+            </div>
+            <div className={`NavButton ${editInfo ? "pickedInput" : ""}`} onClick={()=>{    
+              SetEditPassword(false)
+              SetEditPic(false)
+              SetEditInfo(true)
+            }}>
+                    <span className={`${styles.editInfo}`}></span>
+                    <p>Edit Info</p>
+            </div>
+            <div className={`NavButton ${editPassword ? "pickedInput" : ""}`} onClick={()=>{    
+              SetEditInfo(false)
+              SetEditPic(false)
+              SetEditPassword(true)
+            }}>
+                    <span className={`${styles.changePass}`}></span>
+                    <p>Edit Password</p>
+            </div>
           </> : null
         }
 
       </div>
-      {
+        <div className={`MainDisplay`}>
+        {
         mainNav ?             
-        <div className={`${"secondLayer"} ${profileStyles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
-          <div className={`${"secondLayer"} ${profileStyles.userDataPosition}`}>
-            <div className={`${"secondLayer"} ${profileStyles.profPic}`} style={{ backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}}></div>
-            <div className={`${profileStyles.userInfoContainer}`}>
-              <div className={`${profileStyles.profileUsername}`}>{CurrentProfile.name}</div>
-              <div className={`${profileStyles.profileUserCode}`}>{`#`}{CurrentProfile.code}</div>
+        <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
+          <div className={`${"secondLayer"} ${styles.userDataPosition}`}>
+            <div className={`${"secondLayer"} ${styles.profPic}`} style={{ backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}}></div>
+            <div className={`${styles.userInfoContainer}`}>
+              <div className={`${styles.profileUsername}`}>{CurrentProfile.name}</div>
+              <div className={`${styles.profileUserCode}`}>{`#`}{CurrentProfile.code}</div>
             </div>
           </div>
         </div> : null
@@ -316,12 +341,12 @@ export default function ProfileTab({userEmail , ...props}) {
           editProfileNav ? <>
             {
               editPic ? <>
-               <div className={`${profileStyles.editPicContainer}`} >
-                <div className={`secondLayer ${profileStyles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}} ></div>
+               <div className={`${styles.editPicContainer}`} >
+                <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}} ></div>
                     
                     {
                       profilePercentage ? <>
-                        <span className={`${profileStyles.picPercent}`}>{profilePercentage}</span>
+                        <span className={`${styles.picPercent}`}>{profilePercentage}</span>
                         {/* <input type="button" value="Cancel"  className={`pickedInput`}/> */}
                       </> : <label htmlFor="EditUserProfilePic" className={`secondLayer`}>Change My Profile Picture</label>
                     }
@@ -331,11 +356,11 @@ export default function ProfileTab({userEmail , ...props}) {
                </div>
                
                
-                  <div className={`${profileStyles.editPicContainer}`}>
-                    <div className={`secondLayer ${profileStyles.displayPic}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` }}></div>
+                  <div className={`${styles.editPicContainer}`}>
+                    <div className={`secondLayer ${styles.displayPic}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` }}></div>
                     {
                       wallpaperPercentage ? <>
-                        <span className={`${profileStyles.picPercent}`}>{wallpaperPercentage}</span>
+                        <span className={`${styles.picPercent}`}>{wallpaperPercentage}</span>
                         {/* <input type="button" value="Cancel" className={`pickedInput`}/> */}
                       </> : <label htmlFor="EditUserWallpaperPic" className={`secondLayer`}>Change My Wallpaper Picture</label>
                     }
@@ -353,7 +378,7 @@ export default function ProfileTab({userEmail , ...props}) {
                   newPassword: "",
                   confPassword: ""
                 }}>{({ values }) => (
-                  <form className={`${profileStyles.formContainer}`}>
+                  <form className={`${styles.formContainer}`}>
                     
                       
                         <label>Old Password</label>
@@ -364,14 +389,16 @@ export default function ProfileTab({userEmail , ...props}) {
 
                         <label>Confirm Password</label>
                         <Field name="confPassword" type="password" placeholder="Re-type your new password..." maxLength={50} component={InputField} disabled={false}  errorState={confPassword}/>
-
-                        <input type="button" value=""  className={`mainButton pickedInput ${profileStyles.saveProfileData}`} onClick={()=>{ 
+                        <div className={`NavButton pickedInput ${styles.saveButton}`} onClick={()=>{
                           socket.emit("editPassword", {
                             oldPassword: values.oldPassword,
                             confPassword: values.confPassword,
                             newPassword: values.newPassword
                           }); 
-                      }}/>
+                        }}>
+                            <span className={`${styles.saveProfileData}`}></span>
+                            <p>Save</p>
+                        </div>
                   </form>
                 )}</Formik>
               </> : null
@@ -386,7 +413,7 @@ export default function ProfileTab({userEmail , ...props}) {
                   gender: UserInformation.gender,
                   date: UserInformation.date
                 }}>{({ values }) => (
-                  <form className={`${profileStyles.formContainer}`}>
+                  <form className={`${styles.formContainer}`}>
 
                         <label htmlFor="firstName">First Name</label>
                         <Field name="firstName" type="text" placeholder="ex. Axel" maxLength={26} component={InputField} />
@@ -402,23 +429,28 @@ export default function ProfileTab({userEmail , ...props}) {
                       
                     
                       <label className="title">Gender</label>
-                      <div  className={`${profileStyles.radioContainer} `}>
-                        <label htmlFor="male" className={`${"secondLayer"} ${values.gender == 1 ? "pickedInput" : null} ${profileStyles.radioLabel} `}>Male</label>
-                        <Field type="radio" id="male" name="gender" className={profileStyles.radioInput} value={1} />
-                        <label htmlFor="female" className={`${"secondLayer"} ${values.gender == 0 ? "pickedInput" : null} ${profileStyles.radioLabel} `}>Female</label>
-                        <Field type="radio" id="female" name="gender" className={profileStyles.radioInput} value={0} />
+                      <div  className={`${styles.radioContainer} `}>
+                        <label htmlFor="male" className={`${"secondLayer"} ${values.gender == 1 ? "pickedInput" : null} ${styles.radioLabel} `}>Male</label>
+                        <Field type="radio" id="male" name="gender" className={styles.radioInput} value={1} />
+                        <label htmlFor="female" className={`${"secondLayer"} ${values.gender == 0 ? "pickedInput" : null} ${styles.radioLabel} `}>Female</label>
+                        <Field type="radio" id="female" name="gender" className={styles.radioInput} value={0} />
                       </div>
 
                       <label>Birth Date</label>
-                      <Field type="date" name="date" className={profileStyles.dateList}></Field>
-
-                    <input type="button" value=""  className={`mainButton pickedInput ${profileStyles.saveProfileData}`} onClick={()=>{socket.emit('editProfileInfo', values)}}/>
+                      <Field type="date" name="date" className={styles.dateList}></Field>
+                      <div className={`NavButton pickedInput ${styles.saveButton}`} onClick={()=>{
+                          socket.emit('editProfileInfo', values)
+                        }}>
+                            <span className={`${styles.saveProfileData}`}></span>
+                            <p>Save</p>
+                        </div>
                   </form>
                 )}</Formik>
                 : null
             }
           </> : null
         }
+        </div>
 
 
 

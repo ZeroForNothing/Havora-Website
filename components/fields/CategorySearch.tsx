@@ -53,6 +53,7 @@ const CategorySearch = ({socket,currentCategoryID,SetCurrentCategoryID, fetchPos
         SetCurrentCategoryName(categoryName.trim())
         SetCategoryList(null)
         SetCategoryListSuggestion(null);
+        SetCategorySearch("");
         (document.getElementById("categorySearch") as HTMLInputElement).value = categoryName
         if(!fetchPosts)return;  
         socket.emit('getTopPosts',{
@@ -71,10 +72,10 @@ const CategorySearch = ({socket,currentCategoryID,SetCurrentCategoryID, fetchPos
                 onKeyUp={handleCategorySearch} />
             }
             {
-                categoryList && categoryList.length != 0 && categorySearch && categorySearch.trim().length != 0? 
+                categorySearch? 
                 <div className={`baseLayer ${communityStyles.categoryListPicker}`}>
                 {
-                    categoryList.map((category)=>{
+                    categoryList ? categoryList.map((category)=>{
                         return (
                         <div key={category.Category_ID} className={`secondLayer ${communityStyles.categoryTypeDiv}`}
                         onClick={e=>{
@@ -85,7 +86,7 @@ const CategorySearch = ({socket,currentCategoryID,SetCurrentCategoryID, fetchPos
                             <p>{category.Category_Description}</p>
                         </div>
                         )
-                    })
+                    }) : <p className={`${communityStyles.notFound}`}>"{categorySearch}" was not found</p>
                 }
                 <div className={`${communityStyles.suggest}`}>Suggestions</div>
                 {
