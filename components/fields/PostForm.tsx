@@ -34,7 +34,11 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
             }}
         >
           <span className={`${contentStyles.userProfileName}`}>{username}
-            <span>#{userCode}</span></span>
+            <span>#
+              {userCode.toString().length == 1 ? "000" : ""}
+              {userCode.toString().length == 2 ? "00" : ""}
+              {userCode.toString().length == 3 ? "0" : ""}
+              {userCode}</span></span>
           <div className={`${contentStyles.userDateTime}`}>{moment(postDate).format('MMMM Do YYYY, hh:mm a')}</div>
         </div>
         {

@@ -56,7 +56,12 @@ export default function MainNav(){
                     <span className={`${styles.image}`}></span>
                     <div>
                         <p>{user.name}</p>
-                        <span>#{user.code}</span>
+                        <span>#
+                        {user.code && user.code.toString().length == 1 ? "000" : ""}
+                        {user.code && user.code.toString().length == 2 ? "00" : ""}
+                        {user.code && user.code.toString().length == 3 ? "0" : ""}
+                        {user.code}
+                        </span>
                     </div>
                 </div>
                 <div onClick={async ()=> {        

@@ -30,10 +30,12 @@ export default function PostTab(){
       socket.on("fetchPostType", function(data) {
         if (data.type == 1) {
           SetPostType(`My Profile Post`)
+          SetCurrentCategoryID(1)
         } else if (data.type == 2) {
           SetPostType(`Community Post`)
         } else if (data.type == 3 && data.name != null && data.code != null) {
           SetPostType(`Post for ${data.name} #${data.code}`)
+          SetCurrentCategoryID(1)
         }       
       });
       socket.on("discardPostCreation", ()=> {
@@ -137,14 +139,15 @@ export default function PostTab(){
             onClick={()=>{         
               socket.emit("createPost",{
                   categoryType : currentCategoryID,
-                  title : PostTitle,
+                  title : PostTitle ? PostTitle.trim() : null,
                   text : PostText.current ? PostText.current.value : null,
                   url : PostUrl && PostUrl.trim().length != 0 ? PostUrl.trim() : null
               }) }}
         />
       </div>
 
-        <div className={`${styles.PostContainer}`}>
+            <div className={`MainDisplay`}>
+            <div className={`${styles.PostContainer}`}>
 
             <div className={`borderColor ${styles.postType}`} >{PostType}</div>
                 {
@@ -176,7 +179,7 @@ export default function PostTab(){
                           !data.showDetails ? <>
                           <div className={`${styles.extraFileDetails} ${styles.horizontalDeails}`}>
                           
-                           <p className={`${styles.mediaFileName}`}>{name}</p>
+                          <p className={`${styles.mediaFileName}`}>{name}</p>
                           <span className={`${styles.mediaFileProgress}`}>{percentage}</span>
                           <input className={`secondLayer`} type="button" value="More Details"
                             onClick={ShowDetail(index)}
@@ -191,13 +194,13 @@ export default function PostTab(){
                           <span className={`${styles.mediaFileProgress}`}>{percentage}</span>
                           <input className={`pickedInput ${styles.cancelUploadFile}`} type="button" value="Remove" />
                           </div> 
-                         {
+                        {
                             data.itsImage ? <img src={src}/> : 
                             <video controls>
                               <source src={src}/> 
                               Your browser does not support the video tag.
                             </video>
-                         }
+                        }
                           </>     
                     }
                         </div>
@@ -205,8 +208,9 @@ export default function PostTab(){
                   }) :  null}
             </div>
             <textarea rows={8} ref={PostText} className={`secondLayer InputField`} placeholder="Type here..."></textarea>
-               
-        </div>
+              
+            </div>
+            </div>
         </>
     )
 }

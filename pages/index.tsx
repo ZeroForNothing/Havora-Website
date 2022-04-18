@@ -32,9 +32,8 @@ const Index = ({ user })=> {
          dispatch(fetchSocket())
         }
        else {        
-        if(user)
-          socket.emit('socketLogin',user)
-         socket.on('registerUser',data =>{
+          if(user) socket.emit('socketLogin',user)
+          socket.on('registerUser',data =>{
            dispatch(fetchUser(data))
           })
           socket.on('ShowError',data =>{

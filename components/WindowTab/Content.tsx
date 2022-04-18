@@ -320,7 +320,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
             }
           </div>
 
-          <div className={`${contentStyles.contentContainer} ${currentCategoryID == 1 ? contentStyles.isProfile : ''}`} onScroll={handleContentScroll}>
+          <div className={`${contentStyles.contentContainer} ${currentCategoryID == 1 && mainNav ? contentStyles.isProfile : ''}`} onScroll={handleContentScroll}>
         {
           mainNav ? <>
             

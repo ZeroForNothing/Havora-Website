@@ -29,6 +29,8 @@ export default function ProfileTab({userEmail , ...props}) {
   let { socket } = useSelector((state: any) => state.socket)
   
   let [CurrentProfile, SetCurrentProfile] = useState<Profile>(null)
+  const CurrentProfileRef = useRef<Profile>(CurrentProfile)
+
   let [picToken, SetPicToken] = useState('')
 
   const [currentCategoryID, SetCurrentCategoryID] = useState<number>(1);
@@ -58,7 +60,6 @@ export default function ProfileTab({userEmail , ...props}) {
     name: string,
     friendRequest: number
   }
-
   useEffect(() => {
     if (!socket) return;
     const queryParams = new URLSearchParams(window.location.search);
@@ -69,15 +70,22 @@ export default function ProfileTab({userEmail , ...props}) {
         userCode : codeParam
       })
       socket.on('setProfileData', (data) => {
-        console.log(data)
+        let jsonData = {
+          name: data.username,
+          code: data.userCode,
+          picToken: data.picToken,
+          wallpaperPicType: data.wallpaperPicType,
+          profilePicType: data.profilePicType
+        } as Profile
         SetCurrentProfile({
           name: data.username,
           code: data.userCode,
           picToken: data.picToken,
           wallpaperPicType: data.wallpaperPicType,
           profilePicType: data.profilePicType,
-          friendRequest: data.friendRequest
+          friendRequest : data.friendRequest
         });
+        CurrentProfileRef.current = jsonData;
         //SetWaitingForPost(true);
       })
 
@@ -144,15 +152,12 @@ export default function ProfileTab({userEmail , ...props}) {
         }
       })
       socket.on('manageFriendRequest', function(data) {
-        if (CurrentProfile.name == data.username && CurrentProfile.code == data.userCode && data.relation == 1) {
-          SetCurrentProfile({
-            name: CurrentProfile.name,
-            code: CurrentProfile.code,
-            picToken: CurrentProfile.picToken,
-            wallpaperPicType: CurrentProfile.wallpaperPicType,
-            profilePicType: CurrentProfile.profilePicType,
-            friendRequest: 1
-          });
+        console.log(data.relation)
+        if(data.username == user.name && data.userCode == user.code) return;
+        if (CurrentProfileRef.current.name == data.username 
+          && CurrentProfileRef.current.code == data.userCode 
+          && (data.relation == 3 || data.relation == 2 || data.relation == 1 || data.relation == 0)) {
+          SetCurrentProfile(prevState => ({ ...prevState, friendRequest: data.relation }));
         }
       });
       SetPicToken(user.picToken);
@@ -237,90 +242,118 @@ export default function ProfileTab({userEmail , ...props}) {
   if (CurrentProfile == null) return null
   else return (
     <>
-      <div className={`Nav`}>
-        {
-          mainNav ? <>
-            {
-              (user.name != CurrentProfile.name || user.code != CurrentProfile.code) ? <>
-                <div className={`NavButton`} onClick={()=>{
-                  window.history.pushState({}, document.title, `/?user=${user.name}&code=${user.code}`);
-                  socket.emit('showUserProfile',{
-                    username : user.name,
-                    userCode : user.code
-                  })
-                 }}>
-                    <span className={`returnBack`}></span>
-                    <p>Back</p>
-                </div>
-                {
-                  
-                  <div className={`NavButton`} onClick={()=>{
-                    socket.emit('manageFriendRequest')
-                   }}>
-                    <span className={`${styles.addFriendRelation}`}></span>
-                    <p>
-                      { CurrentProfile.friendRequest == null || CurrentProfile.friendRequest == 1 ? 'Add Friend':''}
-                      { CurrentProfile.friendRequest == 1 ? 'Cancel Request':''}
-                      { CurrentProfile.friendRequest == 2 ? 'Accept Request':''}
-                      { CurrentProfile.friendRequest == 3 ? 'Unfriend':''}
-                    </p>
+      {!postNav ?
+              <div className={`Nav`}>
+              {
+                mainNav ? <>
+                  {
+                    (user.name != CurrentProfile.name || user.code != CurrentProfile.code) ? <>
+                      <div className={`NavButton`} onClick={()=>{
+                        window.history.pushState({}, document.title, `/?user=${user.name}&code=${user.code}`);
+                        socket.emit('showUserProfile',{
+                          username : user.name,
+                          userCode : user.code
+                        })
+                        socket.emit('getTopPosts',{
+                          categoryID : currentCategoryID,
+                          name : user.name,
+                          code : user.code,
+                          page : 1
+                        })
+                       }}>
+                          <span className={`returnBack`}></span>
+                          <p>Back to My Profile</p>
+                      </div>
+                      
+                        {
+                          CurrentProfile.friendRequest == 1 || CurrentProfile.friendRequest == -1 ? 
+                          <>
+                            { CurrentProfile.friendRequest == -1 ?
+                              <div className={`NavButton`} onClick={()=>{
+                                socket.emit('manageFriendRequest', { response: 1 })
+                                }}>
+                                  <span className={`${styles.acceptFriendRelation}`}></span>
+                                  <p>Accept Request</p>
+                                </div> : null
+                            }
+                            <div className={`NavButton`} onClick={()=>{
+                              socket.emit('manageFriendRequest')
+                            }}>
+                              <span className={`${styles.cancelFriendRelation}`}></span>
+                              <p>Cancel Request</p>
+                            </div>
+                            </> 
+                            : <div className={`NavButton`} onClick={()=>{
+                              socket.emit('manageFriendRequest')
+                             }}>
+                              <span className={`${CurrentProfile.friendRequest == 2 ? styles.unFriendRelation : styles.addFriendRelation}`}></span>
+                              <p>
+                                { CurrentProfile.friendRequest == null || CurrentProfile.friendRequest == 0 ? 'Add Friend'
+                                : CurrentProfile.friendRequest == 2 ? 'Remove Friend' : null}
+                              </p>
+                            </div> 
+                        }
+                        
+      
+                        
+                      
+                    </>
+                      : 
+                      <div className={`NavButton`} onClick={()=>{    
+                        SetMainNav(false)
+                        SetEditProfileNav(true)
+                        socket.emit('getUserInformation');
+                      }}>
+                          <span className={`${styles.editProfile}`}></span>
+                          <p>Edit profile</p>
+                      </div>
+                  }
+                  <div className={`NavButton pickedInput`}>
+                          <span className={`${styles.profilePosts}`}></span>
+                          <p>Posts</p>
                   </div>
-                }
-              </>
-                : 
-                <div className={`NavButton`} onClick={()=>{    
-                  SetMainNav(false)
-                  SetEditProfileNav(true)
-                  socket.emit('getUserInformation');
-                }}>
-                    <span className={`${styles.editProfile}`}></span>
-                    <p>Edit profile</p>
-                </div>
-            }
-            <div className={`NavButton pickedInput`}>
-                    <span className={`${styles.profilePosts}`}></span>
-                    <p>Posts</p>
-            </div>
-          </> : null
-        }
-        {
-          editProfileNav ? <>
-            <div className={`NavButton`} onClick={()=>{    
-                  SetEditProfileNav(false)
-                  SetMainNav(true)
-                }}>
-                    <span className={`returnBack`}></span>
-                    <p>Back</p>
-            </div>
-            <div className={`NavButton ${editPic ? "pickedInput" : ""}`} onClick={()=>{    
-                  SetEditPassword(false)
-                  SetEditInfo(false)
-                  SetEditPic(true)
-            }}>
-                    <span className={`${styles.editPic}`}></span>
-                    <p>Edit Picture</p>
-            </div>
-            <div className={`NavButton ${editInfo ? "pickedInput" : ""}`} onClick={()=>{    
-              SetEditPassword(false)
-              SetEditPic(false)
-              SetEditInfo(true)
-            }}>
-                    <span className={`${styles.editInfo}`}></span>
-                    <p>Edit Info</p>
-            </div>
-            <div className={`NavButton ${editPassword ? "pickedInput" : ""}`} onClick={()=>{    
-              SetEditInfo(false)
-              SetEditPic(false)
-              SetEditPassword(true)
-            }}>
-                    <span className={`${styles.changePass}`}></span>
-                    <p>Edit Password</p>
-            </div>
-          </> : null
-        }
-
-      </div>
-        <div className={`MainDisplay`}>
+                </> : null
+              }
+              
+              {
+                editProfileNav ? <>
+                  <div className={`NavButton`} onClick={()=>{    
+                        SetEditProfileNav(false)
+                        SetMainNav(true)
+                      }}>
+                          <span className={`returnBack`}></span>
+                          <p>Back</p>
+                  </div>
+                  <div className={`NavButton ${editPic ? "pickedInput" : ""}`} onClick={()=>{    
+                        SetEditPassword(false)
+                        SetEditInfo(false)
+                        SetEditPic(true)
+                  }}>
+                          <span className={`${styles.editPic}`}></span>
+                          <p>Edit Picture</p>
+                  </div>
+                  <div className={`NavButton ${editInfo ? "pickedInput" : ""}`} onClick={()=>{    
+                    SetEditPassword(false)
+                    SetEditPic(false)
+                    SetEditInfo(true)
+                  }}>
+                          <span className={`${styles.editInfo}`}></span>
+                          <p>Edit Info</p>
+                  </div>
+                  <div className={`NavButton ${editPassword ? "pickedInput" : ""}`} onClick={()=>{    
+                    SetEditInfo(false)
+                    SetEditPic(false)
+                    SetEditPassword(true)
+                  }}>
+                          <span className={`${styles.changePass}`}></span>
+                          <p>Edit Password</p>
+                  </div>
+                </> : null
+              }
+      
+            </div> : null
+      }
+        <div className={`${!editProfileNav && postNav ? "" :"MainDisplay"}`}>
         {
         mainNav ?             
         <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>

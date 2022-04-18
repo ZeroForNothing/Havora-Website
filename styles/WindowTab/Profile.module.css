@@ -128,15 +128,18 @@
   }
   
   .addFriendRelation {
-    background-image: url("../../sharedComponents/Media/addPlayerRelation.png");
+    background-image: url("../../sharedComponents/Media/add-user.png");
   }
   
   .cancelFriendRelation {
-    background-image: url("../../sharedComponents/Media/revokeRequest.png");
+    background-image: url("../../sharedComponents/Media/close.png");
   }
   
   .unFriendRelation {
     background-image: url("../../sharedComponents/Media/removePlayer.png");
+  }
+  .acceptFriendRelation {
+    background-image: url("../../sharedComponents/Media/tick.png");
   }
 
 
