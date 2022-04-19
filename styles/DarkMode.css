@@ -64,7 +64,7 @@
     box-shadow: none ;
   }
 
-  .bodyDarkMode :is(.WindowButton , .Nav input  , .Nav label, input[type=button].secondLayer, div.secondLayer):hover{
+  .bodyDarkMode :is(.WindowButton , .Nav div  , .Nav label, input[type=button].secondLayer, div.secondLayer):hover{
     transition: 0.4s ease all;
     background-color: #565656;
   }

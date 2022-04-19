@@ -21,13 +21,25 @@ export default function CommunityTab(){
     },[socket])
     return (  
     <>
-        {/* <div className={`Nav`}>
-            {
-                mainNav ? null : null
-            }
-        </div> */}
+    {
+        !postNav?<div className={`Nav`}>
+        {
+            mainNav ? <div className={`NavButton`} onClick={()=>{    
+                socket.emit("startCreatingPost", { 
+                    type : 2,
+                    username : null,
+                    userCode : null
+                  })
+              }}>
+                    <span className={`CreateContent`}></span>
+                    <p>Create Post</p>
+              </div> : null
+        }
+        </div>  : null
+    }
+         
         
-        <div className={`MainDisplay`}>
+        <div className={`${postNav ? "MainDisplayContentContainer": "MainDisplay"}`}>
         {
             !postNav ? <CategorySearch socket={socket} currentCategoryID={currentCategoryID} SetCurrentCategoryID={SetCurrentCategoryID} fetchPosts={true}/> : null
         }         

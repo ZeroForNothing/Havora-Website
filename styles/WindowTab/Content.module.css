@@ -18,16 +18,13 @@
     .ShowUserBoxTools .userBoxToolContainer{
       display: block;
     }
-    .CreateContent{
-      background-image: url("../../sharedComponents/Media/create.png");
-    }
     .CommentTextCreation {
-      padding: 2%;
+      padding: 18px;
       border-radius: 5px;
-      position: fixed;
+      position: absolute;
       bottom: 34px;
-      left: 107px;
-      right: 276px;
+      left: 6px;
+      right: 6px;
       margin: auto;
     }
     .CommentTextCreation textarea{

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { ShowError } from "../fields/error"
 import PostForm from '../fields/PostForm'
-import contentStyles from '../../styles/WindowTab/Content.module.css'
+import styles from '../../styles/WindowTab/Content.module.css'
 
 const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, CurrentProfile, mainNav, postNav, SetMainNav, SetPostNav }) =>{
     let [JustScrolledToBottomPost , SetJustScrolledToBottomPost] = useState(false)
@@ -122,8 +122,8 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
                 })
               }
               else if(data.commentID){
-                let contentComment = commentPrevListRef.current.find(content => content.id == data.commentID)
-                let contentReply = replyPrevListRef.current.find(content => content.id == data.commentID)
+                let contentComment = commentPrevListRef.current ? commentPrevListRef.current.find(content => content.id == data.commentID) : null
+                let contentReply = replyPrevListRef.current ? replyPrevListRef.current.find(content => content.id == data.commentID) : null
                 if(contentComment){
                   const contentIndex = commentPrevListRef.current.indexOf(contentComment)
                   contentComment.text = data.text;
@@ -230,19 +230,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
             }
           })
     },[socket])
-    const BackFromComments = e => {
-        e.preventDefault();
-        SetPostNav(false)
-        SetMainNav(true)
-        SetShowComments(false)
-        SetShowReplies(false)
-      }
-      const BackFromReplies = e => {
-        e.preventDefault();
-        ShowCreateComment(false)
-        SetShowComments(true)
-        SetShowReplies(false)
-      }
+
     function CreateCommentFunc(){
         if(socket == null) return;
         let text = CommentTextCreation.current.value
@@ -250,6 +238,19 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
         socket.emit("createComment",{
           text
         })
+      }
+    function Backward(){
+        if(socket == null) return;
+        if(showComments){
+          SetPostNav(false)
+          SetMainNav(true)
+          SetShowComments(false)
+          SetShowReplies(false)
+        }else if(showReplies){
+          ShowCreateComment(false)
+          SetShowComments(true)
+          SetShowReplies(false)
+        }
       }
     const handleContentScroll = (e) => {
         const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
@@ -291,102 +292,94 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
 
 
     return <>
-        {
-          postNav ? 
-            <div className={`Nav`}>
-                <input type="button" className={`secondLayer returnBack`}
-                    onClick={ showComments ? BackFromComments : showReplies ? BackFromReplies : null}
-                />
-            </div>
-           : null
-        }
-         <div className={`subNav`}>
+          <div className={`Nav`}>
           {
-            mainNav ? <input type="button" value=""  className={`pickedInput ${contentStyles.CreateContent}`} onClick={()=>{ 
-              socket.emit("startCreatingPost", { 
-                type :  CurrentProfile ? (
-                  user.name === CurrentProfile.name && user.code === CurrentProfile.code ? 1 : 3
-                  ) : 2,
-                  username : CurrentProfile ? CurrentProfile.name : null,
-                  userCode : CurrentProfile ? CurrentProfile.code : null
-                })
-              }}/> : null
+                postNav ? 
+                <div className={`NavButton`} onClick={()=>{ Backward() }}>
+                      <span className={`returnBack`}></span>
+                      <p>Back</p>
+                </div>
+              : null
             }
             {
               postNav && !showCreateComment ? 
-              <input type="button" className={`${contentStyles.CreateContent} pickedInput`}
-                onClick={() => {ShowCreateComment(true)}}
-              /> : null
+              <div className={`NavButton`} onClick={() => {ShowCreateComment(true)}}>
+                    <span className={`CreateContent`}></span>
+                    <p>Create Comment</p>
+              </div>
+               : null
             }
-          </div>
+            </div>
+            {/* <div className=""> */}
 
-          <div className={`${contentStyles.contentContainer} ${currentCategoryID == 1 && mainNav ? contentStyles.isProfile : ''}`} onScroll={handleContentScroll}>
-        {
-          mainNav ? <>
-            
-              {PostsView && PostsView.length > 0 ?
-                PostsView.map(data => {
-                  return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={data.categoryName} categoryID={data.categoryID} currentCategoryID={currentCategoryID} title={data.title} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
-                })
-                : (
-                  <div className={`${"secondLayer"} ${contentStyles.loadingContent}`}>{`No posts yet`}</div>
-                )
-              }
-              {
-               WaitingForPost ? <div className={`${"secondLayer"} ${contentStyles.loadingContent}`}>{`Loading posts`}</div> : null
-              }
-          </> : null
-        }
-        {
-          postNav ? <>
-            {showComments ? 
-              <>
-                 {
-                    CommentsView ?
-                    CommentsView.map(data=>{  
-                      return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={null} categoryID={null}  currentCategoryID={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
-                    }) 
-                    : 
-                      <div className={`${"secondLayer"} ${contentStyles.loadingContent}`}>{`No posts yet`}</div>
-                  } 
-                  {
-                    WaitingForComment ? <div className={`${"secondLayer"} ${contentStyles.loadingContent}`}>{`Loading comments`}</div> : null
-                  }
-              </>
-             : null}
-            {
-              showReplies ? <>
-              {
-                  RepliesView ?
-                  RepliesView.map(data=>{  
-                    return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={null} categoryID={null} currentCategoryID={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
-                  }) 
-                  : <div className={`${"secondLayer"} ${contentStyles.loadingContent}`}>No replies yet</div>
+            <div className={`${styles.contentContainer} ${currentCategoryID == 1 && mainNav ? styles.isProfile : ''} ${postNav ? "MainDisplayContent" : ''}`} onScroll={handleContentScroll}>
+          {
+            mainNav ? <>
+              
+                {PostsView && PostsView.length > 0 ?
+                  PostsView.map(data => {
+                    return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={data.categoryName} categoryID={data.categoryID} currentCategoryID={currentCategoryID} title={data.title} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
+                  })
+                  : (
+                    <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`No posts yet`}</div>
+                  )
                 }
                 {
-                    WaitingForReply ? <div className={`${"secondLayer"} ${contentStyles.loadingContent}`}>{`Loading replies`}</div> : null
+                WaitingForPost ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`Loading posts`}</div> : null
+                }
+            </> : null
+          }
+          {
+            postNav ? <>
+              {showComments ? 
+                <>
+                  {
+                      CommentsView ?
+                      CommentsView.map(data=>{  
+                        return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={null} categoryID={null}  currentCategoryID={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
+                      }) 
+                      : 
+                        <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`No posts yet`}</div>
+                    } 
+                    {
+                      WaitingForComment ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`Loading comments`}</div> : null
+                    }
+                </>
+              : null}
+              {
+                showReplies ? <>
+                {
+                    RepliesView ?
+                    RepliesView.map(data=>{  
+                      return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={null} categoryID={null} currentCategoryID={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
+                    }) 
+                    : <div className={`${"secondLayer"} ${styles.loadingContent}`}>No replies yet</div>
                   }
-            </>  : null
-            }
-            {
-              showCreateComment ? <>
-                <div className={`baseLayer ${contentStyles.CommentTextCreation}`}>
-                  <textarea rows={8} ref={CommentTextCreation} className="secondLayer" placeholder="Type here..."></textarea>
-                  <div>
-                    <input type="button" value="Discard" className={`secondLayer`}
-                      onClick={() => { ShowCreateComment(false) }}
-                    />
-                    <input type="button" value="Send" className={`pickedInput`}
-                      onClick={CreateCommentFunc}
-                    />
+                  {
+                      WaitingForReply ? <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`Loading replies`}</div> : null
+                    }
+              </>  : null
+              }
+              {
+                showCreateComment ? <>
+                  <div className={`baseLayer ${styles.CommentTextCreation}`}>
+                    <textarea rows={8} ref={CommentTextCreation} className="secondLayer" placeholder="Type here..."></textarea>
+                    <div>
+                      <input type="button" value="Discard" className={`secondLayer`}
+                        onClick={() => { ShowCreateComment(false) }}
+                      />
+                      <input type="button" value="Send" className={`pickedInput`}
+                        onClick={CreateCommentFunc}
+                      />
+                    </div>
                   </div>
-                </div>
-              </> : null
-            }
-          </> : null
-        }
-        
-      </div>
+                </> : null
+              }
+            </> : null
+          }
+          
+        </div>
+            {/* </div> */}
     </>
 }
 

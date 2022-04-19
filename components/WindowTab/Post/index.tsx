@@ -128,22 +128,35 @@ export default function PostTab(){
     }
     return (  
       <>     
-      <div className={`subNav`}>
-        <input type="button" className={`secondLayer ${styles.discard}`} onClick={()=>{ socket.emit("discardPost") }} />
+      <div className={`Nav`}>
+        <div className={`NavButton`} onClick={()=>{    
+          socket.emit("discardPost")
+        }}>
+              <span className={`returnBack`}></span>
+              <p>Back</p>
+        </div>
+        <div className={`NavButton`} onClick={()=>{    
+          SetMediaUrl(!mediaUrl)
+        }}>
+              <span className={`${styles.youtube}`}></span>
+              <p>Add Youtube Url</p>
+        </div>
+        <label className={`NavButton`} htmlFor="mediaFileInsertPost">
+              <span className={`${styles.insertFile}`}></span>
+              <p>Add Media</p>
+        </label>
         <input type="file" id="mediaFileInsertPost" onChange={UploadPostFile} style={{display:"none"}} />
-        <label htmlFor="mediaFileInsertPost"  className={`secondLayer ${styles.insertFile}`}></label>
-        <input type="button"  className={`secondLayer ${styles.youtube}`}
-            onClick={()=>{ SetMediaUrl(!mediaUrl) }}
-        /> 
-        <input type="button" className={`pickedInput secondLayer ${styles.create}`}
-            onClick={()=>{         
-              socket.emit("createPost",{
-                  categoryType : currentCategoryID,
-                  title : PostTitle ? PostTitle.trim() : null,
-                  text : PostText.current ? PostText.current.value : null,
-                  url : PostUrl && PostUrl.trim().length != 0 ? PostUrl.trim() : null
-              }) }}
-        />
+        <div className={`NavButton`} onClick={()=>{    
+          socket.emit("createPost",{
+            categoryType : currentCategoryID,
+            title : PostTitle ? PostTitle.trim() : null,
+            text : PostText.current ? PostText.current.value : null,
+            url : PostUrl && PostUrl.trim().length != 0 ? PostUrl.trim() : null
+          })
+        }}>
+              <span className={`${styles.create}`}></span>
+              <p>Submit Post</p>
+        </div>
       </div>
 
             <div className={`MainDisplay`}>

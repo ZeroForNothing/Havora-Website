@@ -312,6 +312,16 @@ export default function ProfileTab({userEmail , ...props}) {
                           <span className={`${styles.profilePosts}`}></span>
                           <p>Posts</p>
                   </div>
+                  <div className={`NavButton`} onClick={()=>{    
+                    socket.emit("startCreatingPost", { 
+                        type : user.name === CurrentProfile.name && user.code === CurrentProfile.code ? 1 : 3,
+                        username : CurrentProfile ? CurrentProfile.name : null,
+                        userCode : CurrentProfile ? CurrentProfile.code : null
+                      })
+                  }}>
+                        <span className={`CreateContent`}></span>
+                        <p>Create Post</p>
+                  </div>
                 </> : null
               }
               
@@ -353,7 +363,7 @@ export default function ProfileTab({userEmail , ...props}) {
       
             </div> : null
       }
-        <div className={`${!editProfileNav && postNav ? "" :"MainDisplay"}`}>
+        <div className={`${!editProfileNav && postNav ? "MainDisplayContentContainer" :"MainDisplay"}`}>
         {
         mainNav ?             
         <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
