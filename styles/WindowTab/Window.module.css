@@ -3,7 +3,7 @@
     position: fixed;
     height: 100%;
     z-index: 99;
-    background-image: url(../../sharedComponents/Media/Z4N_Logo_Compressed.png);
+    background-image: url(/Media/Z4N_Logo_Compressed.png);
     margin: 0 auto;
     background-position: center;
     background-size: 330px;

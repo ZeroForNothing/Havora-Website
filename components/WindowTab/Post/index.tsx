@@ -132,17 +132,17 @@ export default function PostTab(){
         <div className={`NavButton`} onClick={()=>{    
           socket.emit("discardPost")
         }}>
-              <span className={`returnBack`}></span>
+              <span className={`bi bi-arrow-left`}></span>
               <p>Back</p>
         </div>
         <div className={`NavButton`} onClick={()=>{    
           SetMediaUrl(!mediaUrl)
         }}>
-              <span className={`${styles.youtube}`}></span>
+              <span className={`bi bi-youtube`}></span>
               <p>Add Youtube Url</p>
         </div>
         <label className={`NavButton`} htmlFor="mediaFileInsertPost">
-              <span className={`${styles.insertFile}`}></span>
+              <span className={`bi bi-upload`}></span>
               <p>Add Media</p>
         </label>
         <input type="file" id="mediaFileInsertPost" onChange={UploadPostFile} style={{display:"none"}} />
@@ -154,7 +154,7 @@ export default function PostTab(){
             url : PostUrl && PostUrl.trim().length != 0 ? PostUrl.trim() : null
           })
         }}>
-              <span className={`${styles.create}`}></span>
+              <span className={`bi bi-save`}></span>
               <p>Submit Post</p>
         </div>
       </div>

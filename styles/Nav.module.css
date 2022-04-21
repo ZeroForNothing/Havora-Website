@@ -9,55 +9,7 @@
     display: flex;
     flex-direction: row;
   }
-  .Post {
-    background-size: 37px !important;
-    background-image: url(../sharedComponents/Media/create.png);
-  }
-  .AccountLink{
-    background-image: url("../sharedComponents/Media/AccountLink.png");
-  }
-  .Notification {
-    background-image: url("../sharedComponents/Media/notification.png");
-  }
-  .MusicPlayer {
-    background-image: url("../sharedComponents/Media/music.png");
-  }
-  .home {
-    background-image: url("../sharedComponents/Media/home.png");
-  }
-  .clan{
-    background-image: url("../sharedComponents/Media/clan.png");
-  }
-  .partyGroup{
-    background-image: url("../sharedComponents/Media/partyGroup.png");
-  }
-  .friends{
-    background-image: url("../sharedComponents/Media/friends.png");
-  }
-  .lobby {
-    background-image: url("../sharedComponents/Media/play.png");
-  }
-  .inventory {
-    background-image: url("../sharedComponents/Media/inventory.png");
-  }
-  .store {
-    background-size: 42px !important;
-    background-image: url("../sharedComponents/Media/store.png");
-  }
-  .community {
-    background-size: 38px !important;
-    background-image: url("../sharedComponents/Media/community.png");
-  }
   
-  .Settings {
-    background-size: 29px;
-    background-image: url("../sharedComponents/Media/setting.png");
-  }
-  
-  .FindPlayer {
-    background-image: url("../sharedComponents/Media/searchForPlayer.png");
-  }
-
   .UtilityTools {
     display: flex;
     flex-direction: row;
@@ -67,7 +19,7 @@
     margin: auto;
   }
   .image{
-    background-image: url("../sharedComponents/Media/profPic.jpg");
+    background-image: url("/Media/profPic.jpg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -82,6 +34,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    padding: 0 8px;
 }
 .profileButton div{
     display: flex;
@@ -94,18 +47,37 @@
 }
 .profileButton span{
     margin: 0;
-    font-size: 13px;
-    color: #f9f9f9a6;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 .profileHolder{
     height: 100%;
     width: 270px;
     display: flex;
     flex-direction: row;
+    position: relative;
 }
-.signoutButton{
-
+.dropdown{
+  width: 54px;
+  padding: 0 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }
-.signout{
-    background-image: url("../sharedComponents/Media/signout.png");
+.dropdownContainer{
+  position: absolute;
+  top: 74px;
+  width: 246px;
+  padding: 12px;
+  right: 294px;
+  border-radius: 5px;
+}
+.dropdownContainer div{
+  margin-bottom: 14px;
+  border-radius: 5px;
+}
+.dropdownContainer div:last-child{
+  margin-bottom: 0;
 }

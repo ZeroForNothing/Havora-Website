@@ -5,7 +5,7 @@
     display: inline-block;
     padding: 4px;
     border-radius: 6px;
-    background-image: url(../sharedComponents/Media/Z4N_Logo_Compressed.png);
+    background-image: url(/Media/Z4N_Logo_Compressed.png);
     width: 62px;
     height: 62px;
     background-size: 62px;

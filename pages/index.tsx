@@ -14,6 +14,7 @@ import HomeTab from '../components/WindowTab/Home'
 import ProfileTab from '../components/WindowTab/Profile'
 import PostTab from '../components/WindowTab/Post'
 import CommunityTab from '../components/WindowTab/Community'
+import ChatTab from '../components/WindowTab/Chat'
 
 
 const Index = ({ user })=> {
@@ -24,6 +25,9 @@ const Index = ({ user })=> {
   let [profileTab, SetProfileTab] = useState(false)
   let [postTab, SetPostTab] = useState(false)
   let [communityTab, SetCommunityTab] = useState(false)
+  let [chatTab, SetChatTab] = useState(false)
+
+  let [WindowLoad, SetWindowLoad]  = useState(null)
 
    useEffect(()=>{  
      if(user){
@@ -35,6 +39,7 @@ const Index = ({ user })=> {
           if(user) socket.emit('socketLogin',user)
           socket.on('registerUser',data =>{
            dispatch(fetchUser(data))
+           socket.emit('tellFriendsImOnline');
           })
           socket.on('ShowError',data =>{
             ShowError(data.error)
@@ -54,10 +59,15 @@ const Index = ({ user })=> {
               SetProfileTab(false)
               SetPostTab(false)
               SetCommunityTab(false)
+              SetChatTab(false)
               if(window === "Home") SetHomeTab(true)
               else if(window === "Profile") SetProfileTab(true)
               else if(window === "Post") SetPostTab(true)
               else if(window === "Community") SetCommunityTab(true)
+              else if(window === "Chat"){
+                SetWindowLoad(data.load)
+                SetChatTab(true)
+              }
           })
         }
       }
@@ -73,6 +83,7 @@ const Index = ({ user })=> {
             { profileTab ? <ProfileTab userEmail={user.email}/> : null }
             { postTab ? <PostTab /> : null }
             { communityTab ? <CommunityTab /> : null }
+            { chatTab ? <ChatTab WindowLoad={WindowLoad} /> : null }
           </div>
         </Layout>
         : <LoginForm />}

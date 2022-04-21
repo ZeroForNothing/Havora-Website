@@ -28,9 +28,6 @@
     margin-bottom: 3%;
   }
   
-  .saveProfileData {
-    background-image: url("../../sharedComponents/Media/save.png");
-  }
   .editPicContainer{
     display: flex;
     align-items: center;
@@ -126,45 +123,7 @@
     font-size: 34px;
     margin-top: 31%;
   }
-  
-  .addFriendRelation {
-    background-image: url("../../sharedComponents/Media/add-user.png");
-  }
-  
-  .cancelFriendRelation {
-    background-image: url("../../sharedComponents/Media/close.png");
-  }
-  
-  .unFriendRelation {
-    background-image: url("../../sharedComponents/Media/removePlayer.png");
-  }
-  .acceptFriendRelation {
-    background-image: url("../../sharedComponents/Media/tick.png");
-  }
 
-
-  .profilePosts {
-    background-image: url(../../sharedComponents/Media/postView.png);
-  }
-  
-  .editProfile {
-    background-image: url(../../sharedComponents/Media/editUser.png);
-  }
-  
-  .editPic{
-    background-image: url("../../sharedComponents/Media/imageInsert.png");
-  }
-  
-  .editInfo{
-    background-image: url("../../sharedComponents/Media/editInfo.png");
-  }
-  
-  .changePass {
-    background-image: url("../../sharedComponents/Media/passwordConf.png");
-  }
-  .formContainer .saveButton{
-    padding: 8px 0;
-  }
   .formContainer{
     width: 100%;
   }

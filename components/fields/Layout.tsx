@@ -5,7 +5,7 @@ export default function Layout({ children , title }) {
         <>
             <Head>
                 <title>{title}</title>
-                <link rel="icon" href="../../sharedComponents/Media/Z4N_Logo_Compressed.png" />
+                <link rel="icon" href="/Media/Z4N_Logo_Compressed.png" />
             </Head>
             <Error />
             <div>

@@ -4,6 +4,7 @@ body {
   width: 100vw;
   height: 100vh;
   position: fixed;
+  font-family: FontAwesome;
 }
 
 input , textarea {
@@ -68,15 +69,16 @@ input:focus, textarea:focus{
   bottom: 0;
   z-index: -1;
   left: 0;
-  right: 270px;
+  right: 0;
   position: fixed;
   overflow: auto;
   margin: auto;
   display: flex;
   flex-direction: row;
-  padding: 20px;
+  padding-left: 20px;
   padding-top: 40px;
   padding-bottom: 0;
+  padding-right: 270px;
 }
 
 .InputField{
@@ -126,10 +128,7 @@ input:focus, textarea:focus{
 .Nav :is(div , label) {
   border-radius: 5px;
   margin-bottom: 14px;
-  padding: 10px 0;
-}
-.returnBack {
-  background-image: url("../sharedComponents/Media/backArrow.png");
+  line-height: 54px;
 }
 .inputError {
   border-color: #ff3232 !important;
@@ -140,25 +139,21 @@ input:focus, textarea:focus{
 }
 .pickedInput , input[type=submit]{
   background-color: #ff3232 !important;
-  color: #450e0e;
-  font-weight: bold;
+  /* color: #450e0e; */
   border-radius: 5px;
   box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
 }
 
-.searchIcon{
-  background-image: url("../sharedComponents/Media/search.png");
-}
-.CreateContent{
-  background-image: url("../sharedComponents/Media/create.png");
-}
 .NavButton p{
   font-size: 18px;
   width: 100%;
   margin: 0;
+  margin-right: 20px;
 }
 .NavButton{
   width: 100%;
+  padding: 12px 0px;
+  max-height: 32px;
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -166,10 +161,15 @@ input:focus, textarea:focus{
   user-select: none;
 }
 .NavButton span {
-  background-color: transparent;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 32px;
   height: 32px;
-  width: 120px;
+  width: 32px;
+  margin-right: 20px;
+  margin-left: 20px;
+  text-align: center;
+  line-height: 32px;
+  font-size: 28px;
+}
+.userCode{
+  font-size: 13px;
+  color: #f9f9f9a6;
 }

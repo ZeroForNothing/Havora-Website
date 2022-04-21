@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import '../styles/DarkMode.css'
-
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import App from 'next/app'
 import {Provider} from 'react-redux'
 import {createWrapper} from 'next-redux-wrapper'

@@ -18,9 +18,7 @@
     margin-bottom: 20px;
     cursor: pointer;
   }
-  .categoryList {
-    background-image: url("../../sharedComponents/Media/grid.png");
-  }
+
   .categoryTypeDiv{
     padding: 8px 24px;
     border-radius: 5px;
@@ -44,7 +42,6 @@
     margin-bottom: 20px;
   }
   .removeCategory{
-    background-image: url("../../sharedComponents/Media/close.png");
     width: 100%;
     padding: 12px 28px;
     border-radius: 5px;

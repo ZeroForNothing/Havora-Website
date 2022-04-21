@@ -3,8 +3,8 @@ export default function HomeTab(){
     return (
         <>
         <div className={` Nav`}> 
-            <input type="button" className={`secondLayer ${styles.whatsNew}`}/>
-            <input type="button" className={`secondLayer ${styles.patchNotes}`}/>
+            {/* <input type="button" className={`secondLayer ${styles.whatsNew}`}/>
+            <input type="button" className={`secondLayer ${styles.patchNotes}`}/> */}
         </div>
         <div>
 

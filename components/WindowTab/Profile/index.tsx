@@ -123,7 +123,6 @@ export default function ProfileTab({userEmail , ...props}) {
         }
       })
       socket.on('editProfileInfo', function(data) {
-        console.log(data)
         if (data.error == null) {
           alert("Profile edited successfully")
         } else {
@@ -261,7 +260,7 @@ export default function ProfileTab({userEmail , ...props}) {
                           page : 1
                         })
                        }}>
-                          <span className={`returnBack`}></span>
+                          <span className={`bi bi-arrow-left`}></span>
                           <p>Back to My Profile</p>
                       </div>
                       
@@ -272,21 +271,21 @@ export default function ProfileTab({userEmail , ...props}) {
                               <div className={`NavButton`} onClick={()=>{
                                 socket.emit('manageFriendRequest', { response: 1 })
                                 }}>
-                                  <span className={`${styles.acceptFriendRelation}`}></span>
+                                  <span className={`bi bi-person-check`}></span>
                                   <p>Accept Request</p>
                                 </div> : null
                             }
                             <div className={`NavButton`} onClick={()=>{
                               socket.emit('manageFriendRequest')
                             }}>
-                              <span className={`${styles.cancelFriendRelation}`}></span>
+                              <span className={`bi bi-person-x`}></span>
                               <p>Cancel Request</p>
                             </div>
                             </> 
                             : <div className={`NavButton`} onClick={()=>{
                               socket.emit('manageFriendRequest')
                              }}>
-                              <span className={`${CurrentProfile.friendRequest == 2 ? styles.unFriendRelation : styles.addFriendRelation}`}></span>
+                              <span className={`${CurrentProfile.friendRequest == 2 ? 'bi bi-person-dash' : 'bi bi-person-plus'}`}></span>
                               <p>
                                 { CurrentProfile.friendRequest == null || CurrentProfile.friendRequest == 0 ? 'Add Friend'
                                 : CurrentProfile.friendRequest == 2 ? 'Remove Friend' : null}
@@ -304,12 +303,12 @@ export default function ProfileTab({userEmail , ...props}) {
                         SetEditProfileNav(true)
                         socket.emit('getUserInformation');
                       }}>
-                          <span className={`${styles.editProfile}`}></span>
-                          <p>Edit profile</p>
+                          <span className={`bi bi-person`}></span>
+                          <p>Profile</p>
                       </div>
                   }
                   <div className={`NavButton pickedInput`}>
-                          <span className={`${styles.profilePosts}`}></span>
+                          <span className={`bi bi-list-nested`}></span>
                           <p>Posts</p>
                   </div>
                   <div className={`NavButton`} onClick={()=>{    
@@ -319,7 +318,7 @@ export default function ProfileTab({userEmail , ...props}) {
                         userCode : CurrentProfile ? CurrentProfile.code : null
                       })
                   }}>
-                        <span className={`CreateContent`}></span>
+                        <span className={`bi bi-plus-square`}></span>
                         <p>Create Post</p>
                   </div>
                 </> : null
@@ -331,7 +330,7 @@ export default function ProfileTab({userEmail , ...props}) {
                         SetEditProfileNav(false)
                         SetMainNav(true)
                       }}>
-                          <span className={`returnBack`}></span>
+                          <span className={`bi bi-arrow-left`}></span>
                           <p>Back</p>
                   </div>
                   <div className={`NavButton ${editPic ? "pickedInput" : ""}`} onClick={()=>{    
@@ -339,7 +338,7 @@ export default function ProfileTab({userEmail , ...props}) {
                         SetEditInfo(false)
                         SetEditPic(true)
                   }}>
-                          <span className={`${styles.editPic}`}></span>
+                          <span className={`bi bi-image`}></span>
                           <p>Edit Picture</p>
                   </div>
                   <div className={`NavButton ${editInfo ? "pickedInput" : ""}`} onClick={()=>{    
@@ -347,7 +346,7 @@ export default function ProfileTab({userEmail , ...props}) {
                     SetEditPic(false)
                     SetEditInfo(true)
                   }}>
-                          <span className={`${styles.editInfo}`}></span>
+                          <span className={`bi bi-pencil-square`}></span>
                           <p>Edit Info</p>
                   </div>
                   <div className={`NavButton ${editPassword ? "pickedInput" : ""}`} onClick={()=>{    
@@ -355,7 +354,7 @@ export default function ProfileTab({userEmail , ...props}) {
                     SetEditPic(false)
                     SetEditPassword(true)
                   }}>
-                          <span className={`${styles.changePass}`}></span>
+                          <span className={`bi bi-shield-lock`}></span>
                           <p>Edit Password</p>
                   </div>
                 </> : null
@@ -432,14 +431,14 @@ export default function ProfileTab({userEmail , ...props}) {
 
                         <label>Confirm Password</label>
                         <Field name="confPassword" type="password" placeholder="Re-type your new password..." maxLength={50} component={InputField} disabled={false}  errorState={confPassword}/>
-                        <div className={`NavButton pickedInput ${styles.saveButton}`} onClick={()=>{
+                        <div className={`NavButton pickedInput`} onClick={()=>{
                           socket.emit("editPassword", {
                             oldPassword: values.oldPassword,
                             confPassword: values.confPassword,
                             newPassword: values.newPassword
                           }); 
                         }}>
-                            <span className={`${styles.saveProfileData}`}></span>
+                            <span className={`bi bi-save`}></span>
                             <p>Save</p>
                         </div>
                   </form>
@@ -481,10 +480,10 @@ export default function ProfileTab({userEmail , ...props}) {
 
                       <label>Birth Date</label>
                       <Field type="date" name="date" className={styles.dateList}></Field>
-                      <div className={`NavButton pickedInput ${styles.saveButton}`} onClick={()=>{
+                      <div className={`NavButton pickedInput`} onClick={()=>{
                           socket.emit('editProfileInfo', values)
                         }}>
-                            <span className={`${styles.saveProfileData}`}></span>
+                            <span className={`bi bi-save`}></span>
                             <p>Save</p>
                         </div>
                   </form>

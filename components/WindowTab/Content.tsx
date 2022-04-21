@@ -81,7 +81,6 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
     
             SetMainNav(false);
             SetPostNav(true);
-            ShowCreateComment(!data.onlyView)
             
             SetShowComments(postID ? true : false)
             SetShowReplies(commentID ? true : false)
@@ -273,8 +272,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
             socket.emit('getTopComments', {
               contentID: CurrentPostViewing ,
               page : commentCurrentPage ,
-              itsComment: showComments,
-              onlyView : true
+              itsComment: showComments
             })
           }else if(showReplies && !WaitingForReply && !JustScrolledToBottomReply){
             SetWaitingForReply(true)
@@ -282,8 +280,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
             socket.emit('getTopComments', {
               contentID: CurrentCommentViewing,
               page : replyCurrentPage,
-              itsComment: showComments,
-              onlyView : true
+              itsComment: showComments
             })
           }
             
@@ -296,7 +293,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
           {
                 postNav ? 
                 <div className={`NavButton`} onClick={()=>{ Backward() }}>
-                      <span className={`returnBack`}></span>
+                      <span className={`bi bi-arrow-left`}></span>
                       <p>Back</p>
                 </div>
               : null
@@ -304,7 +301,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
             {
               postNav && !showCreateComment ? 
               <div className={`NavButton`} onClick={() => {ShowCreateComment(true)}}>
-                    <span className={`CreateContent`}></span>
+                    <span className={`bi bi-plus-square`}></span>
                     <p>Create Comment</p>
               </div>
                : null

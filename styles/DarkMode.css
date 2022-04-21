@@ -1,7 +1,7 @@
 .bodyDarkMode{
     background-color: #1e1e1e;
     color: #f9f9f9;
-    /* background-image: url(../sharedComponents/Media/darkMode.png); */
+    /* background-image: url(/Media/darkMode.png); */
   }
   
   .bodyDarkMode ::placeholder {

@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import styles from '../../styles/Nav.module.css'
-import { withIronSession } from "next-iron-session";
 import { ShowError } from '../fields/error';
 
 export default function MainNav(){
     let { socket } = useSelector((state: any) => state.socket)
     let { user } = useSelector((state: any) => state.user)
-
+    let [ShowDropdown,SetShowDropdown] = useState(false)
     useEffect(() => {
         if(!socket) return;
     }, [socket]);
@@ -22,20 +21,20 @@ export default function MainNav(){
         <div  className={`baseLayer ${styles.TopPanel}`}>
             <div className={`${styles.UtilityTools}`}>
                 <div id="Home" onClick={()=> OpenWindow("Home")} className={`WindowButton pickedInput NavButton`}>
-                    <span className={`${styles.home}`}></span>
+                    <span className={`bi bi-house`}></span>
                     <p>Home</p>
                 </div>
                 <div id="Community" onClick={()=> OpenWindow("Community")} className={`WindowButton NavButton`}>
-                    <span className={`${styles.community}`}></span>
+                    <span className={`bi bi-people`}></span>
                     <p>Community</p>
                 </div>
                 <div id="Store" onClick={()=> OpenWindow("Store")} className={`WindowButton NavButton`}>
-                    <span className={`${styles.store}`}></span>
+                    <span className={`bi bi-bag`}></span>
                     <p>Store</p>
                 </div>
-                <div id="Lobby" onClick={()=> OpenWindow("Lobby")} className={`WindowButton NavButton`}>
-                    <span className={`${styles.lobby}`}></span>
-                    <p>Lobby</p>
+                <div id="Library" onClick={()=> OpenWindow("Library")} className={`WindowButton NavButton`}>
+                    <span className={`bi bi-collection`}></span>
+                    <p>Library</p>
                 </div>
                 {/* <input type="button" id="Settings" className={`${styles.Settings}`} onClick={OpenWindow} /> */}
                 {/* <input type="button" id="Notification" className={`${styles.Notification}`} onClick={OpenWindow}  /> */}
@@ -49,14 +48,15 @@ export default function MainNav(){
                 {/* <input type="button" id="Friends" className={` ${styles.friends}`} /> */}
             </div>
             <div className={`${styles.profileHolder}`}>
-                <div className={`${styles.profileButton}`} onClick={()=> {
+
+                <div className={`secondLayer ${styles.profileButton}`} onClick={()=> {
                     window.history.pushState({}, document.title, `/?user=${user.name}&code=${user.code}`);
                     OpenWindow("Profile")
-                }}>
-                    <span className={`${styles.image}`}></span>
+                }} >
+                <span className={`${"secondLayer"} ${styles.image}`} style={{ backgroundImage: user.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + user.picToken + "/file." + user.profilePicType })` : 'none'}} ></span>
                     <div>
                         <p>{user.name}</p>
-                        <span>#
+                        <span className='userCode'>#
                         {user.code && user.code.toString().length == 1 ? "000" : ""}
                         {user.code && user.code.toString().length == 2 ? "00" : ""}
                         {user.code && user.code.toString().length == 3 ? "0" : ""}
@@ -64,20 +64,38 @@ export default function MainNav(){
                         </span>
                     </div>
                 </div>
-                <div onClick={async ()=> {        
-                    const response = await fetch("/api/logout", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" }
-                    });
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        ShowError("Signout failed")
-                    }
-                }} className={`NavButton ${styles.signoutButton}`}>
-                    <span className={`${styles.signout}`}></span>
-                    <p>Sign Out</p>
+                <div className={`${styles.dropdown}`} onClick={()=>{SetShowDropdown(!ShowDropdown)}}>
+                    <span className={`dropdownIcon bi ${ShowDropdown ? 'bi bi-chevron-up' : 'bi-chevron-down'}`}></span>
                 </div>
+                {
+                    ShowDropdown ?  
+                    <div className={`baseLayer ${styles.dropdownContainer}`}>
+                        <div onClick={()=> {
+                            SetShowDropdown(false);
+                            OpenWindow("Settings")
+                        }} className={`NavButton secondLayer`}>
+                            <span className={`bi bi-gear`}></span>
+                            <p>Settings</p>
+                        </div>
+                        <div onClick={async ()=> {  
+                            SetShowDropdown(false)      
+                            const response = await fetch("/api/logout", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" }
+                            });
+                            if (response.ok) {
+                                window.location.reload();
+                            } else {
+                                ShowError("Signout failed")
+                            }
+                        }} className={`NavButton secondLayer pickedInput`}>
+                            <span className={`bi bi-box-arrow-right`}></span>
+                            <p>Sign Out</p>
+                        </div>
+                    </div> : null
+                }
+               
+               
             </div>
             {/* <div id="Profile" className={`${"baseLayer"}  ${styles.Profile}`} >
                 <input type="button" className={`${"secondLayer"} ${"outsideShadow"}`}/>

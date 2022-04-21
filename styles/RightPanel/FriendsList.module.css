@@ -6,23 +6,21 @@
     right: 0;
     padding-top: 20px;
 }
-  
+
 .friendStatus {
-    width: 88%;
-    height: 55px;
-    overflow: hidden;
-    padding: 4% 5%;
-    transition: transform .2s;
-    cursor: pointer;
-    border-left: 5px solid #c5c5c5;
-    margin-bottom: 14px;
-    border-radius: 5px;
-    position: relative;
+  width: 100%;
+  transition: transform .2s;
+  cursor: pointer;
+  margin: auto;
+  margin-bottom: 14px;
+  padding: 8px 0;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  position: relative;
+  display: flex;
+  flex-direction: row;
   }
   
-  .addFriendListButton {
-    background-image: url("../../sharedComponents/Media/AccSwitch_lookFront.png");
-  }
   .CoinImage{
     width: 30px;
     height: 30px;
@@ -31,12 +29,6 @@
     background-repeat: no-repeat;
     background-size: contain;
     background-color: transparent;
-  }
-  .ZeroCoin{
-    background-image: url("../../sharedComponents/Media/Z-Coin.png");
-  }
-  .NormalCoin{
-    background-image: url("../../sharedComponents/Media/N-Coin.png");
   }
   .friendPreview {
     -webkit-app-region: no-drag;
@@ -54,7 +46,7 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    float: left;
+    margin-left:8px
   }
   
   .quickUserInfo {
@@ -141,18 +133,13 @@
 
   
   .friendText {
-    float: left;
-    width: 62%;
-    font-size: 17px;
-    margin-top: 7px;
+    font-size: 22px;
+    flex-direction: column;
+    display: flex;
+    justify-content: space-evenly;
     margin-left: 14px;
-    overflow: hidden;
   }
   
-  .friendOpinion {
-    font-size: 15px;
-    margin-top: 5px;
-  }
   
   .unreadMsgAlert {
     position: absolute;
@@ -164,28 +151,28 @@
   
   .gotMsgFromFriend {
     transition: 0.3s ease all;
-    animation: blinkingMsg 2s infinite;
+    animation: blinkingMsg 4s infinite;
   }
   
   @keyframes blinkingMsg {
     0% {
-      background-color: #e2e2e2;
+      background-color: #4e4e4e;
     }
   
     49% {
-      background-color: #e2e2e2;
+      background-color: #4e4e4e;
     }
   
     60% {
-      background-color: #f0f0f0;
+      background-color: #5e5e5e;
     }
   
     99% {
-      background-color: #f0f0f0;
+      background-color: #5e5e5e;
     }
   
     100% {
-      background-color: #e2e2e2;
+      background-color: #4e4e4e;
     }
   }
   
@@ -237,15 +224,7 @@
     height: 100%;
     border-radius: 50%;
   }
-  
-  .callButtonFriendDiv .answerFriendCall {
-    background-image: url(../../sharedComponents/Media/phoneCall.png);
-  }
-  
-  .hangupFriendCall {
-    background-image: url(../../sharedComponents/Media/phoneHangup.png);
-  }
-  
+    
   .callerUserName {
     width: 100%;
     text-align: center;
@@ -257,7 +236,6 @@
     margin-top: 75%;
     margin-bottom: 13%;
     height: 45%;
-    background-image: url("../../sharedComponents/Media/profPic.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -278,7 +256,6 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: 31px;
-    background-image: url(../../sharedComponents/Media/phoneHangup.png);
     height: 74%;
     margin-top: 4%;
     width: 31%;
@@ -288,7 +265,6 @@
   
   .onGoingCallContainer .callerUserPic {
     width: 39%;
-    background-image: url("../../sharedComponents/Media/profPic.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -307,27 +283,11 @@
     right: 5px;
     width: 26px;
     height: 26px;
-    background-image: url("../../sharedComponents/Media/Offline.png");
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
   }
   
-  .GamePlatform {
-    background-image: url("../../sharedComponents/Media/Ingame.png");
-  }
-  
-  .ClientPlatform {
-    background-image: url("../../sharedComponents/Media/Client.png");
-  }
-  
-  .WebPlatform {
-    background-image: url("../../sharedComponents/Media/Web.png");
-  }
-  
-  .MobilePlatform {
-    background-image: url("../../sharedComponents/Media/Mobile.png");
-  }
   
 
   

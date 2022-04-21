@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import moment from "moment";
 import contentStyles from '../../styles/WindowTab/Content.module.css'
 
+
 const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , categoryID , currentCategoryID, title, mediaFolder, mediaFiles, mediaUrl, postText, username, userCode, myName, myCode, postDate, commentsCount, postAgree, postDisagree, userInteracted, postViews, itsComment, itsReply, ...props})=> {
   
     let [textBeingEdited,SetTextBeingEdited] = useState(false);
@@ -13,13 +14,9 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
     return (
       <div className={`borderColor ${contentStyles.postContainer}`}>
         {
-          categoryID != 1 && categoryName && title != null && title != '' ? 
-          <>
-          {
-            categoryID !== currentCategoryID ? <div className={`secondLayer ${contentStyles.postCategory}`} onClick={()=>{ socket.emit('getTopPosts',{ categoryID, name : null, code : null, page : 1 }) }} >{categoryName}</div> : null
-          }
-            <div className={`${contentStyles.userProfileTitle}`}>{title}</div>
-          </> 
+          !textBeingEdited ? 
+          <div className={`secondLayer ${contentStyles.userBoxTools} bi bi-three-dots-vertical`} onClick={() => { SetShowUserBoxTools(!showUserBoxTools) }}>
+          </div>
           : null
         }
         <div className={`secondLayer ${contentStyles.userProfilePic}`} style={{
@@ -34,7 +31,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
             }}
         >
           <span className={`${contentStyles.userProfileName}`}>{username}
-            <span>#
+            <span className='userCode'>#
               {userCode.toString().length == 1 ? "000" : ""}
               {userCode.toString().length == 2 ? "00" : ""}
               {userCode.toString().length == 3 ? "0" : ""}
@@ -42,9 +39,14 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
           <div className={`${contentStyles.userDateTime}`}>{moment(postDate).format('MMMM Do YYYY, hh:mm a')}</div>
         </div>
         {
-          !textBeingEdited ? <input type="button" className={`secondLayer ${contentStyles.userBoxTools}`}
-            onClick={() => { SetShowUserBoxTools(!showUserBoxTools) }}
-          /> : null
+          categoryID != 1 && categoryName && title != null && title != '' ? 
+          <>
+          {
+            categoryID !== currentCategoryID ? <div className={`secondLayer ${contentStyles.postCategory}`} onClick={()=>{ socket.emit('getTopPosts',{ categoryID, name : null, code : null, page : 1 }) }} ><span>{`#`}</span>{categoryName}</div> : null
+          }
+            <div className={`${contentStyles.userProfileTitle}`}>{title}</div>
+          </> 
+          : null
         }
         {
           showUserBoxTools && !textBeingEdited ? <div className={`baseLayer ${contentStyles.userBoxToolContainer}`}>
@@ -92,7 +94,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
         }
         {postText ? <>
           {!textBeingEdited?
-          <div className={`secondLayer ${contentStyles.userProfileText}`}>
+          <div className={`${contentStyles.userProfileText}`}>
               {
                 postText.trim().length > 0 ? 
                 <>
@@ -134,7 +136,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
         }
   
         {!textBeingEdited ? <div className={`${contentStyles.userBoxOptions}`}>
-          <div className={`borderColor ${contentStyles.contentCounterDiv}`}>
+          {/* <div className={`borderColor ${contentStyles.contentCounterDiv}`}>
             <div>{postAgree} Likes</div>
             <div>{postDisagree} Dislikes</div>
             {
@@ -149,9 +151,9 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
                   <div>0 Shares</div>
                 </> : null
             }
-          </div>
+          </div> */}
           <div className={`${contentStyles.InteractionDiv}`}>
-            <input type="button" value="Like" className={`agreeButton secondLayer ${userInteracted == 1 ? "pickedInput" : null}`}
+            <input type="button" value={`${postAgree} Like${postAgree > 1 ? 's':''}`} className={`agreeButton secondLayer ${userInteracted == 1 ? "pickedInput" : null}`}
               onClick={()=>{
                 let postID = itsComment || itsReply ? null : contentID;
                 let commentID = itsComment || itsReply ? contentID : null;
@@ -163,7 +165,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
                 })
               }}
             />
-            <input type="button" value="Dislike" className={`disagreeButton secondLayer ${userInteracted == 2 ? "pickedInput" : null}`}
+            <input type="button" value={`${postDisagree} Dislike${postDisagree > 1 ? 's':''}`} className={`disagreeButton secondLayer ${userInteracted == 2 ? "pickedInput" : null}`}
               onClick={()=>{
                 let postID = itsComment || itsReply ? null : contentID;
                 let commentID = itsComment || itsReply ? contentID : null;
@@ -175,26 +177,26 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
                 })
               }}
             />
-              {
-                !itsReply && !itsComment ?
-                  <>
-                    <input type="button" value="Share" className={`secondLayer`} />
-    
-                  </> : null
-              }
             {
               !itsReply ?
-                <input type="button" value={`View ${itsComment ? "Replies" : "Comments"}`} className={`secondLayer`}
-                  onClick={() =>  ShowCommentsFunc(socket, contentID, true, itsComment) }
-                />
-                : null
+              <input type="button" value={`${commentsCount} ${itsComment ? "Replies" : "Comments"}`} className={`secondLayer`}
+              onClick={() =>  ShowCommentsFunc(socket, contentID, true, itsComment) }
+              />
+              : null
             }
             {
+              !itsReply && !itsComment ?
+                <>
+                  <input type="button" value="Share" className={`secondLayer`} />
+  
+                </> : null
+            }
+            {/* {
               !itsReply ?
                 <input className={`secondLayer ${contentStyles.createComment}`} type="button" value={`${itsComment ? "Reply" : "Comment"}${" here..."}`}
-                  onClick={() => ShowCommentsFunc(socket, contentID, false, itsComment) }
+                  onClick={() => ShowCommentsFunc(socket, contentID, true, itsComment) }
                 /> : null
-            }
+            } */}
           </div>
         </div> : null}
       </div>
@@ -210,8 +212,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
       socket.emit('getTopComments', {
         contentID: id,
         page : 1,
-        itsComment: !itsReply,
-        onlyView
+        itsComment: !itsReply
       })
       //socket.emit('getProfileSpecificContent', data)
     }

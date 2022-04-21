@@ -1,0 +1,130 @@
+.chat {
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 2px solid grey;
+  }
+  .msgContainer{
+    display: flex;
+    flex-direction: row;
+    padding: 7px;
+    border-radius: 5px;
+  }
+  .textHolder {
+    overflow-y: auto;
+    position: absolute;
+    top: 34px;
+    left: 0;
+    right: 0;
+    bottom: 120px;
+    padding: 2%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .inputHolder{
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    height: 80px;
+    width: auto;
+  }
+  
+  
+  .msgSeen {
+    color: #ff3232;
+  }
+  .checkMark{
+    font-size: 20px;
+    position: absolute;
+    right: 0;
+    bottom: -4px;
+  }
+  .msgText{
+    display: flex;
+    flex-direction: row;
+    position: relative;
+  }
+  .msgText span{
+    white-space: pre-wrap;
+    width: 100%;
+    margin-right: 20px;
+  }
+  .shortTime{
+    visibility: hidden;
+    line-height: 18px;
+    width: 50px;
+    text-align: center;
+  }
+  .longTime {
+    font-size: 12px;
+    width: 100%;
+    text-align: right;
+    height: 100%;
+  }
+  .msgUserInfo{
+
+  }
+  .msgUserImage{
+    height: 50px;
+    width: 50px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius:5px;
+
+  }
+  .senderTime {
+    user-select: none;
+    padding-top: 18px;
+    padding-left: 11px;
+    font-size: 12px;
+    float: left;
+  }
+
+.msgUserName{
+  font-size: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.msgUserName p{
+  margin:0;
+  margin-right: 4px;
+}
+  .textDiv {
+    width: 96%;
+    padding: 0 2%;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .msgContainer:hover{
+    background-color: #3a3a3a;
+  }
+  .msgContainer:hover .shortTime{
+    visibility: visible;
+  }
+  
+  .showMoreText {
+    width: 96%;
+    margin-left: 2%;
+    border-radius: 5px;
+    padding: 4% 0%;
+    text-align: center;
+    font-size: 17px;
+    cursor: pointer;
+  }
+  
+  .addDontShareCredentials {
+    width: 82%;
+    user-select: none;
+    margin: auto;
+    margin-top: 2%;
+    font-size: 17px;
+    border-radius: 5px;
+    padding: 5%;
+    text-align: center;
+  }
+  

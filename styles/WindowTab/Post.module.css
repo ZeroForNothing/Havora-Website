@@ -51,18 +51,6 @@
 margin-top: 20px;
 }
 
-.discard{
-  background-image: url("../../sharedComponents/Media/trash.png");
-}
-.create{
-  background-image: url("../../sharedComponents/Media/save.png");
-}
-.youtube{
-  background-image: url("../../sharedComponents/Media/youtube.png");
-}
-.insertFile{
-  background-image: url("../../sharedComponents/Media/imageInsert.png");
-}
 .youtubeFrameVideo {
   margin-top: 18px;
   border-radius: 6px;

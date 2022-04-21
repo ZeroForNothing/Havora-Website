@@ -31,7 +31,7 @@ export default function CommunityTab(){
                     userCode : null
                   })
               }}>
-                    <span className={`CreateContent`}></span>
+                    <span className={`bi bi-plus-square`}></span>
                     <p>Create Post</p>
               </div> : null
         }
