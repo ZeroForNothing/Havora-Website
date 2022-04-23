@@ -9,7 +9,7 @@ export default function Login() {
 
     async function LoginUser(data) {
         var userAgent = navigator.userAgent.toLowerCase();
-        let returnData = { email: data.email, password: data.password, client: userAgent.indexOf(' electron/') > -1 };
+        let returnData = { email: data.email, password: data.password, platform: userAgent.indexOf(' electron/') > -1 ? "Client" : "Website" };
         const response = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
