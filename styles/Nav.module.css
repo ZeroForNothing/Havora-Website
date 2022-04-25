@@ -67,16 +67,18 @@
   cursor: pointer;
 }
 .dropdownContainer{
-  position: absolute;
-  top: 74px;
-  width: 246px;
-  padding: 12px;
-  right: 294px;
-  border-radius: 5px;
+  position: fixed;
+  top: 60px;
+  width: 270px;
+  bottom: 0;
+  right: 0;
+  box-shadow: none !important;
 }
 .dropdownContainer div{
-  margin-bottom: 14px;
+  margin: auto;
+  margin-top: 14px;
   border-radius: 5px;
+  width: 92%;
 }
 .dropdownContainer div:last-child{
   margin-bottom: 0;

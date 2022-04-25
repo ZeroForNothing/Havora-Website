@@ -12,6 +12,8 @@ export default function ChatTab({WindowLoad}){
     let chatPrevListRef = useRef(null)
     let messagesEndRef = useRef(null)
     let [writtenMessagesCounter , SetWrittenMessagesCounter] = useState(0)
+    let lastMsgFromUserNameRef = useRef(null)
+    let lastMsgFromUserCodeRef = useRef(null)
     let [lastMsgFromUserName , SetLastMsgFromUserName] = useState(null)
     let [lastMsgFromUserCode , SetLastMsgFromUserCode] = useState(null)
     const scrollToBottom = () => {
@@ -44,19 +46,27 @@ export default function ChatTab({WindowLoad}){
             if (data.myself) {
                 if(isNaN(data.textID) || isNaN(data.oldID)) return;
                 let message = [...chatPrevListRef.current].find(msg => msg.Old_ID == data.oldID)
-                const messageIndex = [...chatPrevListRef.current].indexOf(message)
+                const index = [...chatPrevListRef.current].indexOf(message)
+                if(!message)return;
                 message.Text_ID = parseInt(data.textID);
                 message.Text_Status = "sent"
                 SetChatList(oldArray => {
-                  return [
-                    ...oldArray.slice(0, messageIndex),
-                    message,
-                    ...oldArray.slice(messageIndex + 1),
-                  ]
+                    return [
+                        ...oldArray.slice(0, index),
+                        message,
+                        ...oldArray.slice(index + 1),
+                    ]
                 })
             } else {
                 if(!data.message || isNaN(data.textID) || !data.username || !data.userCode || !data.unSeenMsgsCount) return;
-                CreateMessageHolder(parseInt(data.textID),data.message,data.username,data.userCode)
+                let alreadyWritten = false;
+                if(data.username === lastMsgFromUserNameRef && data.userCode=== lastMsgFromUserCodeRef)
+                    alreadyWritten = true; 
+                else{
+                    lastMsgFromUserNameRef = (data.username);
+                    lastMsgFromUserCodeRef = (data.userCode);
+                }
+                CreateMessageHolder(parseInt(data.textID),data.message,data.username,data.userCode , alreadyWritten)
                 socket.emit('msgsSeen')
             }
           })
@@ -80,15 +90,7 @@ export default function ChatTab({WindowLoad}){
             SetChatList(arrlist)
           });
     },[socket])
-    function CreateMessageHolder(id,text , username,userCode){
-        let alreadyWritten = false;
-
-        if(username === lastMsgFromUserName && userCode=== lastMsgFromUserCode)
-            alreadyWritten = true; 
-        else{
-            SetLastMsgFromUserName(username);
-            SetLastMsgFromUserCode(userCode);
-        }
+    function CreateMessageHolder(id,text , username,userCode , alreadyWritten){
         let newArr = {Old_ID: id, Text_ID: null, User_Name:username, User_Code : userCode,Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , alreadyWritten}
         SetWrittenMessagesCounter(id + 1)
         chatPrevListRef.current = [...chatPrevListRef.current] ? ([...chatPrevListRef.current]).concat([newArr]) : [newArr];
@@ -99,7 +101,15 @@ export default function ChatTab({WindowLoad}){
         if (event.key === 'Enter' && !event.shiftKey && messageText.current.value.trim().length != 0) {
             event.preventDefault();
             let id = writtenMessagesCounter;
-            CreateMessageHolder(id,messageText.current.value.trim(),user.name,user.code)
+            let alreadyWritten = false;
+
+            if(user.name === lastMsgFromUserName && user.code=== lastMsgFromUserCode)
+                alreadyWritten = true; 
+            else{
+                SetLastMsgFromUserName(user.name);
+                SetLastMsgFromUserCode(user.code);
+            }
+            CreateMessageHolder(id,messageText.current.value.trim(),user.name,user.code , alreadyWritten)
 
             let message = messageText.current.value.trim()
             socket.emit('sendMessage', {

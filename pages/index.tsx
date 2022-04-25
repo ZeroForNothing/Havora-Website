@@ -31,10 +31,7 @@ const Index = ({ user })=> {
 
    useEffect(()=>{  
      if(user){
-
-       if(socket == null){
-         dispatch(fetchSocket())
-        }
+       if(!socket){ dispatch(fetchSocket()) }
        else {        
           if(user) socket.emit('socketLogin',user)
           socket.on('registerUser',data =>{
@@ -62,7 +59,10 @@ const Index = ({ user })=> {
               SetChatTab(false)
               if(window === "Home") SetHomeTab(true)
               else if(window === "Profile") SetProfileTab(true)
-              else if(window === "Post") SetPostTab(true)
+              else if(window === "Post"){
+                SetWindowLoad(data.load)
+                SetPostTab(true)
+              }
               else if(window === "Community") SetCommunityTab(true)
               else if(window === "Chat"){
                 SetWindowLoad(data.load)
@@ -81,7 +81,7 @@ const Index = ({ user })=> {
           <div className={`baseLayer WindowTab`}>
             { homeTab ? <HomeTab /> : null }
             { profileTab ? <ProfileTab userEmail={user.email}/> : null }
-            { postTab ? <PostTab /> : null }
+            { postTab ? <PostTab WindowLoad={WindowLoad} /> : null }
             { communityTab ? <CommunityTab /> : null }
             { chatTab ? <ChatTab WindowLoad={WindowLoad} /> : null }
           </div>

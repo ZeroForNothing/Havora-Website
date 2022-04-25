@@ -12,7 +12,7 @@ const MessageForm = ({id,myName,myCode,myPicToken,myPicType, msgWriterName,msgWr
         <div className={`${styles.msgContainer}`}>
             <div className={`${styles.msgUserInfo}`}>
                 {
-                    !alreadyWritten ?  <div className={`secondLayer ${styles.msgUserImage}`} style={{ backgroundImage:  picType ? `url(${"/MediaFiles/ProfilePic/" + picToken + "/file." + picType })` : 'none'}}></div> : null
+                    !alreadyWritten ?  <div className={`secondLayer ${styles.msgUserImage}`} style={{ backgroundImage:  picType ? `url(${"/MediaFiles/ProfilePic/" + picToken + "/" + picType })` : 'none'}}></div> : null
                 }   
                 {
                     alreadyWritten? <div className={`userCode ${styles.shortTime}`}>{moment(date).format('hh:mm')}</div> : null

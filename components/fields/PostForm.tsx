@@ -20,7 +20,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
           : null
         }
         <div className={`secondLayer ${contentStyles.userProfilePic}`} style={{
-          backgroundImage: profilePicType ? `url(/MediaFiles/ProfilePic/${picToken}/file.${profilePicType})` : 'none'
+          backgroundImage: profilePicType ? `url(/MediaFiles/ProfilePic/${picToken}/${profilePicType})` : 'none'
         }}></div>
         <div className={`secondLayer ${contentStyles.userContentData}`}
            onClick={() => { 

@@ -7,7 +7,7 @@ import { ShowError } from '../../fields/error';
 import axios from 'axios';
 import CategorySearch  from "../../fields/CategorySearch"
 
-export default function PostTab(){
+export default function PostTab({WindowLoad}){
     let [mediaUrl , SetMediaUrl] = useState(false)
     let [mediaUploaded , SetMediaUploaded] = useState([])
 
@@ -19,7 +19,7 @@ export default function PostTab(){
 
     let { user } = useSelector((state: any) => state.user)
     let { socket } = useSelector((state: any) => state.socket)
-    let [picToken , SetPicToken] = useState(null)
+    let [uploadURL , SetUploadURL] = useState<string>(null)
 
     const [currentCategoryID, SetCurrentCategoryID] = useState<number>(null);
 
@@ -43,8 +43,8 @@ export default function PostTab(){
       });
       socket.on("promptToDiscardPost",()=>{
         console.log("promptToDiscardPost")
-      })     
-      SetPicToken(user.picToken)
+      })   
+      SetUploadURL("/upload?picToken=" + user.picToken+"&folderName="+ WindowLoad)
     }, [socket]);
 
     const handlePostUrl = e =>{
@@ -92,7 +92,7 @@ export default function PostTab(){
           let index = amountOfFiles;
           await axios.request({
             method: "post", 
-            url: "/upload?picToken=" + picToken, 
+            url: uploadURL, 
             data: form,
             onUploadProgress: (progress) => {
               let ratio = progress.loaded / progress.total

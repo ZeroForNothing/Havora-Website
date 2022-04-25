@@ -27,8 +27,8 @@ export default function CommunityTab(){
             mainNav ? <div className={`NavButton`} onClick={()=>{    
                 socket.emit("startCreatingPost", { 
                     type : 2,
-                    username : null,
-                    userCode : null
+                    name : null,
+                    code : null
                   })
               }}>
                     <span className={`bi bi-plus-square`}></span>

@@ -14,10 +14,43 @@ export default function FriendsList(){
         if(!socket) return;
         socket.on('updateFriendList', (data) => {
             if (data == null) return;
-            let friendList = data.friendListJson
+            let friendList = JSON.parse(data.friendListJson)
             friendPrevListRef.current = friendList
             SetFriendList(friendList)
             //console.log(friendList)
+        })
+        socket.on('msgsRecievedWhileNotTaklingWithUser', (data) => {
+            if (!data || !data.message || !data.textID || !data.username || !data.userCode || !data.unSeenMsgsCount) return;
+            if(!data.showUnreadMsgs){
+                data.showUnreadMsgs = false;
+                socket.emit("msgsRecievedWhileNotTaklingWithUser" , data)
+            }else{
+                let friend = [...friendPrevListRef.current].find(slot => slot.username == data.username && slot.userCode == data.userCode)
+                const index = [...friendPrevListRef.current].indexOf(friend)
+                if(!friend)return;
+                friend.unReadMsg = data.unSeenMsgsCount
+                SetFriendList(oldArray => {
+                  return [
+                    ...oldArray.slice(0, index),
+                    friend,
+                    ...oldArray.slice(index + 1),
+                  ]
+                })
+            }
+        })
+        socket.on('removeMsgsRecievedAlert', (data) => {
+            if (!data || !data.username || !data.userCode) return;
+            let friend = [...friendPrevListRef.current].find(slot => slot.username == data.username && slot.userCode == data.userCode)
+            const index = [...friendPrevListRef.current].indexOf(friend)
+            if(!friend)return;
+            friend.unReadMsg = 0
+            SetFriendList(oldArray => {
+              return [
+                ...oldArray.slice(0, index),
+                friend,
+                ...oldArray.slice(index + 1),
+              ]
+            })
         })
         // socket.on('getFriendRequest', function(data) {
         //     if (data == null) return;

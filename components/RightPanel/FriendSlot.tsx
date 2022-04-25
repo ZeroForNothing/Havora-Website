@@ -3,15 +3,14 @@ import styles from '../../styles/RightPanel/FriendsList.module.css'
 
 export const FriendSlot = ({ socket,username,userCode, unReadMsg ,userClientAvability , userWebAvability ,userMobileAvability ,userGameAvability , profilePicType , picToken }: any)=>{
     return (
-    <div className={`secondLayer WindowButton ${styles.friendStatus} ${unReadMsg > 0 ? styles.gotMsgFromFriend: '' } ${userClientAvability == 1 || userWebAvability == 1 || userMobileAvability == 1 || userGameAvability == 1 ? styles.userStatusOnline: '' }`}
+    <div className={`WindowButton ${styles.friendStatus} ${unReadMsg > 0 ? styles.gotMsgFromFriend: '' } ${userClientAvability == 1 || userWebAvability == 1 || userMobileAvability == 1 || userGameAvability == 1 ? styles.userStatusOnline: '' }`}
     onClick={()=> {
         socket.emit('showChatWindow',{
             username,
             userCode
         }); 
-        //socket.emit('showChatHistory')
     }}>
-            <div className={`secondLayer ${styles.friendIcon}`} style={{ backgroundImage: profilePicType ? `url(/MediaFiles/ProfilePic/${picToken}/file.${profilePicType})` : 'none' }} ></div>
+            <div className={`secondLayer ${styles.friendIcon}`} style={{ backgroundImage: profilePicType ? `url(/MediaFiles/ProfilePic/${picToken}/${profilePicType})` : 'none' }} ></div>
             <div className={`${styles.currentPlatform} ${userGameAvability == 1 ? styles.GamePlatform : ""} ${userClientAvability == 1 ? styles.ClientPlatform : ""} ${userWebAvability == 1 ? styles.WebPlatform : ""} ${userMobileAvability == 1 ? styles.MobilePlatform : ""}`}></div>
             <div className={`${styles.friendText}`}>
                 <span>{username}</span>

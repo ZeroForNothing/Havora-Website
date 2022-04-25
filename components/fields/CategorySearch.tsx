@@ -66,8 +66,13 @@ const CategorySearch = ({socket,currentCategoryID,SetCurrentCategoryID, fetchPos
     return (
         <div className={`${communityStyles.categoryContainer}`}>
             {
-                currentCategoryID && currentCategoryID != 1 ? <input type="button" value={currentCategoryName} maxLength={150} 
-                className={`secondLayer inputIcon ${communityStyles.removeCategory}`} onClick={handleRemoveCategory} /> 
+                currentCategoryID && currentCategoryID != 1 ? 
+                <div className={`NavButton secondLayer ${communityStyles.removeCategory}`} onClick={()=>{
+                    handleRemoveCategory
+                    }}>
+                      <span className={`bi bi-x`}></span>
+                      <p>{currentCategoryName}</p>
+                </div>
                 : <InputField id="categorySearch" type="text" placeholder="Search for category type..." maxLength={150} icon={`search`}
                 onKeyUp={handleCategorySearch} />
             }

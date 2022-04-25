@@ -31,8 +31,6 @@ export default function ProfileTab({userEmail , ...props}) {
   let [CurrentProfile, SetCurrentProfile] = useState<Profile>(null)
   const CurrentProfileRef = useRef<Profile>(CurrentProfile)
 
-  let [picToken, SetPicToken] = useState('')
-
   const [currentCategoryID, SetCurrentCategoryID] = useState<number>(1);
 
   //const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,4}))$/;    
@@ -134,7 +132,7 @@ export default function ProfileTab({userEmail , ...props}) {
           }
           ShowError(text)
         }
-      })
+      });
     
       socket.on('getUserInformation', function(data) {
         if (data != null) {
@@ -149,7 +147,7 @@ export default function ProfileTab({userEmail , ...props}) {
         } else {
           ShowError("Couldn't get user information")
         }
-      })
+      });
       socket.on('manageFriendRequest', function(data) {
         console.log(data.relation)
         if(data.username == user.name && data.userCode == user.code) return;
@@ -159,7 +157,16 @@ export default function ProfileTab({userEmail , ...props}) {
           SetCurrentProfile(prevState => ({ ...prevState, friendRequest: data.relation }));
         }
       });
-      SetPicToken(user.picToken);
+      socket.on('updateUserPicture', function(data) {
+        if (data.picType == "Profile"){
+          SetProfilePercentage(null)
+          SetCurrentProfile(prevState => ({ ...prevState, profilePicType: data.fileName }));
+        }
+        else {
+          SetWallpaperPercentage(null)
+          SetCurrentProfile(prevState => ({ ...prevState, wallpaperPicType: data.fileName }));
+        }
+      });
   }, [socket]);
 
 
@@ -189,11 +196,11 @@ export default function ProfileTab({userEmail , ...props}) {
     form.append(`email`, userEmail);
     let perc = "0%"
     let src = URL.createObjectURL(files[0])
-    if (picType == 1) {
+    if (picType == "Profile") {
       // SetProfilePic(src)
       SetProfilePercentage(perc)
     }
-    else if (picType == 2) {
+    else if (picType == "Wallpaper") {
       // SetWallpaperPic(src)
       SetWallpaperPercentage(perc)
     } else {
@@ -205,20 +212,21 @@ export default function ProfileTab({userEmail , ...props}) {
     try {
       await axios.request({
         method: "post",
-        url: "/profileUpload?picType=" + picType + "&picToken=" + picToken,
+        url: "/profileUpload?picToken=" + user.picToken+'&picType='+picType,
         data: form,
         onUploadProgress: (progress) => {
           let ratio = progress.loaded / progress.total
           let percentage = (ratio * 100).toFixed(2) + "%";
 
-          if (picType == 1) SetProfilePercentage(percentage)
+          if (picType == "Profile") SetProfilePercentage(percentage)
           else SetWallpaperPercentage(percentage)
         }
       }).then(response => {
-        if (response.data.msg) {
-          if (picType == 1) SetProfilePercentage(null)
-          else SetWallpaperPercentage(null)
-          socket.emit('registerUser')
+        if (response.data.ok) {
+          socket.emit('updateUserPicture' , {
+            picType,
+            fileName : response.data.fileName
+          })
         }
         else ShowError(response.data.error);
         e.target.value = "";
@@ -314,8 +322,8 @@ export default function ProfileTab({userEmail , ...props}) {
                   <div className={`NavButton`} onClick={()=>{    
                     socket.emit("startCreatingPost", { 
                         type : user.name === CurrentProfile.name && user.code === CurrentProfile.code ? 1 : 3,
-                        username : CurrentProfile ? CurrentProfile.name : null,
-                        userCode : CurrentProfile ? CurrentProfile.code : null
+                        name : CurrentProfile ? CurrentProfile.name : null,
+                        code : CurrentProfile ? CurrentProfile.code : null
                       })
                   }}>
                         <span className={`bi bi-plus-square`}></span>
@@ -365,9 +373,9 @@ export default function ProfileTab({userEmail , ...props}) {
         <div className={`${!editProfileNav && postNav ? "MainDisplayContentContainer" :"MainDisplay"}`}>
         {
         mainNav ?             
-        <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
+        <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/" + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
           <div className={`${"secondLayer"} ${styles.userDataPosition}`}>
-            <div className={`${"secondLayer"} ${styles.profPic}`} style={{ backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}}></div>
+            <div className={`${"secondLayer"} ${styles.profPic}`} style={{ backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/" + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}}></div>
             <div className={`${styles.userInfoContainer}`}>
               <div className={`${styles.profileUsername}`}>{CurrentProfile.name}</div>
               <div className={`${styles.profileUserCode}`}>{`#`}{CurrentProfile.code}</div>
@@ -384,7 +392,7 @@ export default function ProfileTab({userEmail , ...props}) {
             {
               editPic ? <>
                <div className={`${styles.editPicContainer}`} >
-                <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/file." + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}} ></div>
+                <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/" + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}} ></div>
                     
                     {
                       profilePercentage ? <>
@@ -393,13 +401,13 @@ export default function ProfileTab({userEmail , ...props}) {
                       </> : <label htmlFor="EditUserProfilePic" className={`secondLayer`}>Change My Profile Picture</label>
                     }
                     <input type="file" accept="image/*" name="image" id="EditUserProfilePic"
-                      onChange={uploadImage(1)} style={{ display: "none" }}
+                      onChange={uploadImage('Profile')} style={{ display: "none" }}
                     />
                </div>
                
                
                   <div className={`${styles.editPicContainer}`}>
-                    <div className={`secondLayer ${styles.displayPic}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/file." + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` }}></div>
+                    <div className={`secondLayer ${styles.displayPic}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/" + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` }}></div>
                     {
                       wallpaperPercentage ? <>
                         <span className={`${styles.picPercent}`}>{wallpaperPercentage}</span>
@@ -407,7 +415,7 @@ export default function ProfileTab({userEmail , ...props}) {
                       </> : <label htmlFor="EditUserWallpaperPic" className={`secondLayer`}>Change My Wallpaper Picture</label>
                     }
                     <input type="file" accept="image/*" name="image" id="EditUserWallpaperPic"
-                      onChange={uploadImage(2)} style={{ display: "none" }}
+                      onChange={uploadImage('Wallpaper')} style={{ display: "none" }}
                     />
                   </div>
                 

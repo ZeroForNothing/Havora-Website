@@ -42,11 +42,8 @@
     margin-bottom: 20px;
   }
   .removeCategory{
-    width: 100%;
-    padding: 12px 28px;
     border-radius: 5px;
     font-size: 22px;
-    cursor: pointer;
   }
   .notFound{
     margin: 0;
