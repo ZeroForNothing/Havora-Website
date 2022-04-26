@@ -12,7 +12,6 @@
   transition: transform .2s;
   cursor: pointer;
   margin: auto;
-  margin-bottom: 14px;
   padding: 8px 0;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
@@ -151,29 +150,7 @@
   
   .gotMsgFromFriend {
     transition: 0.3s ease all;
-    animation: blinkingMsg 4s infinite;
-  }
-  
-  @keyframes blinkingMsg {
-    0% {
-      background-color: #4e4e4e;
-    }
-  
-    49% {
-      background-color: #4e4e4e;
-    }
-  
-    60% {
-      background-color: #5e5e5e;
-    }
-  
-    99% {
-      background-color: #5e5e5e;
-    }
-  
-    100% {
-      background-color: #4e4e4e;
-    }
+    background-color: #4e4e4e;
   }
   
   .hideMsgAlert {

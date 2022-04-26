@@ -1,4 +1,4 @@
-import styles from '../styles/Signup.module.css'
+import styles from '../styles/NoAuth/Signup.module.css'
 import Link from 'next/link'
 import { InputField } from '../components/fields/InputField'
 import { Field, Formik } from "formik"

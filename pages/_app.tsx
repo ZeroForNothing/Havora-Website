@@ -1,5 +1,5 @@
-import '../styles/globals.css'
-import '../styles/DarkMode.css'
+import '../styles/Global/globals.css'
+import '../styles/Global/DarkMode.css'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import App from 'next/app'
 import {Provider} from 'react-redux'

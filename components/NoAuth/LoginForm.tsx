@@ -1,4 +1,4 @@
-import styles from '../../styles/Login.module.css'
+import styles from '../../styles/NoAuth/Login.module.css'
 import Link from 'next/link'
 import { Field, Formik } from "formik"
 import Layout from '../fields/Layout'

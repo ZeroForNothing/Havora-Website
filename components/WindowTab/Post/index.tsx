@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import {InsertYoutubeUrl , checkAcceptedExtensions} from './PostData';
 import { ShowError } from '../../fields/error';
 import axios from 'axios';
-import CategorySearch  from "../../fields/CategorySearch"
+import CategorySearch  from "../../Components/CategorySearch"
 
 export default function PostTab({WindowLoad}){
     let [mediaUrl , SetMediaUrl] = useState(false)

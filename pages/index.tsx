@@ -5,7 +5,7 @@ import { fetchUser } from '../store/actions/userAction'
 import { withIronSession } from "next-iron-session";
 
 import Layout from '../components/fields/Layout'
-import MainNav from '../components/RightPanel/MainNav'
+import MainNav from '../components/TopPanel/MainNav'
 import FriendsList from '../components/RightPanel/FriendsList'
 import { ShowError } from '../components/fields/error'
 import LoginForm from "../components/NoAuth/LoginForm"

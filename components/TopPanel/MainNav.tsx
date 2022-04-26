@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
-import styles from '../../styles/Nav.module.css'
+import styles from '../../styles/TopPanel/Nav.module.css'
 import { ShowError } from '../fields/error';
 
 export default function MainNav(){

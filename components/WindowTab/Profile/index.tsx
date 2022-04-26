@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux'
 import { ShowError } from "../../fields/error"
 import axios from "axios"
 import moment from "moment"
-import Content from "../Content"
+import Content from "../../Components/Content"
 
 export default function ProfileTab({userEmail , ...props}) {
   

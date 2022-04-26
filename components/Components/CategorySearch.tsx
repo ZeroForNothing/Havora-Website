@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import communityStyles from '../../styles/WindowTab/Community.module.css'
-import { InputField } from "./InputField";
+import { InputField } from "../fields/InputField";
 
 const CategorySearch = ({socket,currentCategoryID,SetCurrentCategoryID, fetchPosts, ...props })=>{
 

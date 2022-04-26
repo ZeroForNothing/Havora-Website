@@ -11,7 +11,7 @@ export default withIronSession(
         body: JSON.stringify(req.body)
       });
       let user = await response.json();
-      if (user != null && user.error == null) {
+      if (user && user.ok && !user.error) {
         req.session.set("user", user);
         await req.session.save();
         return res.status(201).send();

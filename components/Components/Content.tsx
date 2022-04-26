@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { ShowError } from "../fields/error"
-import PostForm from '../fields/PostForm'
+import PostForm from './PostForm'
 import styles from '../../styles/WindowTab/Content.module.css'
 
 const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, CurrentProfile, mainNav, postNav, SetMainNav, SetPostNav }) =>{

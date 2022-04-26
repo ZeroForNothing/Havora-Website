@@ -2,8 +2,8 @@ import communityStyles from '../../../styles/WindowTab/Community.module.css'
 import { useState,useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { ShowError } from '../../fields/error';
-import Content from '../Content';
-import CategorySearch from '../../fields/CategorySearch';
+import Content from '../../Components/Content';
+import CategorySearch from '../../Components/CategorySearch';
 
 export default function CommunityTab(){
 
