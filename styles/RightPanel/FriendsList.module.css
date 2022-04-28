@@ -1,25 +1,25 @@
 .FriendsList{
-    position: fixed;
-    bottom: 0;
-    width: 270px;
-    top: 54px;
-    right: 0;
-    padding-top: 20px;
+  position: fixed;
+  bottom: 0;
+  width: 242px;
+  top: 54px;
+  right: 0;
+  padding: 20px 14px;
+  border-left: 1px solid;
 }
 
-.friendStatus {
-  width: 100%;
-  transition: transform .2s;
-  cursor: pointer;
-  margin: auto;
-  padding: 8px 0;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  position: relative;
-  display: flex;
-  flex-direction: row;
+  .friendStatus {
+    width: 100%;
+    transition: transform .2s;
+    cursor: pointer;
+    margin: auto;
+    padding: 8px 0;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    border-radius: 5px;
+
   }
-  
   .CoinImage{
     width: 30px;
     height: 30px;
@@ -30,7 +30,6 @@
     background-color: transparent;
   }
   .friendPreview {
-    -webkit-app-region: no-drag;
     position: fixed;
     width: 23%;
     height: 25%;
@@ -39,8 +38,8 @@
   }
   
   .friendIcon {
-    height: 55px;
-    width: 55px;
+    height: 42px;
+    width: 42px;
     border-radius: 6px;
     background-size: cover;
     background-repeat: no-repeat;
@@ -266,5 +265,8 @@
   }
   
   
-
+.friendListTitle{
+  margin-bottom: 10px;
+  font-size: 18px;
+}
   

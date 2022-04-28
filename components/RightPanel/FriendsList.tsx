@@ -119,7 +119,7 @@ export default function FriendsList(){
     },[socket])
 
     return (
-        <div  className={`${styles.FriendsList}`}>
+        <div  className={`borderColor ${styles.FriendsList}`}>
 
             {/* <div id="EasyAccessButtons" className="friendListContainer">
                 <input type="button" id="Settings" />
@@ -135,7 +135,8 @@ export default function FriendsList(){
             {/* <div id="quickUserInfo">
             <div id="balanceHolder"><span>1.00 $</span></div>
             </div> */}
-            <div className="friendListPanelContainer">
+            <div className={`${styles.friendListTitle}`}>General</div>
+            <div>
                 <div className="friendPreview"></div>
                 {
                     friendList && friendList.length > 0 ? friendList.map((friend,index) => {

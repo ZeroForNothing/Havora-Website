@@ -3,7 +3,7 @@ import styles from '../../styles/RightPanel/FriendsList.module.css'
 
 export const FriendSlot = ({ socket,username,userCode, unReadMsg ,userClientAvability , userWebAvability ,userMobileAvability ,userGameAvability , profilePicType , picToken }: any)=>{
     return (
-    <div className={`WindowButton ${styles.friendStatus} ${unReadMsg > 0 ? styles.gotMsgFromFriend: '' } ${userClientAvability == 1 || userWebAvability == 1 || userMobileAvability == 1 || userGameAvability == 1 ? styles.userStatusOnline: '' }`}
+    <div className={`borderColor WindowButton ${styles.friendStatus} ${unReadMsg > 0 ? styles.gotMsgFromFriend: '' } ${userClientAvability == 1 || userWebAvability == 1 || userMobileAvability == 1 || userGameAvability == 1 ? styles.userStatusOnline: '' }`}
     onClick={()=> {
         socket.emit('showChatWindow',{
             username,

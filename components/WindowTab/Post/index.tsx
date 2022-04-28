@@ -44,7 +44,7 @@ export default function PostTab({WindowLoad}){
       socket.on("promptToDiscardPost",()=>{
         console.log("promptToDiscardPost")
       })   
-      SetUploadURL("/upload?picToken=" + user.picToken+"&folderName="+ WindowLoad)
+      SetUploadURL("/upload?picToken=" + user.picToken+"&folderName="+ WindowLoad+'&directoryFolder=PostFiles')
     }, [socket]);
 
     const handlePostUrl = e =>{
@@ -103,7 +103,7 @@ export default function PostTab({WindowLoad}){
               }
             }
           }).then( response => {
-            if(response.data.msg){
+            if(response.data.ok){
               if(mediaUploaded[index]){
                 mediaUploaded[index].percentage = "Uploaded Successfully"
                 SetMediaUploaded(mediaUploaded) 
