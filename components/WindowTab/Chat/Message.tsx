@@ -47,13 +47,13 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                 }
                 {
                     mediaFiles && mediaFiles.length > 0 && !tempMedia ? mediaFiles.map(( media,index) =>{
-                        return <div className={`${styles.msgMediaHolder}`}>
+                        return <div key={index} className={`${styles.msgMediaHolder}`}>
                            {
                                 (media.endsWith(".png") || media.endsWith(".jpg") || media.endsWith(".jpeg")) ?
-                                <img key={index} className={`secondLayer`} src={`/MediaFiles/ChatFiles/${picToken}/${mediaFolder}/${media}`} />
+                                <img className={`secondLayer`} src={`/MediaFiles/ChatFiles/${picToken}/${mediaFolder}/${media}`} />
                                 : (
                                   (media.endsWith(".mp4") || media.endsWith(".MP4") || media.endsWith(".mov")|| media.endsWith(".x-matroska")) ?
-                                    <video key={index} className={`secondLayer`} controls>
+                                    <video className={`secondLayer`} controls>
                                       <source src={`/MediaFiles/ChatFiles/${picToken}/${mediaFolder}/${media}`} />
                                       Can't view video here
                                     </video> : null)
@@ -64,13 +64,13 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                 }
                 {
                     !mediaFiles && !mediaFolder && tempMedia && tempMedia.length > 0 ? tempMedia.map(( media,index) =>{
-                        return <div className={`${styles.msgMediaHolder}`}> 
+                        return <div key={index} className={`${styles.msgMediaHolder}`}> 
                             <div className={`${styles.tempMediaDiv}`}>
                                 {
                                     media.itsImage ?
-                                    <img key={index} className={`secondLayer`} src={media.src} />
+                                    <img className={`secondLayer`} src={media.src} />
                                     : 
-                                    <video key={index} className={`secondLayer`} controls>
+                                    <video className={`secondLayer`} controls>
                                         <source src={media.src} />
                                         Can't view video here
                                     </video> 

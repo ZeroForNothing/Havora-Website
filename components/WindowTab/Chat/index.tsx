@@ -24,6 +24,7 @@ export default function ChatTab({WindowLoad}){
     let [mediaUploaded , SetMediaUploaded] = useState([])
     let mediaUploadedRef = useRef(mediaUploaded)
 
+    let [fetchMoreMsgs , SetFetchMoreMsgs]  = useState(false);
     let [chatCurrentPage , SetChatPage]  = useState(1);
 
     const scrollToBottom = () => {
@@ -58,6 +59,7 @@ export default function ChatTab({WindowLoad}){
 
             chatPrevListRef.current = chatPrevListRef.current ? [...chatPrevListRef.current].concat(chatlogHistory) : chatlogHistory
             SetChatList(chatPrevListRef.current)
+            SetFetchMoreMsgs(true);
         })
         socket.on('sendMessage', function(data) {
             if (data.myself) {
@@ -263,9 +265,11 @@ export default function ChatTab({WindowLoad}){
       }
       
         const handleScroll = e => {
-            console.log("scroll")
-            const bottom = e.target.scrollHeight + e.target.scrollTop === e.target.clientHeight;
-            if(bottom){
+            console.log(e.target.scrollHeight + e.target.scrollTop , e.target.clientHeight + 250)
+            const bottom = e.target.scrollHeight + e.target.scrollTop  <= e.target.clientHeight + 250;
+            if(bottom && fetchMoreMsgs){
+                SetFetchMoreMsgs(false);
+                console.log("Fetch chat page" + chatCurrentPage)
                 socket.emit('showChatHistory' , {
                     page : chatCurrentPage 
                 })
