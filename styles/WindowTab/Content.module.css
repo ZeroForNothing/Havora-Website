@@ -1,5 +1,7 @@
-.postContainer {
+  .postContainer {
     width: 96%;
+    max-width: 700px;
+    margin: 0 auto;
     position: relative;
     padding: 20px 0%;
     border-bottom: 1px solid;

@@ -36,7 +36,7 @@ input:focus, textarea:focus{
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #e4e4e4;
+  background: #3e3e3e;
   border-radius: 6px;
 }
 
@@ -76,7 +76,7 @@ input:focus, textarea:focus{
   display: flex;
   flex-direction: row;
   padding-left: 20px;
-  padding-top: 40px;
+  padding-top: 20px;
   padding-bottom: 0;
   padding-right: 270px;
 }
@@ -107,10 +107,11 @@ input:focus, textarea:focus{
   width: 280px;
 }
 .MainDisplay{
-  max-width: 680px;
-  margin: 0 auto;
-  width: 100%;
-  position: relative;
+  top: 20px;
+  left: 320px;
+  right: 300px;
+  bottom: 0;
+  position: absolute;
 }
 .MainDisplayContent{
   max-width: 680px;

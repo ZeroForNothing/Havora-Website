@@ -120,33 +120,66 @@ export default function ChatTab({WindowLoad}){
             chatPrevListRef.current = arrlist;
             SetChatList(arrlist)
           });
-        socket.on('createChatDirectory', function(data) {
-            if(data && data.folderName) {
-                let arr = [...mediaUploadedRef.current];
-                arr.forEach((files ,index) => {
-                    uploadMediaWithMessage(data.folderName , files.file, index,arr);
-                });
-                mediaFileRef.current.value = "";
-                mediaUploadedRef.current = [];
-                SetMediaUploaded([]);
-            }
-            else ShowError("Failed to create media chat directory")
-        });
     },[socket])
     function CreateMessageHolder(id,text , Text_TempMedia , Text_MediaFolder ,Text_MediaFiles ,username,userCode , showUser){
 
         let newArr = {Old_ID: id, Text_ID: null, User_Name:username, User_Code : userCode,Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , showUser , Text_TempMedia  , Text_MediaFiles , Text_MediaFolder }
-
+        console.log(newArr);
         chatPrevListRef.current = chatPrevListRef.current ? [newArr].concat([...chatPrevListRef.current]) : [newArr];
         SetChatList(chatPrevListRef.current)
-
+        
         scrollToBottom()
         SetMediaMessagesCounter(mediaMessagesCounter + 1)
         SetWrittenMessagesCounter(writtenMessagesCounter + 1)
+
+        if(Text_TempMedia) {
+            let sendMedia = []
+            Text_TempMedia.forEach(async (files , index) => {
+               let tempIndex = 0;
+               const mediaMessageResult = await uploadMediaWithMessage(Text_MediaFolder , files.file , index , Text_TempMedia);
+
+               if(!mediaMessageResult) {
+                let message = [...chatPrevListRef.current].find(msg => msg.Old_ID == "oldMedia_"+ mediaMessagesCounter)
+                const messageIndex = [...chatPrevListRef.current].indexOf(message)
+                if(!message) return;
+                    tempIndex = Text_TempMedia.indexOf(message.Text_TempMedia[index])
+                if(tempIndex == -1) return;
+                    message.Text_TempMedia[tempIndex].retry = true;
+                SetChatList(oldArray => {
+                    return [
+                        ...oldArray.slice(0, messageIndex),
+                        message,
+                        ...oldArray.slice(messageIndex + 1),
+                    ]
+                })
+               }else{
+                   let message = [...chatPrevListRef.current].find(msg => msg.Old_ID == "oldMedia_"+ mediaMessagesCounter)
+                   const messageIndex = [...chatPrevListRef.current].indexOf(message)
+                   if(!message) return;
+                       tempIndex = Text_TempMedia.indexOf(message.Text_TempMedia[index])
+                   if(tempIndex == -1) return;
+                       message.Text_TempMedia[tempIndex].finished = true;
+                   SetChatList(oldArray => {
+                       return [
+                           ...oldArray.slice(0, messageIndex),
+                           message,
+                           ...oldArray.slice(messageIndex + 1),
+                       ]
+                   })
+                   console.log("finished")
+               }
+               sendMedia.push(mediaMessageResult);
+               if(sendMedia.length == Text_TempMedia.length){
+                   console.log('sendMessage')
+                   socket.emit('sendMessage', {id : mediaMessagesCounter , folderName : Text_MediaFolder})
+               }
+            });
+        }
     }
-    const handleKeyDown = (event) => {
+    const handleKeyDown = async (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
+            
             let showUser = true;
             let mediaAndText = false;
 
@@ -158,17 +191,37 @@ export default function ChatTab({WindowLoad}){
             }
             lastMsgFromUserNameRef.current = null;
             lastMsgFromUserCodeRef.current = null;
-            if(mediaUploaded && mediaUploaded.length != 0){
-                CreateMessageHolder("oldMedia_"+mediaMessagesCounter,null , mediaUploaded, null , null ,user.name,user.code , showUser)
-                socket.emit('createChatDirectory')
-                mediaAndText = true;
-            }
             if(messageText.current.value.trim().length != 0){
                 if(mediaAndText) showUser = false
                 let message = messageText.current.value.trim()
                 CreateMessageHolder("oldText_"+writtenMessagesCounter, message,null, null , null , user.name, user.code , showUser)
                 socket.emit('sendMessage', { message, id : writtenMessagesCounter})
                 messageText.current.value = '';
+                mediaAndText = true;
+            }
+
+            
+            if(mediaUploaded && mediaUploaded.length != 0){ 
+                let files = [...mediaUploadedRef.current];
+                mediaFileRef.current.value = "";
+                mediaUploadedRef.current = [];
+                SetMediaUploaded([]);
+                const folderName = await axios.post('/CreateTempDirectory',{
+                    picToken : user.picToken,
+                    directoryType : 'ChatFiles'
+                  }).then(function (res : any) {
+                      if(res && res.data && res.data.ok && res.data.folderName)
+                        return res.data.folderName;
+                      else
+                        return false;
+                  }).catch(function (error : any) {
+                      if(error) 
+                      ShowError("CreateTempDirectory: Encountered error no temp directory created")
+                      return false;
+                  });
+                  if(folderName){
+                      CreateMessageHolder("oldMedia_"+mediaMessagesCounter,null , files, folderName , null ,user.name,user.code , showUser)
+                  }
             }
         }
       }
@@ -193,37 +246,53 @@ export default function ChatTab({WindowLoad}){
                   size: (files[index].size / 1024).toFixed(2),
                   itsImage : files[index].type.includes("image"),
                   percentage : 0,
-                  showDetails : false,
-                  finished : false
+                  finished : false,
+                  cancel : null,
+                  retry : false
                 }
                 URL.revokeObjectURL(files[index])  
                 mediaUploadedRef.current = mediaUploadedRef.current ? [...mediaUploadedRef.current].concat([data]) : [data]
                 SetMediaUploaded(mediaUploadedRef.current) 
                 messageText.current.focus();
         }
+        e.target.value = "";
       }
-      async function uploadMediaWithMessage(folderName , file, indexArr  ,arr){
-       
-        let tempIndex= 0;
+      async function uploadMediaWithMessage(folderName , file , indexArr , arr ){
         const form = new FormData();
+        let tempIndex = 0;
         form.append('files',file)
+        let cancelTokenSource = axios.CancelToken.source();
+
+        let message = [...chatPrevListRef.current].find(msg => msg.Old_ID == "oldMedia_"+ mediaMessagesCounter)
+        const index = [...chatPrevListRef.current].indexOf(message)
+        if(!message) return;
+            tempIndex = arr.indexOf(message.Text_TempMedia[indexArr])
+        if(tempIndex == -1) return;
+            message.Text_TempMedia[tempIndex].cancel = () => { cancelTokenSource.cancel('Upload cancelled') };
+
+        SetChatList(oldArray => {
+            return [
+                ...oldArray.slice(0, index),
+                message,
+                ...oldArray.slice(index + 1),
+            ]
+        })
+
         try {
-            await axios.request({
+          return await axios.request({
               method: "post", 
               url: '/upload?picToken='+user.picToken+"&folderName="+ folderName+'&directoryFolder=ChatFiles', 
               data: form,
+              cancelToken: cancelTokenSource.token,
               onUploadProgress: (progress) => {
                 let ratio = progress.loaded / progress.total
                 let percentage = (ratio * 100).toFixed(2);
-                console.log(percentage)
                 let message = [...chatPrevListRef.current].find(msg => msg.Old_ID == "oldMedia_"+ mediaMessagesCounter)
                 const index = [...chatPrevListRef.current].indexOf(message)
-
                 if(!message) return;
-                tempIndex = arr.indexOf(message.Text_TempMedia[indexArr])
-                    
+                    tempIndex = arr.indexOf(message.Text_TempMedia[indexArr])
                 if(tempIndex == -1) return;
-                message.Text_TempMedia[tempIndex].percentage = percentage
+                    message.Text_TempMedia[tempIndex].percentage = percentage
 
                 SetChatList(oldArray => {
                     return [
@@ -234,42 +303,29 @@ export default function ChatTab({WindowLoad}){
                 })
               }
             }).then( response => {
+                console.log(response)
               if(response.data.ok){
-                socket.emit('sendMessage', {id : mediaMessagesCounter , folderName , fileName : response.data.fileName })
-                let message = [...chatPrevListRef.current].find(msg => msg.Old_ID == "oldMedia_"+ mediaMessagesCounter)
-                const index = [...chatPrevListRef.current].indexOf(message)
-                if(!message)return;
-                if(tempIndex == -1)return;
-                    message.Text_TempMedia[tempIndex].finished = true;
-                SetChatList(oldArray => {
-                    return [
-                        ...oldArray.slice(0, index),
-                        message,
-                        ...oldArray.slice(index + 1),
-                    ]
-                })
-              }else
-                ShowError(response.data.error);;
-            }).catch((error) => {
-              if(error.toString().includes("413") ){
-                ShowError("File size huge exceeds 100 MB");
+                return true
+              }else{
+                ShowError(response.data.error);
               }
-              else
+                return false;
+            }).catch((error) => {
                 ShowError(error);
+                return false;
             })
            
           } catch (err) {
             ShowError('Error uploading the files')
-            console.log('Error uploading the files', err)
+            return false;
           }
+         
       }
       
         const handleScroll = e => {
-            console.log(e.target.scrollHeight + e.target.scrollTop , e.target.clientHeight + 250)
             const bottom = e.target.scrollHeight + e.target.scrollTop  <= e.target.clientHeight + 250;
             if(bottom && fetchMoreMsgs){
                 SetFetchMoreMsgs(false);
-                console.log("Fetch chat page" + chatCurrentPage)
                 socket.emit('showChatHistory' , {
                     page : chatCurrentPage 
                 })
@@ -333,9 +389,7 @@ export default function ChatTab({WindowLoad}){
                       })}
                     </div> : null
                 }
-            <textarea className={`secondLayer InputField ${styles.inputHolder}`} placeholder={`Type here...`} maxLength={300} ref={messageText} id="message-input" 
-                   onKeyDown={handleKeyDown}
-            ></textarea>
+                <input type="text" className={`secondLayer InputField ${styles.inputHolder}`} placeholder={`Type here...`}  ref={messageText}  onKeyDown={handleKeyDown} maxLength={300}/>
             {/* <div id="leftSideChat">
                 <input type="button" id="friendCallChat" />
                 <input type="button" id="friendCloseChat" value="&times;" />

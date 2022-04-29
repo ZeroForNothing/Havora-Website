@@ -14,7 +14,7 @@
     top: 50px;
     left: 0;
     right: 0;
-    bottom: 120px;
+    bottom: 65px;
     padding: 2%;
     display: flex;
     flex-direction: column-reverse;
@@ -22,7 +22,7 @@
     border-radius: 5px;
   }
   .changeTextHolderHeight{
-    bottom: 284px;
+    bottom: 378px;
   }
 
   .inputHolder{
@@ -30,7 +30,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 80px;
+    height: 25px;
     width: auto;
   }
   
@@ -79,6 +79,7 @@
     white-space: pre-wrap;
     width: 100%;
     margin-right: 20px;
+    overflow-wrap: anywhere;
   }
   .shortTime{
     visibility: hidden;
@@ -115,13 +116,16 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-
+  margin-bottom: 6px;
 }
 .msgUserName p:hover{
   text-decoration: underline;
 }
-
+.friendNameMsg p{
+  color: #8181ff  !important;
+}
 .msgUserName p{
+  color: #ff3232;
   cursor: pointer;
   margin:0;
   margin-right: 4px;
@@ -164,15 +168,17 @@
   }
   .mediaHolder{
     position: absolute;
-    bottom: 120px;
+    bottom: 65px;
     left: 0;
     right: 0;
-    height: 150px;
+    height: 300px;
     border-radius: 5px;
     border: 1px solid;
     display: flex;
-    align-items: center;
-    padding: 0 2%;
+    overflow: auto;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
   }
   .mediaDiv{
     width: 120px;
@@ -181,7 +187,9 @@
     border-radius: 5px;
     overflow: hidden;
     cursor: pointer;
+    margin: 14px;
   }
+
   .mediaDiv img{
     height: 100%;
     position: absolute;
@@ -191,20 +199,31 @@
   }
 
   .textDiv :is(img , video){
-    max-width: 100%;
-    max-height: 400px;
+    max-width: 500px;
+    max-height: 300px;
     border-radius: 5px;
+    object-fit: cover;
   }
   .msgMediaHolder{
     position: relative;
     width: 100%;
-    margin-top: 6px;
+
     overflow: hidden;
   }
+  .msgMediaResult{
+    width: 100%;
+    margin-top: 6px;
+  }
+  .msgMediaResult:first-child{
+    margin-top: 0;
+  }
 .tempMediaDiv{
-  display: inline-block;
-  position: relative;
+  height: 120px;
+  display: flex;
+  flex-direction: row;
   max-width: 100%;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
   .progress{
     position: absolute;
@@ -213,9 +232,45 @@
     transform: translate(-50%, -50%);
     width: 62px;
   }
+ 
   .newMessages{
     color: #ff3232;
     width: 100%;
     text-align: center;
     padding: 8px 0;
+  }
+  .tempMediaContainer{
+    position: relative;
+    max-width: 300px;
+    min-width: 140px;
+  }
+  .tempMediaContainer :is(img,video){
+    max-height: 82%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .tempMediaInfo{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
+  .tempMediaInfo div{
+    padding: 8px 12px;
+  }
+  .cancelUpload{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: transparent;
+    color: red;
+    display: flex;
+    align-items: center;
+    place-content: center;
+    font-size: 42px;
+    cursor: pointer;
   }

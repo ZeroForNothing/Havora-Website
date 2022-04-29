@@ -10,8 +10,7 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
     let [picToken , SetPicToken] = useState(myMsg ? myPicToken : talkingWithPicToken)
     let [picType , SetPicType] = useState(myMsg ? myPicType : talkingWithPicType)
 
-    if(!tempMedia && mediaFiles && mediaFolder)mediaFiles = mediaFiles ? mediaFiles.toString().split(",") : null
-
+    mediaFiles = mediaFiles ? mediaFiles.toString().split(",") : null
     return (
         <div className={`${styles.msgContainer}`}>
             <div className={`${styles.msgUserInfo}`}>
@@ -29,7 +28,7 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                     <input type="button" className={`${styles.EditUserMsg}`} value="Edit"/>
                 </div> */}
                 {
-                   showUser ? <div className={`${styles.msgUserName}`}  onClick={()=> {
+                   showUser ? <div className={`${styles.msgUserName} ${myMsg ? '' : styles.friendNameMsg}`}  onClick={()=> {
                     window.history.pushState({}, document.title, `/?user=${msgWriterName}&code=${msgWriterCode}`);
                     socket.emit('OpenWindow',{
                         window : 'Profile'
@@ -45,9 +44,12 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                         <div className={`userCode ${styles.longTime}`}>{moment(date).format('hh:mm A')}</div>
                    </div> :null
                 }
+                    {
+                        mediaFiles || mediaFolder || tempMedia ? <>
+                     <div className={`${styles.msgMediaHolder}`}>
                 {
-                    mediaFiles && mediaFiles.length > 0 && !tempMedia ? mediaFiles.map(( media,index) =>{
-                        return <div key={index} className={`${styles.msgMediaHolder}`}>
+                    mediaFiles && mediaFiles.length > 0 && mediaFolder && !tempMedia ? mediaFiles.map(( media,index) =>{
+                        return <div key={index}  className={`${styles.msgMediaResult}`}>
                            {
                                 (media.endsWith(".png") || media.endsWith(".jpg") || media.endsWith(".jpeg")) ?
                                 <img className={`secondLayer`} src={`/MediaFiles/ChatFiles/${picToken}/${mediaFolder}/${media}`} />
@@ -58,19 +60,19 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                                       Can't view video here
                                     </video> : null)
                            }
-                        </div>
+                            </div>
                         })
                     : null
                 }
                 {
-                    !mediaFiles && !mediaFolder && tempMedia && tempMedia.length > 0 ? tempMedia.map(( media,index) =>{
-                        return <div key={index} className={`${styles.msgMediaHolder}`}> 
-                            <div className={`${styles.tempMediaDiv}`}>
+                    !mediaFiles && mediaFolder && tempMedia && tempMedia.length > 0 ? tempMedia.map(( media,index) =>{
+                        return  <div  key={index} className={`secondLayer ${styles.tempMediaDiv}`}>
+                                <div  className={`${styles.tempMediaContainer}`}>
                                 {
                                     media.itsImage ?
-                                    <img className={`secondLayer`} src={media.src} />
+                                    <img src={media.src} />
                                     : 
-                                    <video className={`secondLayer`} controls>
+                                    <video controls>
                                         <source src={media.src} />
                                         Can't view video here
                                     </video> 
@@ -86,21 +88,38 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                                             trailColor: '#2d2d2d',
                                             // backgroundColor: '#32ff34',
                                         })}/>
+                                        <div className={`${styles.cancelUpload}`}  onClick={() => { media.cancel }} >
+                                            <span className={`bi bi-x`}></span>
+                                        </div>
                                     </div> : null
                                 }
+                                </div>
+                                <div className={`${styles.tempMediaInfo}`}>
+
+                                    <div className={``}>{`Name: ${media.name}`}</div>
+                                   <div className={``}>{`Size: ${media.size}`}</div>
+                                   <div className={``}>{`Status: ${media.finished ? `Waiting for other files to finish` : `Uploading`}`}</div>
+                                </div>
+                                
                             </div>
-                        </div>
                         })
                     : null
                 }
-               
-                <div className={`${styles.msgText}`}>
-                    <span>{text}
-                    {
-                        textEdited === "edited" ?  '(edited)' : null
+                    </div>
+                        </>: null
                     }
-                    </span>
-                </div>
+                    {
+                        text?<>
+                        <div className={`${styles.msgText}`}>
+                            <span>{text}
+                            {
+                                textEdited === "edited" ?  '(edited)' : null
+                            }
+                            </span>
+                        </div>
+                        </> : null
+                    }
+
                    {
                        myMsg?<div className={`${styles.checkMark} bi ${view === 'seen' ? styles.msgSeen :''} 
                        ${status === 'recieved' ? 'bi-check2-all' : status === 'sent' ? 'bi-check2' : 'bi-clock'}`}></div>: null
