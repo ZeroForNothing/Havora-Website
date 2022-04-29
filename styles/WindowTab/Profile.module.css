@@ -51,6 +51,7 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    max-width: 727px;
     width: 100%;
     margin: auto;
   }
