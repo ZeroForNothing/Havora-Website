@@ -19,7 +19,7 @@ import ChatTab from '../components/WindowTab/Chat'
 
 const Index = ({ user })=> {
 
-  const dispatch = useDispatch();
+  const dispatch : any = useDispatch();
   let { socket } = useSelector((state: any) => state.socket)
   let [homeTab, SetHomeTab] = useState(true)
   let [profileTab, SetProfileTab] = useState(false)

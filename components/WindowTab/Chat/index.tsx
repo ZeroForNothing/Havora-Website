@@ -14,6 +14,7 @@ export default function ChatTab({WindowLoad}){
     let [chatList , SetChatList] = useState([])
     let chatPrevListRef = useRef(chatList)
     let messagesEndRef = useRef(null)
+    let mediaHolderRef = useRef(null)
     let [writtenMessagesCounter , SetWrittenMessagesCounter] = useState(0)
     let [mediaMessagesCounter , SetMediaMessagesCounter] = useState(0)
     let lastMsgFromUserNameRef = useRef(null)
@@ -30,8 +31,10 @@ export default function ChatTab({WindowLoad}){
     const scrollToBottom = () => {
         setTimeout(()=>{ messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) },50)
     }
+
     useEffect(()=>{
         if(!socket) return;
+
         socket.emit('showChatHistory',{
             page : chatCurrentPage
         })
@@ -76,11 +79,13 @@ export default function ChatTab({WindowLoad}){
                     message.Text_TempMedia = null;
                 }
                 SetChatList(oldArray => {
-                    return [
+                    let newArr = [
                         ...oldArray.slice(0, index),
                         message,
                         ...oldArray.slice(index + 1),
-                    ]
+                    ];
+                    chatPrevListRef.current = newArr
+                    return newArr;
                 })
             } else {
 
@@ -94,7 +99,6 @@ export default function ChatTab({WindowLoad}){
                     lastMsgFromUserNameRef.current = (data.username);
                     lastMsgFromUserCodeRef.current = (data.userCode);
                 }
-                console.log(data.username, lastMsgFromUserNameRef , data.userCode, lastMsgFromUserCodeRef , showUser)
                 SetLastMsgFromUserName(null);
                 SetLastMsgFromUserCode(null);
                 CreateMessageHolder(parseInt(data.textID),data.message, null  , data.folderName , data.tempFiles ,data.username,data.userCode , showUser)
@@ -120,11 +124,40 @@ export default function ChatTab({WindowLoad}){
             chatPrevListRef.current = arrlist;
             SetChatList(arrlist)
           });
+        socket.on('deleteMsg', function(data) {
+            let message = [...chatPrevListRef.current].find(msg => msg.Text_ID == data.textID)
+            const index = [...chatPrevListRef.current].indexOf(message)
+            if(!message)return;
+            SetChatList(oldArray => {
+                let newArr = [
+                    ...oldArray.slice(0, index),
+                    ...oldArray.slice(index + 1),
+                ];
+                chatPrevListRef.current = newArr
+                return newArr;
+            })
+          });
+          socket.on('editMsg', function(data) {
+            let message = [...chatPrevListRef.current].find(msg => msg.Text_ID == data.textID)
+            const index = [...chatPrevListRef.current].indexOf(message)
+            if(!message)return;
+            message.Text_Message =data.message
+            message.Text_Edit ='edited'
+            SetChatList(oldArray => {
+                let newArr = [
+                    ...oldArray.slice(0, index),
+                    message,
+                    ...oldArray.slice(index + 1),
+                ];
+                chatPrevListRef.current = newArr
+                return newArr;
+            })
+          })
     },[socket])
     function CreateMessageHolder(id,text , Text_TempMedia , Text_MediaFolder ,Text_MediaFiles ,username,userCode , showUser){
 
         let newArr = {Old_ID: id, Text_ID: null, User_Name:username, User_Code : userCode,Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , showUser , Text_TempMedia  , Text_MediaFiles , Text_MediaFolder }
-        console.log(newArr);
+
         chatPrevListRef.current = chatPrevListRef.current ? [newArr].concat([...chatPrevListRef.current]) : [newArr];
         SetChatList(chatPrevListRef.current)
         
@@ -146,11 +179,13 @@ export default function ChatTab({WindowLoad}){
                 if(tempIndex == -1) return;
                     message.Text_TempMedia[tempIndex].retry = true;
                 SetChatList(oldArray => {
-                    return [
-                        ...oldArray.slice(0, messageIndex),
+                    let newArr = [
+                        ...oldArray.slice(0, index),
                         message,
-                        ...oldArray.slice(messageIndex + 1),
-                    ]
+                        ...oldArray.slice(index + 1),
+                    ];
+                    chatPrevListRef.current = newArr
+                    return newArr;
                 })
                }else{
                    let message = [...chatPrevListRef.current].find(msg => msg.Old_ID == "oldMedia_"+ mediaMessagesCounter)
@@ -159,22 +194,27 @@ export default function ChatTab({WindowLoad}){
                        tempIndex = Text_TempMedia.indexOf(message.Text_TempMedia[index])
                    if(tempIndex == -1) return;
                        message.Text_TempMedia[tempIndex].finished = true;
-                   SetChatList(oldArray => {
-                       return [
-                           ...oldArray.slice(0, messageIndex),
-                           message,
-                           ...oldArray.slice(messageIndex + 1),
-                       ]
-                   })
-                   console.log("finished")
+                    SetChatList(oldArray => {
+                        let newArr = [
+                            ...oldArray.slice(0, index),
+                            message,
+                            ...oldArray.slice(index + 1),
+                        ];
+                        chatPrevListRef.current = newArr
+                        return newArr;
+                    })
                }
                sendMedia.push(mediaMessageResult);
                if(sendMedia.length == Text_TempMedia.length){
-                   console.log('sendMessage')
                    socket.emit('sendMessage', {id : mediaMessagesCounter , folderName : Text_MediaFolder})
                }
             });
         }
+    }
+    const handleInput = (e)=>{
+        if(messageText.current.scrollHeight > 250) return;
+        messageText.current.style.height = '';
+        messageText.current.style.height =messageText.current.scrollHeight +'px';
     }
     const handleKeyDown = async (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -198,6 +238,7 @@ export default function ChatTab({WindowLoad}){
                 socket.emit('sendMessage', { message, id : writtenMessagesCounter})
                 messageText.current.value = '';
                 mediaAndText = true;
+                messageText.current.style.height ='25px'
             }
 
             
@@ -240,6 +281,7 @@ export default function ChatTab({WindowLoad}){
                 return;
               }
               let data = {
+                  id : index,
                   file : files[index],
                   src : URL.createObjectURL(files[index]) ,
                   name : files[index].name ,
@@ -253,8 +295,8 @@ export default function ChatTab({WindowLoad}){
                 URL.revokeObjectURL(files[index])  
                 mediaUploadedRef.current = mediaUploadedRef.current ? [...mediaUploadedRef.current].concat([data]) : [data]
                 SetMediaUploaded(mediaUploadedRef.current) 
-                messageText.current.focus();
-        }
+            }
+        messageText.current.focus();
         e.target.value = "";
       }
       async function uploadMediaWithMessage(folderName , file , indexArr , arr ){
@@ -271,11 +313,13 @@ export default function ChatTab({WindowLoad}){
             message.Text_TempMedia[tempIndex].cancel = () => { cancelTokenSource.cancel('Upload cancelled') };
 
         SetChatList(oldArray => {
-            return [
+            let newArr = [
                 ...oldArray.slice(0, index),
                 message,
                 ...oldArray.slice(index + 1),
-            ]
+            ];
+            chatPrevListRef.current = newArr
+            return newArr;
         })
 
         try {
@@ -295,15 +339,16 @@ export default function ChatTab({WindowLoad}){
                     message.Text_TempMedia[tempIndex].percentage = percentage
 
                 SetChatList(oldArray => {
-                    return [
+                    let newArr = [
                         ...oldArray.slice(0, index),
                         message,
                         ...oldArray.slice(index + 1),
-                    ]
+                    ];
+                    chatPrevListRef.current = newArr
+                    return newArr;
                 })
               }
             }).then( response => {
-                console.log(response)
               if(response.data.ok){
                 return true
               }else{
@@ -334,11 +379,6 @@ export default function ChatTab({WindowLoad}){
     return (
         <>
         <div className={` Nav`}> 
-            <label className={`NavButton`} htmlFor="mediaFileInsertPost">
-                <span className={`bi bi-upload`}></span>
-                <p>Add Media</p>
-            </label>
-            <input type="file" id="mediaFileInsertPost" onChange={UploadMediaFile} style={{display:"none"}} ref={mediaFileRef} multiple/>
         </div>
         <div className={`MainDisplay ${styles.chat}`}>
             <div className={`borderColor ${styles.friendNameChat}`}>
@@ -352,7 +392,7 @@ export default function ChatTab({WindowLoad}){
                     </span>
                </div>
             </div>
-            <div className={`borderColor ${styles.textHolder} ${mediaUploaded && mediaUploaded.length > 0 ? styles.changeTextHolderHeight : ''}`} id="message-container" onScroll={handleScroll}>
+            <div className={`borderColor ${styles.textHolder} ${mediaUploaded && mediaUploaded.length > 0 ? styles.changeTextHolderHeight : ''}`} onScroll={handleScroll}>
                 <div ref={messagesEndRef}/>
                 {
                     chatList && chatList.length > 0 ? chatList.map( (msg , index , array) =>{
@@ -367,16 +407,32 @@ export default function ChatTab({WindowLoad}){
                 }
             </div>
                 {mediaUploaded && mediaUploaded.length > 0 ?
-                    <div className={`borderColor ${styles.mediaHolder}`}>
+                    <div className={`borderColor ${styles.mediaHolder}`} ref={mediaHolderRef}>
                     {
                       mediaUploaded.map((data , index)=>{  
                         let name = data.name;
                         let src = data.src;
                         let size = data.size;
                         size > 1024 ? size = (size/1024).toFixed(2) + " MB" : size += " KB"
-                        name.length > 20 ? name = name.substring(0, 20) : null
+                        name.length > 20 ? name = name.substring(0, 20) : null;
+                        const removeMedia = () => { 
+                            let media = [...mediaUploadedRef.current].find(med => med.id == index)
+                            const indexOf = [...mediaUploadedRef.current].indexOf(media)
+                            if(!media)return;
+                            SetMediaUploaded(oldArray => {
+                                let newArr = [
+                                    ...oldArray.slice(0, indexOf),
+                                    ...oldArray.slice(indexOf + 1),
+                                ];
+                                mediaUploadedRef.current = newArr
+                                return newArr;
+                            })
+                        };
                         return (
                           <div className={`secondLayer  ${styles.mediaDiv}`} key={`media_${index}_${ new Date().getTime()}`}>
+                            <div className={`${styles.removeMediaDiv}`} onClick={removeMedia}>
+                                <span className='bi bi-x'></span>
+                            </div>
                             {
                                 data.itsImage ? <img src={src}/> : 
                                 <video controls>
@@ -389,20 +445,17 @@ export default function ChatTab({WindowLoad}){
                       })}
                     </div> : null
                 }
-                <input type="text" className={`secondLayer InputField ${styles.inputHolder}`} placeholder={`Type here...`}  ref={messageText}  onKeyDown={handleKeyDown} maxLength={300}/>
+                <div className={`InputField ${styles.inputHolder}`}>
+                    <textarea placeholder={`Type here...`} ref={messageText}  onKeyDown={handleKeyDown} maxLength={300} onInput={handleInput}/>
+                    <div>
+                        <label className={`bi bi-upload`} htmlFor="mediaFileInsertPost"></label>
+                        <input type="file" id="mediaFileInsertPost" onChange={UploadMediaFile} style={{display:"none"}} ref={mediaFileRef} multiple/>
+                    </div>
+                </div>
             {/* <div id="leftSideChat">
                 <input type="button" id="friendCallChat" />
                 <input type="button" id="friendCloseChat" value="&times;" />
             </div> */}
-            {/* <script type="text/javascript">
-            $('#message-container').on('scroll', function() {
-            if ($(this).scrollTop() < 250 && FetchChat) {
-            console.log("pass")
-            FetchChat = false
-            socket.emit('showChatHistory')
-            }
-            });
-            </script> */}
         </div>
         </>
     )

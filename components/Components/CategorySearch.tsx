@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import communityStyles from '../../styles/WindowTab/Community.module.css'
 import { InputField } from "../fields/InputField";
 
@@ -14,7 +14,8 @@ const CategorySearch = ({socket,currentCategoryID,SetCurrentCategoryID, fetchPos
     const [categoryListSuggestion,SetCategoryListSuggestion] = useState(null)
     const [categorySearch,SetCategorySearch] = useState('')
     const [currentCategoryName, SetCurrentCategoryName] = useState<string>(null);
-
+    let categorySearchRef = useRef(null);
+    
     useEffect(()=>{
         if(!socket) return;
         socket.on('getCategoryList',(data)=>{
@@ -54,7 +55,7 @@ const CategorySearch = ({socket,currentCategoryID,SetCurrentCategoryID, fetchPos
         SetCategoryList(null)
         SetCategoryListSuggestion(null);
         SetCategorySearch("");
-        (document.getElementById("categorySearch") as HTMLInputElement).value = categoryName
+        categorySearchRef.current.value = categoryName
         if(!fetchPosts)return;  
         socket.emit('getTopPosts',{
             categoryID : categoryID,
@@ -73,7 +74,7 @@ const CategorySearch = ({socket,currentCategoryID,SetCurrentCategoryID, fetchPos
                       <span className={`bi bi-x`}></span>
                       <p>{currentCategoryName}</p>
                 </div>
-                : <InputField id="categorySearch" type="text" placeholder="Search for category type..." maxLength={150} icon={`search`}
+                : <InputField ref={categorySearchRef} type="text" placeholder="Search for category type..." maxLength={150} icon={`search`}
                 onKeyUp={handleCategorySearch} />
             }
             {

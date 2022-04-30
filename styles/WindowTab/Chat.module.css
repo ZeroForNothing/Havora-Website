@@ -1,6 +1,8 @@
   .chat {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
   }
+
   .msgContainer{
     display: flex;
     flex-direction: row;
@@ -10,39 +12,51 @@
   }
   .textHolder {
     overflow-y: auto;
-    position: absolute;
-    top: 50px;
-    left: 0;
-    right: 0;
-    bottom: 65px;
     padding: 2%;
     display: flex;
     flex-direction: column-reverse;
     border: 1px solid;
     border-radius: 5px;
+    margin-bottom: 14px;
   }
-  .changeTextHolderHeight{
+  /* .changeTextHolderHeight{
     bottom: 378px;
-  }
+  } */
 
   .inputHolder{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    border-color: #828282;
+    background-color: #444444;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+  }
+  .inputHolder textarea{
     height: 25px;
-    width: auto;
+    width: 100%;
+    background-color: transparent;
+    resize: none;
+    font-size: 21px;
+    padding: 0%;
+    height: 25px;
+    color: #f9f9f9;
+  }
+  .inputHolder label{
+    padding: 0px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .inputHolder div{
+    display: flex;
+    flex-direction: row;
   }
   
   .friendNameChat{
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
     height: 38px;
     padding: 0 16px;
     border: 1px solid;
     border-radius: 5px;
+    margin-bottom: 14px;
   }
   .friendNameChat div{
     height: 100%;
@@ -92,8 +106,11 @@
     position: absolute;
     top: 6px;
     right: 8px;
+    display: flex;
   }
-
+.edited{
+  margin-left: 7px;
+}
   .msgUserImage{
     height: 50px;
     width: 50px;
@@ -101,7 +118,7 @@
     background-repeat: no-repeat;
     background-size: cover;
     border-radius:5px;
-
+    
   }
   .senderTime {
     user-select: none;
@@ -115,7 +132,7 @@
   font-size: 20px;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: baseline;
   margin-bottom: 6px;
 }
 .msgUserName p:hover{
@@ -167,15 +184,10 @@
     text-align: center;
   }
   .mediaHolder{
-    position: absolute;
-    bottom: 65px;
-    left: 0;
-    right: 0;
-    height: 300px;
+    margin-bottom: 14px;
     border-radius: 5px;
     border: 1px solid;
     display: flex;
-    overflow: auto;
     flex-wrap: wrap;
     flex-direction: row;
     justify-content: flex-start;
@@ -190,7 +202,7 @@
     margin: 14px;
   }
 
-  .mediaDiv img{
+  .mediaDiv :is(img , video){
     height: 100%;
     position: absolute;
     top: 50%;
@@ -267,10 +279,55 @@
     left: 0;
     top: 0;
     background-color: transparent;
-    color: red;
+    color: #ff3232;
     display: flex;
     align-items: center;
     place-content: center;
     font-size: 42px;
     cursor: pointer;
+  }
+  .msgContainer:hover .interactDiv{
+    visibility: visible;
+  }
+.interactDiv:hover{
+  visibility: visible;
+}
+  .interactDiv{
+    visibility: hidden;
+    position: absolute;
+    top: -34px;
+    right: 8px;
+    border-radius: 5px;
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+  }
+  .interactDiv span{
+    font-size: 18px;
+    display: block;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-right: 1px solid;
+  }
+  .interactDiv span:last-child{
+    border: none;
+  }
+  .interactDiv span:hover{
+    color: #ff3232
+  }
+  .mediaDiv:hover .removeMediaDiv{
+    visibility: visible;
+  }
+  .removeMediaDiv{
+    visibility: hidden;
+    color: #ff3232;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    place-content: center;
+    align-items: center;
+    font-size: 38px;
+    position: absolute;
+    z-index: 1;
+    background-color: #00000029;
   }
