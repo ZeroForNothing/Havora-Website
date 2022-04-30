@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import moment from "moment";
 import styles from '../../../styles/WindowTab/Chat.module.css'
-import { CircularProgressbar , buildStyles} from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterName,msgWriterCode ,talkingWithPicToken, talkingWithPicType, text, date, textEdited, status, view,tempMedia , mediaFiles , mediaFolder , showUser})=> {
@@ -85,25 +84,31 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                                 {
                                     !media.finished ?                                
                                      <div className={`${styles.progress}`}>
-                                        <CircularProgressbar value={media.percentage}   styles={buildStyles({
-                                            // How long animation takes to go from one percentage to another, in seconds
-                                            pathTransitionDuration: 0.01,
-                                            // Colors
-                                            pathColor: `#ff3232`,
-                                            trailColor: '#2d2d2d',
-                                            // backgroundColor: '#32ff34',
-                                        })}/>
-                                        <div className={`${styles.cancelUpload}`}  onClick={() => { media.cancel }} >
-                                            <span className={`bi bi-x`}></span>
-                                        </div>
+                                        
+                                         {/* pathColor: `#ff3232`,
+                                            trailColor: '#2d2d2d', */}
+
                                     </div> : null
                                 }
                                 </div>
                                 <div className={`${styles.tempMediaInfo}`}>
-
-                                    <div className={``}>{`Name: ${media.name}`}</div>
-                                   <div className={``}>{`Size: ${media.size}`}</div>
-                                   <div className={``}>{`Status: ${media.finished ? `Waiting for other files to finish` : `Uploading`}`}</div>
+                                   <div>{`Name: ${media.name}`}</div>
+                                   <div>{`Size: ${media.size} MB`}</div>
+                                    <div className={`${styles.statusInfo}`}>
+                                        {
+                                            !media.finished ? 
+                                            <>
+                                            <progress value={media.percentage} max={100} />
+                                            <span className={`${styles.progressPercent}`} >{media.percentage}%</span>
+                                            {
+                                                media.retry ? 
+                                                <span className={`bi bi-arrow-clockwise`}></span>
+                                                :  <span className={`bi bi-x`}  onClick={media.cancel} ></span>
+                                            }
+                                            </>
+                                            : `Waiting for other files to finish`
+                                        }
+                                    </div>
                                 </div>
                                 
                             </div>

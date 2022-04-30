@@ -180,9 +180,9 @@ export default function ChatTab({WindowLoad}){
                     message.Text_TempMedia[tempIndex].retry = true;
                 SetChatList(oldArray => {
                     let newArr = [
-                        ...oldArray.slice(0, index),
+                        ...oldArray.slice(0, messageIndex),
                         message,
-                        ...oldArray.slice(index + 1),
+                        ...oldArray.slice(messageIndex + 1),
                     ];
                     chatPrevListRef.current = newArr
                     return newArr;
@@ -196,9 +196,9 @@ export default function ChatTab({WindowLoad}){
                        message.Text_TempMedia[tempIndex].finished = true;
                     SetChatList(oldArray => {
                         let newArr = [
-                            ...oldArray.slice(0, index),
+                            ...oldArray.slice(0, messageIndex),
                             message,
-                            ...oldArray.slice(index + 1),
+                            ...oldArray.slice(messageIndex + 1),
                         ];
                         chatPrevListRef.current = newArr
                         return newArr;
@@ -310,7 +310,7 @@ export default function ChatTab({WindowLoad}){
         if(!message) return;
             tempIndex = arr.indexOf(message.Text_TempMedia[indexArr])
         if(tempIndex == -1) return;
-            message.Text_TempMedia[tempIndex].cancel = () => { cancelTokenSource.cancel('Upload cancelled') };
+            message.Text_TempMedia[tempIndex].cancel = () => { cancelTokenSource.cancel('Upload cancelled')};
 
         SetChatList(oldArray => {
             let newArr = [
