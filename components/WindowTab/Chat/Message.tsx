@@ -3,7 +3,7 @@ import moment from "moment";
 import styles from '../../../styles/WindowTab/Chat.module.css'
 import 'react-circular-progressbar/dist/styles.css';
 
-const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterName,msgWriterCode ,talkingWithPicToken, talkingWithPicType, text, date, textEdited, status, view,tempMedia , mediaFiles , mediaFolder , showUser})=> {
+const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterName,msgWriterCode ,talkingWithPicToken, talkingWithPicType, text, date, textEdited, status, view,tempMedia , mediaFiles , mediaFolder , showUser , flag})=> {
 
     let [myMsg,SetMyMSg] = useState( myName === msgWriterName && myCode === msgWriterCode);
     let [picToken , SetPicToken] = useState(myMsg ? myPicToken : talkingWithPicToken)
@@ -22,19 +22,15 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                 }
                 
             </div>
-            <div className={`${styles.textDiv}`}>
-                {/* <div className={`${styles.recieverListDiv}`}>
-                    <input type="button" className={`${styles.DeleteUserMsg}`} value="Delete" />
-                    <input type="button" className={`${styles.EditUserMsg}`} value="Edit"/>
-                </div> */}
+             <div className={`${styles.textDiv}`}>
                 {
-                   showUser ? <div className={`${styles.msgUserName} ${myMsg ? '' : styles.friendNameMsg}`} >
+                    showUser ? <div className={`${styles.msgUserName} ${myMsg ? '' : styles.friendNameMsg}`} >
                        <p onClick={()=> {
-                    window.history.pushState({}, document.title, `/?user=${msgWriterName}&code=${msgWriterCode}`);
-                    socket.emit('OpenWindow',{
-                        window : 'Profile'
-                      })
-                    }}>{msgWriterName}</p>
+                           window.history.pushState({}, document.title, `/?user=${msgWriterName}&code=${msgWriterCode}`);
+                           socket.emit('OpenWindow',{
+                               window : 'Profile'
+                            })
+                        }}>{msgWriterName}</p>
                         <span className='userCode'>#
                         {msgWriterCode && msgWriterCode.toString().length == 1 ? "000" : ""}
                         {msgWriterCode && msgWriterCode.toString().length == 2 ? "00" : ""}
@@ -48,10 +44,12 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                             </div>
                    </div> :null
                 }
+                {flag == 'active' ?              
+                 <>
                     {
                         mediaFiles || mediaFolder || tempMedia ? <>
                      <div className={`${styles.msgMediaHolder}`}>
-                {
+                    {
                     mediaFiles && mediaFiles.length > 0 && mediaFolder && !tempMedia ? mediaFiles.map(( media,index) =>{
                         return <div key={index}  className={`${styles.msgMediaResult}`}>
                            {
@@ -80,15 +78,6 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                                         <source src={media.src} />
                                         Can't view video here
                                     </video> 
-                                }
-                                {
-                                    !media.finished ?                                
-                                     <div className={`${styles.progress}`}>
-                                        
-                                         {/* pathColor: `#ff3232`,
-                                            trailColor: '#2d2d2d', */}
-
-                                    </div> : null
                                 }
                                 </div>
                                 <div className={`${styles.tempMediaInfo}`}>
@@ -139,40 +128,47 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                        ${status === 'recieved' ? 'bi-check2-all' : status === 'sent' ? 'bi-check2' : 'bi-clock'}`}></div>: null
                    } 
                 
-            </div>
-            <div className={`secondLayer ${styles.interactDiv}`}>
-                {
-                    myMsg && !textBeingEdited ? <>
-                        <span className='borderColor bi bi-pencil-fill' onClick={()=>{
+                <div className={`secondLayer ${styles.interactDiv}`}>
+                    {
+                        myMsg && !textBeingEdited ? <>
+                        {
+                            text ? <span className='borderColor bi bi-pencil-fill' onClick={()=>{
                                 SetTextBeingEdited(true)
-                        }}></span>
-                        <span className='borderColor bi bi-trash3' onClick={()=>{
-                                socket.emit('deleteMsg', {
-                                    textID: id
-                                })
-                        }}></span>
-                    </> : null
-                }
-                {
-                    myMsg && textBeingEdited ? <>
-                        <span className='borderColor bi bi-backspace' onClick={() => { SetTextBeingEdited(false) }}></span>
-                        <span className='borderColor bi bi-save' onClick={() => {
+                            }}></span> : null
+                        }
+                            <span className='borderColor bi bi-trash3' onClick={()=>{
+                                    socket.emit('deleteMsg', {
+                                        textID: id
+                                    })
+                            }}></span>
+                        </> : null
+                    }
+                    {
+                        myMsg && textBeingEdited ? <>
+                            <span className='borderColor bi bi-backspace' onClick={() => { SetTextBeingEdited(false) }}></span>
+                            <span className='borderColor bi bi-save' onClick={() => {
+                                if(!EditedText.current) return;
                                 let currentText = EditedText.current.value.trim();
                                 if(currentText.length == 0) return;
                                 SetTextBeingEdited(false)
                                 socket.emit('editMsg', {
                                     textID: id,
                                     message: currentText
-                                  });
-                            }}></span>
-                    </> : null
-                }
-                {
-                    !myMsg && !textBeingEdited ? <>
-                        <span className='bi bi-reply-fill' onClick={() => { }}></span>
-                    </> : null
-                }
+                                    });
+                                }}></span>
+                        </> : null
+                    }
+                    {
+                        !myMsg && !textBeingEdited ? <>
+                            <span className='bi bi-reply-fill' onClick={() => { }}></span>
+                        </> : null
+                    }
+                </div>
+                </>
+           : `Message has been deleted`}
             </div>
+     
+
         </div>
     )
   }

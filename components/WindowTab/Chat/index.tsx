@@ -34,13 +34,25 @@ export default function ChatTab({WindowLoad}){
 
     useEffect(()=>{
         if(!socket) return;
-
+        console.log("change")
         socket.emit('showChatHistory',{
             page : chatCurrentPage
         })
+        socket.on('refreshChat',()=>{
+            socket.emit('showChatHistory',{
+                page : 1,
+                refresh : true
+            })
+        })
         socket.on('showChatHistory', function(data) {
+            if(!data ) return;
             let chatlogHistory = JSON.parse(data.chatLog);
-            if (chatlogHistory == null) return;
+            SetChatPage(data.page);
+            if(data.refresh){
+                chatPrevListRef.current = []
+                SetChatList([])
+            }
+            if(!chatlogHistory) return;
             chatlogHistory.reverse();
             let username = null;
             let userCode = null;
@@ -58,7 +70,6 @@ export default function ChatTab({WindowLoad}){
                 if(data.unSeenMsgsCount != null && data.unSeenMsgsCount > -1 && data.unSeenMsgsCount  === index)
                     msg.newMessages = data.unSeenMsgsCount;
             });
-            SetChatPage(data.page);
 
             chatPrevListRef.current = chatPrevListRef.current ? [...chatPrevListRef.current].concat(chatlogHistory) : chatlogHistory
             SetChatList(chatPrevListRef.current)
@@ -128,9 +139,12 @@ export default function ChatTab({WindowLoad}){
             let message = [...chatPrevListRef.current].find(msg => msg.Text_ID == data.textID)
             const index = [...chatPrevListRef.current].indexOf(message)
             if(!message)return;
+            message.Text_Message = 'Message has been deleted';
+            message.Text_Flag ='inActive'
             SetChatList(oldArray => {
                 let newArr = [
                     ...oldArray.slice(0, index),
+                    message,
                     ...oldArray.slice(index + 1),
                 ];
                 chatPrevListRef.current = newArr
@@ -156,7 +170,7 @@ export default function ChatTab({WindowLoad}){
     },[socket])
     function CreateMessageHolder(id,text , Text_TempMedia , Text_MediaFolder ,Text_MediaFiles ,username,userCode , showUser){
 
-        let newArr = {Old_ID: id, Text_ID: null, User_Name:username, User_Code : userCode,Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , showUser , Text_TempMedia  , Text_MediaFiles , Text_MediaFolder }
+        let newArr = {Old_ID: id, Text_ID: null, User_Name:username, User_Code : userCode,Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , showUser , Text_TempMedia  , Text_MediaFiles , Text_MediaFolder , Text_Flag : 'active'}
 
         chatPrevListRef.current = chatPrevListRef.current ? [newArr].concat([...chatPrevListRef.current]) : [newArr];
         SetChatList(chatPrevListRef.current)
@@ -211,10 +225,10 @@ export default function ChatTab({WindowLoad}){
             });
         }
     }
-    const handleInput = (e)=>{
+    const handleInput = e =>{
         if(messageText.current.scrollHeight > 250) return;
         messageText.current.style.height = '';
-        messageText.current.style.height =messageText.current.scrollHeight +'px';
+        messageText.current.style.height = messageText.current.scrollHeight +'px';
     }
     const handleKeyDown = async (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -400,10 +414,10 @@ export default function ChatTab({WindowLoad}){
                             {
                                 msg.newMessages ? <div className={`${styles.newMessages}`}>{`(${msg.newMessages}) new message${msg.newMessages > 1 ? 's' : ''}`}</div> : null
                             }
-                             <MessageForm key={msg.Text_ID ? msg.Text_ID : msg.Old_ID} socket={socket} id={msg.Text_ID} myName={user.name} myCode={user.code} myPicToken={user.picToken} myPicType={user.profilePicType} msgWriterName={msg.User_Name} msgWriterCode={msg.User_Code} talkingWithPicToken={WindowLoad.picToken} talkingWithPicType={WindowLoad.picType} text={msg.Text_Message} date={msg.Text_Date} textEdited={msg.Text_Edit} status={msg.Text_Status} view={msg.Text_View}  tempMedia={msg.Text_TempMedia}  mediaFiles={msg.Text_MediaFiles} mediaFolder={msg.Text_MediaFolder} showUser={msg.showUser}/>
+                             <MessageForm key={msg.Text_ID ? msg.Text_ID : msg.Old_ID} socket={socket} id={msg.Text_ID} myName={user.name} myCode={user.code} myPicToken={user.picToken} myPicType={user.profilePicType} msgWriterName={msg.User_Name} msgWriterCode={msg.User_Code} talkingWithPicToken={WindowLoad.picToken} talkingWithPicType={WindowLoad.picType} text={msg.Text_Message} date={msg.Text_Date} flag={msg.Text_Flag} textEdited={msg.Text_Edit} status={msg.Text_Status} view={msg.Text_View}  tempMedia={msg.Text_TempMedia}  mediaFiles={msg.Text_MediaFiles} mediaFolder={msg.Text_MediaFolder} showUser={msg.showUser}/>
                         </>
                     })
-                    :'Please dont share your information. We will never ask for your credentials.'
+                    :<div className={`pickedInput ${styles.credentials}`}>{`Please dont share your information`}<br /> {` We will never ask for your credentials`}</div>
                 }
             </div>
                 {mediaUploaded && mediaUploaded.length > 0 ?

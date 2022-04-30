@@ -18,6 +18,7 @@
     border: 1px solid;
     border-radius: 5px;
     margin-bottom: 14px;
+    height: 100%;
   }
   /* .changeTextHolderHeight{
     bottom: 378px;
@@ -52,8 +53,7 @@
   }
   
   .friendNameChat{
-    height: 38px;
-    padding: 0 16px;
+    padding: 8px 16px;
     border: 1px solid;
     border-radius: 5px;
     margin-bottom: 14px;
@@ -65,9 +65,8 @@
   }
   .friendNameChat p{
     margin: 0;
-    font-size: 28px;
+    font-size: 30px;
     margin-right: 10px;
-    height: 100%;
   }
   .msgSeen {
     color: #ff3232;
@@ -235,13 +234,7 @@
   border-radius: 5px;
   margin-bottom: 10px;
 }
-  .progress{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 62px;
-  }
+
  
   .newMessages{
     color: #ff3232;
@@ -329,4 +322,11 @@
     height: 12px;
     color: #ff3232;
     width: 100%;
+  }
+  .credentials{
+    padding: 22px;
+    border-radius: 5px;
+    font-size: 21px;
+    line-height: 50px;
+    text-align: center;
   }
