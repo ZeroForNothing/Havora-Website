@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styles from '../../styles/RightPanel/FriendsList.module.css'
 import { FriendSlot } from './FriendSlot';
+import { GroupSlot } from './GroupSlot';
+import Peer from 'simple-peer'
+import { ShowError } from '../fields/error';
+import { nanoid } from 'nanoid'
 
 export default function FriendsList(){
 
@@ -10,8 +14,384 @@ export default function FriendsList(){
 
     const [friendList,SetFriendList] = useState(null)
     let friendPrevListRef = useRef(null);
+
+    interface callerInfo {
+        name : string,
+        code : number,
+        token : string,
+        prof : string,
+        wall : string,
+        socketID ?: string
+    }
+    interface callerSignalInfo extends callerInfo{
+        signal : any,
+        connectionID : string
+    }
+    interface messageInfo extends callerInfo{
+        top : string
+    }
+    interface callerSignalInfoOnly{
+        signal : any,
+        connectionID : string
+    }
+
+    const [currentScreenShareStream , SetCurrentScreenShareStream] = useState(null);
+
+	// const [ stream, setStream ] : any = useState()
+	const [ receivingCall, setReceivingCall ] = useState(false)
+	const [ calling, setCalling ] = useState(false)
+	const [ callInChat, SetCallInChat ] = useState(false)
+
+	const [ callAccepted, setCallAccepted ] = useState(false)
+
+
+    const [callerSignalInfo , SetCallerSignalInfo] = useState<callerSignalInfoOnly>(null)
+    const [callerInfo , SetCallerInfo] = useState<callerInfo>(null)
+    const callAnotherInfoRef = useRef<callerInfo>(null)
+    const [preview , SetPreview] = useState<messageInfo>(null)
+    const previewRef = useRef(null)
+    const friendsListSlots = useRef(null)
+
+    const maximizeScreenRef = useRef(null)
+
+    const [biggerView , SetBiggerView] = useState(null);
+    const [smallerView , SetSmallerView] = useState(false);
+	// const myAudio : any = useRef()
+
+	const ringtone : any = useRef()
+	const connectionRef = useRef([])
+
+    const [callStatus , SetCallStatus] = useState(null)
+    const [inviteToCall , SetInviteToCall] = useState(false)
+
+    const [lobbyList , SetLobbyList] = useState([])
+
+    const [inCallUserList , SetInCallUserList] = useState([])
+    let inCallUserListRef = useRef(inCallUserList);
+
+    function openFullscreen(elem) {
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { /* Safari */
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { /* IE11 */
+          elem.msRequestFullscreen();
+        }
+      }
+      
+      /* Close fullscreen */
+      function closeFullscreen(document) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { /* Safari */
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { /* IE11 */
+          document.msExitFullscreen();
+        }
+      }
+
+    const callUser = async (userInfo : callerInfo , addPeopleToCall : boolean) => {
+
+        if(!addPeopleToCall && connectionRef.current.length != 0) {
+            //call another person while on call
+            callAnotherInfoRef.current = userInfo;
+            leaveCall();
+            return;
+        }
+    
+        const stream = await fetchMediaStream();
+        if(!stream)return;
+
+        SetCallerInfo(userInfo);
+        setCalling(true);
+        SetCallStatus("Connecting...")
+		const peer = new Peer({
+			initiator: true,
+			trickle: false,
+			stream: stream
+		})
+        const connectionID = nanoid() 
+
+		peer.on("signal", (signal) => {
+            SetCallStatus("Calling...")
+			socket.emit("callUser", {
+				signal,
+                name : userInfo.name,
+                code : userInfo.code,
+                connectionID
+			})
+		})
+        peer.on('track', (track, stream) => {
+            manageTrack(track, stream);
+        })
+		peer.on("stream", (stream) => {
+            SetInCallUserList(oldArr => { 
+                let temp = {muted : false , stream , prof : userInfo.prof, wall : userInfo.wall , token : userInfo.token};
+                inCallUserListRef.current = [temp , ...oldArr ];
+                return [temp , ...oldArr ] 
+            });
+		})
+        peer.on('close', () => {
+            leaveCall();
+        })
+        peer.on('error', (err) => {
+            console.error(err)
+        })
+		connectionRef.current = [...connectionRef.current , { peer , connectionID }];
+	}
+
+    const answerCall = async () =>  {
+
+        const stream = await fetchMediaStream();
+        if(!stream)return;
+
+		setCallAccepted(true)
+        setReceivingCall(false);
+        SetCallStatus("Answering...")
+        manageCall(true);
+        
+
+		const peer = new Peer({
+			initiator: false,
+			trickle: false,
+			stream: stream
+		})
+
+		peer.on("signal", (data) => {
+            SetCallStatus(`In-Call`);
+			socket.emit("answerCall", { 
+                signal: data,
+                socketID : callerInfo.socketID,
+                connectionID : callerSignalInfo.connectionID,
+            })
+		})
+        peer.on('track', (track, stream) => {
+            manageTrack(track, stream);
+        })
+
+		peer.on("stream", (stream) => {
+            SetInCallUserList(oldArr => { 
+                let temp = {muted : false , stream , prof : callerInfo.prof , wall : callerInfo.wall , token : callerInfo.token}
+                inCallUserListRef.current = [temp , ...oldArr ];
+                return [temp , ...oldArr]
+             });
+		})
+        peer.on('close', () => {
+            leaveCall();
+        })
+        peer.on('error', (err) => {
+            leaveCall();
+            console.error(err)
+        })
+		peer.signal(callerSignalInfo.signal)
+		connectionRef.current = [...connectionRef.current , { peer , connectionID : callerSignalInfo.connectionID}];
+	}
+
+    function onCloseCall(){
+        SetCallerInfo(null);
+        SetCallStatus("Call ended");
+        setCalling(false);
+        setReceivingCall(false);
+        setCallAccepted(false);
+        SetCallerSignalInfo(null);
+        inCallUserListRef.current = [];
+        SetInCallUserList([]);
+        SetCallInChat(false)
+
+        SetCurrentScreenShareStream(null)
+
+        if(ringtone.current){
+            manageCall(true);
+        }
+    }
+    const manageCall = (muted) => {
+        ringtone.current.muted = muted;
+        muted ?  ringtone.current.pause() : ringtone.current.play()
+        ringtone.current.currentTime = 0;
+    }
+	const leaveCall = () => {
+        if(connectionRef.current.length != 0){
+            connectionRef.current.forEach(conn => {
+                conn.peer.destroy();
+            });
+            connectionRef.current = [];
+            onCloseCall();
+            if(callAnotherInfoRef.current){
+                const temp = callAnotherInfoRef.current;
+                callAnotherInfoRef.current = null;
+                callUser(temp, false);
+            }
+        }else{
+            onCloseCall();
+        }
+        socket.emit('hangupCall');
+	}
+    function manageTrack(track,stream){
+        track.addEventListener('mute', () => {
+            // track was removed by remote
+            if(stream.getVideoTracks().length){
+                RemoveShareScreen(stream);
+            }
+        })
+    }
+    function RemoveShareScreen(stream){
+        let value = [...inCallUserListRef.current].find(call => call.stream ==  stream)
+        const index = [...inCallUserListRef.current].indexOf(value)
+        if(!value) return;
+
+        value.stream.getTracks().forEach(track => track.stop());
+
+        SetBiggerView(null);
+        
+        SetInCallUserList(oldArray => {
+            let newArr = [
+                ...oldArray.slice(0, index),
+                ...oldArray.slice(index + 1),
+            ];
+            inCallUserListRef.current = newArr
+            return newArr;
+        })
+    }
+    function stopScreenShare(){
+        if(currentScreenShareStream){
+            for (const track of currentScreenShareStream.getTracks()) {
+                connectionRef.current.forEach(conn => {
+                    conn.peer.removeTrack(track, currentScreenShareStream);
+                });
+            }
+            RemoveShareScreen(currentScreenShareStream);
+            SetCurrentScreenShareStream(null);
+        }
+    }
+    async function startScreenCapture() {
+        try {
+            const stream = await navigator.mediaDevices.getDisplayMedia();
+            SetInCallUserList(oldArr => {
+                let temp = {muted : false , stream}; 
+                inCallUserListRef.current = [temp , ...oldArr ];
+                return [temp , ...oldArr]
+             });
+            for (const track of stream.getTracks()) {
+                connectionRef.current.forEach(conn => {
+                    conn.peer.addTrack(track, stream);
+                });
+                manageTrack(track,stream)
+            }
+            SetCurrentScreenShareStream(stream);
+        } catch(err) {
+          console.error("Error: " + err);
+        }
+    }
+    function volumeActivity(id , stream){
+        // detect voice activity
+        const audioContext = new AudioContext();
+        const mediaStreamAudioSourceNode = audioContext.createMediaStreamSource(stream);
+        const analyserNode = audioContext.createAnalyser();
+        mediaStreamAudioSourceNode.connect(analyserNode);
+        const pcmData = new Float32Array(analyserNode.fftSize);
+        
+        let interval = setInterval(()=>{
+            analyserNode.getFloatTimeDomainData(pcmData);
+            let sumSquares = 0.0;
+            for (const amplitude of pcmData) { sumSquares += amplitude*amplitude; }
+            let volume = Math.sqrt(sumSquares / pcmData.length) * 30;
+            volume = volume > 1 ? 1 : volume;
+            volume = parseFloat(volume.toFixed(2));
+            SetInCallUserList(oldArray => {
+                let temp = [...oldArray];
+                temp.forEach(element => {
+                    if(element.id == id) element.volume = volume;
+                });
+                inCallUserListRef.current = temp;
+                return temp;
+            })
+            socket.emit('updateVoiceActivity' ,{id , volume})
+        }, 500);
+
+    }
+    async function fetchMediaStream(){
+        const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+        const id = (Math.random() + 1).toString(36).substring(7);
+        const temp  = {id , muted : true , stream , prof : user.prof , wall : user.wall , token : user.token , volume : 0}
+        SetInCallUserList(oldArr => { 
+            inCallUserListRef.current = [ temp , ...oldArr ]
+            return [ temp , ...oldArr ]
+         });
+        //EXPERIMENTAL buggy and takes performance
+        // volumeActivity(id , stream);
+        return stream;
+    }
     useEffect(()=>{
         if(!socket) return;
+
+        socket.on('onEnterLobby',(data)=>{
+            SetLobbyList([{ name : data.name }])
+        })
+
+        document.addEventListener('click', function(event) {
+            if(!previewRef.current) return;
+            var isClickInsideElement = previewRef.current.contains((event as any).target);
+            var isClickInsideElement2 = friendsListSlots.current.contains((event as any).target);
+            if (!isClickInsideElement && !isClickInsideElement2) {
+                //Do something click is outside specified element
+                SetPreview(null)
+            }
+        });
+        socket.on("updateVoiceActivity", (data) => {
+            SetInCallUserList(oldArray => {
+                oldArray.forEach(element => {
+                    if(element.id == data.id) element.volume = data.volume;
+                });
+                inCallUserListRef.current = [...oldArray];
+                return [...oldArray];
+            })
+		})
+        socket.on("SetCallFromRightPanel", (data) => {
+            SetCallInChat(data.callerChatOpened);
+		})
+        socket.on("callAccepted", (data : callerSignalInfo) => {
+            if(connectionRef.current.length != 0) {          
+                let content = [...connectionRef.current].find(content => content.connectionID == data.connectionID)
+                const index = [...connectionRef.current].indexOf(content)
+
+                if(index < 0) return;
+                connectionRef.current[index].peer.signal(data.signal)
+                
+                SetCallerInfo(data);
+                SetCallStatus(`In-Call`)
+                setCallAccepted(true)
+            }
+		})
+        socket.on("hangupCall", () => {
+            onCloseCall();
+            ShowError("Hangup: User hanged up");
+		})
+        socket.on('callRinging',()=>{
+            SetCallStatus("Ringing...");
+        })
+        socket.on('alreadyInCall',()=>{
+            leaveCall();
+            ShowError("Hangup: User already In-call");
+        })
+		socket.on("callUser", (data : callerSignalInfo) => {
+            if(connectionRef.current.length != 0){
+                let content = [...connectionRef.current].find(content => content.connectionID == data.connectionID)
+                const index = [...connectionRef.current].indexOf(content)
+                if(index < 0) return;
+                connectionRef.current[index].peer.signal(data.signal)
+                SetCallerSignalInfo({signal : data.signal , connectionID : data.connectionID})
+            }else{
+                onCloseCall();
+                socket.emit("callRinging")
+                SetCallStatus(`is calling...`);
+                setReceivingCall(true);
+                manageCall(false)
+                SetCallerInfo(data);
+                SetCallerSignalInfo({signal : data.signal , connectionID : data.connectionID})
+            }
+		})
+
+
         socket.on('updateFriendList', (data) => {
             if (data == null) return;
             let friendList = JSON.parse(data.friendListJson)
@@ -20,12 +400,12 @@ export default function FriendsList(){
             //console.log(friendList)
         })
         socket.on('msgsRecievedWhileNotTaklingWithUser', (data) => {
-            if (!data || !data.message || !data.textID || !data.username || !data.userCode || !data.unSeenMsgsCount) return;
+            if (!data || !data.message || !data.textID || !data.name || !data.code || !data.unSeenMsgsCount) return;
             if(!data.showUnreadMsgs){
                 data.showUnreadMsgs = false;
                 socket.emit("msgsRecievedWhileNotTaklingWithUser" , data)
             }else{
-                let friend = [...friendPrevListRef.current].find(slot => slot.username == data.username && slot.userCode == data.userCode)
+                let friend = [...friendPrevListRef.current].find(slot => slot.name == data.name && slot.code == data.code)
                 const index = [...friendPrevListRef.current].indexOf(friend)
                 if(!friend)return;
                 friend.unReadMsg = data.unSeenMsgsCount
@@ -39,8 +419,8 @@ export default function FriendsList(){
             }
         })
         socket.on('removeMsgsRecievedAlert', (data) => {
-            if (!data || !data.username || !data.userCode) return;
-            let friend = [...friendPrevListRef.current].find(slot => slot.username == data.username && slot.userCode == data.userCode)
+            if (!data || !data.name || !data.code) return;
+            let friend = [...friendPrevListRef.current].find(slot => slot.name == data.name && slot.code == data.code)
             const index = [...friendPrevListRef.current].indexOf(friend)
             if(!friend)return;
             friend.unReadMsg = 0
@@ -58,12 +438,12 @@ export default function FriendsList(){
         //       let friendRequests = JSON.parse(data.friendRequests);
         //       let form = '';
         //       for (let x in friendRequests)
-        //         form += friendRequest(friendRequests[x].username, friendRequests[x].userCode)
+        //         form += friendRequest(friendRequests[x].name, friendRequests[x].code)
         //       $("#NotificationTab #RelationRequestList").empty().append(form)
         //     }
         //   })
         // socket.on('friendIsOnline', function(data) {
-        //     let friendname = "FriendName_" + data.username + '-' + data.userCode;
+        //     let friendname = "FriendName_" + data.name + '-' + data.code;
         //     $('#' + friendname).find(".friendStatus").addClass("userStatusOnline");
         //     if (data.clientDevice == 1)
         //       $('#' + friendname).find(".currentPlatform").addClass("GamePlatform")
@@ -78,25 +458,25 @@ export default function FriendsList(){
         //     //msgsRecieved(friendname)
         //   });
         // socket.on('appendRequestToNotification', (data) => {
-        //     if (data.userCode == null || data.userCode == null) return;
-        //     let form = friendRequest(data.username, data.userCode);
+        //     if (data.code == null || data.code == null) return;
+        //     let form = friendRequest(data.name, data.code);
         //     $("#NotificationTab #RelationRequestList").prepend(form);
         //     $("#Notification").addClass
         //   })
         // socket.on('TellFriendDisconnected', function(data) {
-        //     $("#FriendName_" + data.username).find(".friendStatus").removeClass("userStatusOnline");
+        //     $("#FriendName_" + data.name).find(".friendStatus").removeClass("userStatusOnline");
         //     if (data.clientDevice == 1)
-        //       $("#FriendName_" + data.username).find(".currentPlatform").removeClass("GamePlatform")
+        //       $("#FriendName_" + data.name).find(".currentPlatform").removeClass("GamePlatform")
         //     else if (data.clientDevice == 2)
-        //       $("#FriendName_" + data.username).find(".currentPlatform").removeClass("ClientPlatform")
+        //       $("#FriendName_" + data.name).find(".currentPlatform").removeClass("ClientPlatform")
         //     else if (data.clientDevice == 3)
-        //       $("#FriendName_" + data.username).find(".currentPlatform").removeClass("WebPlatform")
+        //       $("#FriendName_" + data.name).find(".currentPlatform").removeClass("WebPlatform")
         //     else if (data.clientDevice == 4)
-        //       $("#FriendName_" + data.username).find(".currentPlatform").removeClass("MobilePlatform")
+        //       $("#FriendName_" + data.name).find(".currentPlatform").removeClass("MobilePlatform")
         //     else
-        //       $("#FriendName_" + data.username).children(".currentPlatform").removeClass("WebPlatform").removeClass("MobilePlatform").removeClass("ClientPlatform").removeClass("GamePlatform")
+        //       $("#FriendName_" + data.name).children(".currentPlatform").removeClass("WebPlatform").removeClass("MobilePlatform").removeClass("ClientPlatform").removeClass("GamePlatform")
         
-        //     $("#FriendName_" + data.username).appendTo("#OfflineUsersList");
+        //     $("#FriendName_" + data.name).appendTo("#OfflineUsersList");
         //     arrangeFriendList()
         //   });
         
@@ -121,64 +501,161 @@ export default function FriendsList(){
     return (
         <div  className={`borderColor ${styles.FriendsList}`}>
 
-            {/* <div id="EasyAccessButtons" className="friendListContainer">
-                <input type="button" id="Settings" />
-                <input type="button" id="Notification" />
-                <input type="button" id="FindPlayer" />
-            </div> */}
-            {/* <div id="AccountLink">
-                <div className="">
-                    <span id="CurrentUserName">username</span>
-                    <span id="CurrentUserCode">#0000</span>
+                
+            { receivingCall || callAccepted || calling || callerInfo ?
+                <div  ref={maximizeScreenRef} className={`${styles.callOverlay} ${receivingCall ? styles.recievingPositon : ''} ${callInChat ? styles.callInChat : ''}`}>
+                    <div className={`${styles.callContainer} ${callInChat ? styles.callContainerInChat : ''}`}>
+                        {
+                            callInChat && callerInfo ? <div className={`${styles.callUserTitle}`}>
+                                <p>{callerInfo.name}</p>
+                                <span className='code'>#
+                                {callerInfo.code && callerInfo.code.toString().length == 1 ? "000" : ""}
+                                {callerInfo.code && callerInfo.code.toString().length == 2 ? "00" : ""}
+                                {callerInfo.code && callerInfo.code.toString().length == 3 ? "0" : ""}
+                                {callerInfo.code}
+                                </span>
+                            </div>: null
+                        }
+                        {
+                            callerInfo ? 
+                            <div className={`${styles.callUserProfile}`}>
+                                {
+                                    callAccepted ? <>
+                                        <div className={`${styles.inCallImages} ${biggerView !== null ? styles.keepOnlyBiggerView : ''}`}>
+                                                <div className={`${styles.HoldImagesRight} ${smallerView ? styles.smallerView : ''}`}>
+                                                {
+                                                    inCallUserList ? inCallUserList.map((callUser , index) =>{
+                                                        let isAudio = false;
+                                                        let isVideo = false;
+                                                        if(callUser.stream.getAudioTracks().length)// checking audio presence
+                                                            isAudio=true;
+                                                        if(callUser.stream.getVideoTracks().length)// checking video presence
+                                                            isVideo=true;
+                                                        return <div key={callUser.stream.id} className={`secondLayer ${styles.callerHolder} ${biggerView != null && biggerView === index ? styles.biggerView : ''}`} style={{borderColor : `rgba(0,150,0, ${callUser.volume ? callUser.volume : 0})`, 
+                                                        backgroundImage: callUser.wall ? `url(${"/MediaFiles/WallpaperPic/" + callUser.token + "/" + callUser.wall })` : 'none' }}  onClick={()=>{ 
+                                                            if(!callInChat) return;
+                                                            if(biggerView != null && biggerView === index){
+                                                                SetBiggerView(null);
+                                                                SetSmallerView(false);
+                                                            }else{
+                                                                SetBiggerView(index);
+                                                                SetSmallerView(true);
+                                                            }
+                                                         }}>
+                                                            {
+                                                                biggerView != null && biggerView === index &&  isVideo ? <video ref={video => {if(video){ video.srcObject = callUser.stream; }}} muted={callUser.muted} autoPlay></video> : isVideo ? <span>{`Watch stream`}</span> : null
+                                                            }
+                                                            {
+                                                                isAudio ? <audio ref={audio => {if(audio){ audio.srcObject = callUser.stream; }}} muted={callUser.muted} autoPlay></audio> : null
+                                                            }
+                                                            {
+                                                                !isVideo ? <img className='unInteractiveLayer' src={`/MediaFiles/ProfilePic/${callUser.token}/${callUser.prof}`} /> : null
+                                                            }
+                                                        </div>
+                                                    }) : null
+                                                }
+                                                <div className={`${styles.toggleCallersDisplay}`}>
+                                                    <div className={`secondLayer bi ${smallerView ? 'bi-chevron-left' : 'bi-chevron-right'}`} onClick={()=>{ SetSmallerView(!smallerView) }} />
+                                                    <div className={`secondLayer bi bi-grid`} onClick={()=>{ SetSmallerView(false); SetBiggerView(null) }} />
+                                                </div>
+                                                </div>
+                                        </div>
+                                    </>
+                                    : <>
+                                    <div className={`secondLayer ${styles.callerImage}`} style={{ backgroundImage: callerInfo.prof ? `url(${"/MediaFiles/ProfilePic/" + callerInfo.token + "/" + callerInfo.prof })` : 'none'}} />
+
+                                    <div>
+                                        <p>{callerInfo.name}</p>
+                                        <span className='code'>#
+                                        {callerInfo.code && callerInfo.code.toString().length == 1 ? "000" : ""}
+                                        {callerInfo.code && callerInfo.code.toString().length == 2 ? "00" : ""}
+                                        {callerInfo.code && callerInfo.code.toString().length == 3 ? "0" : ""}
+                                        {callerInfo.code}
+                                        </span>
+                                    </div>
+                                    <div className={`${styles.callStatus}`}>
+                                        {callStatus}
+                                    </div>
+                                    </>
+                                }
+                            </div> 
+                            : null
+                        }
+                            <div className={`${styles.callHandle}`}>
+                                {callInChat && callAccepted ?  <div className={` ${!inviteToCall ? 'secondLayer bi bi-plus-lg' : 'pickedInput bi bi-x-lg' }`} onClick={()=>{ SetInviteToCall(!inviteToCall) }} />  : null}
+                                {callInChat && callAccepted ?  <div className={`secondLayer bi ${currentScreenShareStream ? 'pickedInput bi-x-square' : ' bi-tv'}`} onClick={()=>{ currentScreenShareStream  ? stopScreenShare() : startScreenCapture() }} />  : null}
+                                {callAccepted && !callInChat ? <div className='secondLayer bi bi-arrows-angle-expand' onClick={()=>{ 
+                                    socket.emit('OpenWindow',{
+                                        window : "Chat",
+                                        name : callerInfo.name,
+                                        code: callerInfo.code
+                                    }); 
+                                }} /> : null}
+                                { receivingCall || callAccepted || calling ? <div className={`secondLayer bi bi-telephone pickedInput`} onClick={()=>{ leaveCall() }} /> : null }
+                                { receivingCall && !callAccepted ? <div className={`secondLayer bi bi-telephone ${styles.callerAccept}`} onClick={()=>{ answerCall() }} /> : null}
+                                {callInChat && callAccepted ?  <div className={`secondLayer bi bi-fullscreen`} onClick={()=>{ 
+                                    if(screen.availWidth === window.innerWidth){
+                                        closeFullscreen(document);
+                                    }else{
+                                        openFullscreen(maximizeScreenRef.current)
+                                    }
+                                 }} />  : null}
+                            </div>
+                    </div>
+                </div> : null
+                }
+                
+                <div>
+                    
+                    
+                    <audio loop muted ref={ringtone} autoPlay >
+                        <source src="Audio/ringtone.mp3" type="audio/mpeg" />
+                    </audio>
                 </div>
-            </div> */}
-            {/* <div id="quickUserInfo">
-            <div id="balanceHolder"><span>1.00 $</span></div>
-            </div> */}
-            <div className={`${styles.friendListTitle}`}>General</div>
-            <div>
-                <div className="friendPreview"></div>
+            
+                <>
+                <div className={`${styles.friendListTitle} ${ callerInfo && !callInChat ? styles.callAboveTitle : ''}`}>General</div>
+                <div ref={friendsListSlots}>
                 {
                     friendList && friendList.length > 0 ? friendList.map((friend,index) => {
-                        return <FriendSlot key={index} socket={socket} username={friend.username} userCode={friend.userCode} unReadMsg={friend.unReadMsg} userClientAvability={friend.userClientAvability} userWebAvability={friend.userWebAvability} userMobileAvability={friend.userMobileAvability} userGameAvability={friend.userGameAvability} profilePicType={friend.profilePicType} picToken={friend.picToken} />
+                        return <FriendSlot key={index} socket={socket} name={friend.name} code={friend.code} unReadMsg={friend.unReadMsg} userClientAvability={friend.userClientAvability} userWebAvability={friend.userWebAvability} userMobileAvability={friend.userMobileAvability} userGameAvability={friend.userGameAvability} prof={friend.prof} wall={friend.wall} token={friend.token} SetPreview={SetPreview} inviteToCall={inviteToCall} callUser={callUser}/>
                     }) : 'No friends yet'
                 }
-            </div>
+                </div>
+                <div>
+                {
+                    lobbyList && lobbyList.length > 0 ? lobbyList.map((group,index) => {
+                        return <GroupSlot key={index} socket={socket} name={group.name} />
+                    }) : 'No groups yet'
+                }
+                </div>
+                </> 
+                {
+                    preview ? 
+                    <div id="preview" ref={previewRef} className={`unInteractiveLayer ${styles.previewContainer}`} style={{top : preview.top}}>
+                        <div className={`${styles.previewProfile}`}>
+                            <div className='unInteractiveLayer'>
+                                <img src={`/MediaFiles/WallpaperPic/${preview.token}/${preview.wall}`} />
+                            </div>
+                            <img className={`${styles.previewProfileImg}`} src={`/MediaFiles/ProfilePic/${preview.token}/${preview.prof}`} />
+                        </div>
+                        <div className={`${styles.previewInteract}`}>
+                            <div className="secondLayer" onClick={()=>{ 
+                                callUser({name : preview.name, code : preview.code , prof : preview.prof , wall : preview.wall , token : preview.token} , false);
+                                SetPreview(null); 
+                            }}>
+                                <span className="bi bi-telephone-fill" />Call
+                            </div>
+                            <div className="secondLayer" onClick={()=>{  
+                                socket.emit('OpenWindow', { window : "Chat" ,name : preview.name , code : preview.code });
+                                SetPreview(null); 
+                            }}>
+                                <span className="bi bi-chat-left-fill" />Message
+                            </div>
+                        </div>
+                    </div> : null
+                }
         </div>
     )
 }
-{/* <div className="onGoingCallContainer">
-    <div className="callerUserPic"></div>
-    <input type="button" className="userHangupCall" />
-</div> */}
-{/* <div className="friendListCallContainer">
-<div className="callerUserPic"></div>
-<div className="callerUserName"><span>username</span></div>
-<div className="callButtonFriendDiv">
-    <input type="button" className="callButtonFriend answerFriendCall" />
-</div>
-<div className="callButtonFriendDiv">
-    <input type="button" className="callButtonFriend hangupFriendCall" />
-</div>
-</div> */}
 
-        {/* <div classNameName={`${styles.onGoingCallContainer}`}>
-            <div classNameName={`${styles.callerUserPic}`}></div>
-            <input type="button" classNameName={`${styles.userHangupCall}`}/>
-            </div>
-            <div classNameName={`${styles.friendListCallContainer}`}>
-            <div classNameName={`${styles.callerUserPic}`}></div>
-            <div classNameName={`${styles.callerUserName}`}><span>username</span></div>
-            <div classNameName={`${styles.callButtonFriendDiv}`}>
-                <input type="button" classNameName={`${styles.callButtonFriend} ${styles.answerFriendCall}`}/>
-            </div>
-            <div classNameName={`${styles.callButtonFriendDiv}`}>
-                <input type="button" classNameName={`${styles.callButtonFriend} ${styles.hangupFriendCall}`}/>
-            </div>
-            </div>
-            <div classNameName={`${styles.friendListPanelContainer}`}>
-            <div classNameName={`${styles.friendPreview}`}></div>
-            <div id="OnlineUsersList" classNameName={`${styles.OnlineUsersList}`}></div>
-            <div id="OfflineUsersList" classNameName={`${styles.OfflineUsersList}`}></div>
-            </div> */}
-    

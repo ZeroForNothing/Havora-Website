@@ -53,10 +53,10 @@ export default function MainNav(){
                     window.history.pushState({}, document.title, `/?user=${user.name}&code=${user.code}`);
                     OpenWindow("Profile")
                 }} >
-                <span className={`${"secondLayer"} ${styles.image}`} style={{ backgroundImage: user.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + user.picToken + "/" + user.profilePicType })` : 'none'}} ></span>
+                <span className={`${"secondLayer"} ${styles.image}`} style={{ backgroundImage: user.prof ? `url(${"/MediaFiles/ProfilePic/" + user.token + "/" + user.prof })` : 'none'}} ></span>
                     <div>
                         <p>{user.name}</p>
-                        <span className='userCode'>#
+                        <span className='code'>#
                         {user.code && user.code.toString().length == 1 ? "000" : ""}
                         {user.code && user.code.toString().length == 2 ? "00" : ""}
                         {user.code && user.code.toString().length == 3 ? "0" : ""}
@@ -100,7 +100,7 @@ export default function MainNav(){
             {/* <div id="Profile" className={`${"baseLayer"}  ${styles.Profile}`} >
                 <input type="button" className={`${"secondLayer"} ${"outsideShadow"}`}/>
                 <div>
-                    <span id="CurrentUserName" className={`${styles.CurrentUserName}`}>username</span>
+                    <span id="CurrentUserName" className={`${styles.CurrentUserName}`}>name</span>
                     <span id="CurrentUserCode" className={`${styles.CurrentUserCode}`}>#0000</span>
                 </div>
             </div> */}

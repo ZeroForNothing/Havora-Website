@@ -5,6 +5,7 @@ import styles from '../../../styles/WindowTab/Chat.module.css'
 import { ShowError } from '../../fields/error'
 import { checkAcceptedExtensions } from '../Post/PostData'
 import MessageForm from './Message'
+
 export default function ChatTab({WindowLoad}){
 
     let { user } = useSelector((state: any) => state.user)
@@ -24,17 +25,24 @@ export default function ChatTab({WindowLoad}){
     let mediaFileRef = useRef(null);
     let [mediaUploaded , SetMediaUploaded] = useState([])
     let mediaUploadedRef = useRef(mediaUploaded)
-
+    
     let [fetchMoreMsgs , SetFetchMoreMsgs]  = useState(false);
     let [chatCurrentPage , SetChatPage]  = useState(1);
+    let [inCall , SetInCall]  = useState(WindowLoad.inCall);
 
     const scrollToBottom = () => {
         setTimeout(()=>{ messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) },50)
     }
-
+    useEffect(()=>{
+        // socket.emit('showChatHistory',{
+        //     page : 1,
+        //     refresh : true
+        // })
+        SetInCall(WindowLoad.inCall);
+    },[WindowLoad])
     useEffect(()=>{
         if(!socket) return;
-        console.log("change")
+
         socket.emit('showChatHistory',{
             page : chatCurrentPage
         })
@@ -54,15 +62,15 @@ export default function ChatTab({WindowLoad}){
             }
             if(!chatlogHistory) return;
             chatlogHistory.reverse();
-            let username = null;
-            let userCode = null;
+            let name = null;
+            let code = null;
             chatlogHistory.forEach((msg) => {
                 msg.showUser = true
-                if(username === msg.User_Name && userCode === msg.User_Code) 
+                if(name === msg.User_Name && code === msg.User_Code) 
                 msg.showUser = false
                 else{
-                    username = msg.User_Name
-                    userCode = msg.User_Code
+                    name = msg.User_Name
+                    code = msg.User_Code
                 }
             });
             chatlogHistory.reverse();
@@ -101,23 +109,23 @@ export default function ChatTab({WindowLoad}){
             } else {
 
                 if(!data.message && !data.folderName && !data.tempFiles) return;
-                if(isNaN(data.textID) || !data.username || !data.userCode || !data.unSeenMsgsCount) return;
-                if(data.username !== WindowLoad.username && data.userCode !== WindowLoad.userCode) return;
+                if(isNaN(data.textID) || !data.name || !data.code || !data.unSeenMsgsCount) return;
+                if(data.name !== WindowLoad.name && data.code !== WindowLoad.code) return;
                 let showUser = true;
-                if(data.username === lastMsgFromUserNameRef.current && data.userCode=== lastMsgFromUserCodeRef.current)
+                if(data.name === lastMsgFromUserNameRef.current && data.code=== lastMsgFromUserCodeRef.current)
                     showUser = false; 
                 else{
-                    lastMsgFromUserNameRef.current = (data.username);
-                    lastMsgFromUserCodeRef.current = (data.userCode);
+                    lastMsgFromUserNameRef.current = (data.name);
+                    lastMsgFromUserCodeRef.current = (data.code);
                 }
                 SetLastMsgFromUserName(null);
                 SetLastMsgFromUserCode(null);
-                CreateMessageHolder(parseInt(data.textID),data.message, null  , data.folderName , data.tempFiles ,data.username,data.userCode , showUser)
+                CreateMessageHolder(parseInt(data.textID),data.message, null  , data.folderName , data.tempFiles ,data.name,data.code , showUser)
                 socket.emit('msgsSeen')
             }
           })
           socket.on('msgsRecieved', function(data) {
-            if(!data.username && !data.userCode && !chatPrevListRef.current) return;
+            if(!data.name && !data.code && !chatPrevListRef.current) return;
             let arrlist = [...chatPrevListRef.current];
             arrlist.forEach(element => {
                 element.Text_Status = 'recieved'
@@ -126,7 +134,7 @@ export default function ChatTab({WindowLoad}){
             SetChatList(arrlist)
         })
         socket.on('msgsSeen', function(data) {
-            if(!data.username && !data.userCode && !chatPrevListRef.current) return;
+            if(!data.name && !data.code && !chatPrevListRef.current) return;
             
             let arrlist = [...chatPrevListRef.current];
             arrlist.forEach(element => {
@@ -168,9 +176,10 @@ export default function ChatTab({WindowLoad}){
             })
           })
     },[socket])
-    function CreateMessageHolder(id,text , Text_TempMedia , Text_MediaFolder ,Text_MediaFiles ,username,userCode , showUser){
 
-        let newArr = {Old_ID: id, Text_ID: null, User_Name:username, User_Code : userCode,Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , showUser , Text_TempMedia  , Text_MediaFiles , Text_MediaFolder , Text_Flag : 'active'}
+    function CreateMessageHolder(id,text , Text_TempMedia , Text_MediaFolder ,Text_MediaFiles ,name,code , showUser){
+
+        let newArr = {Old_ID: id, Text_ID: null, User_Name:name, User_Code : code,Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , showUser , Text_TempMedia  , Text_MediaFiles , Text_MediaFolder , Text_Flag : 'active'}
 
         chatPrevListRef.current = chatPrevListRef.current ? [newArr].concat([...chatPrevListRef.current]) : [newArr];
         SetChatList(chatPrevListRef.current)
@@ -262,7 +271,7 @@ export default function ChatTab({WindowLoad}){
                 mediaUploadedRef.current = [];
                 SetMediaUploaded([]);
                 const folderName = await axios.post('/CreateTempDirectory',{
-                    picToken : user.picToken,
+                    token : user.token,
                     directoryType : 'ChatFiles'
                   }).then(function (res : any) {
                       if(res && res.data && res.data.ok && res.data.folderName)
@@ -339,7 +348,7 @@ export default function ChatTab({WindowLoad}){
         try {
           return await axios.request({
               method: "post", 
-              url: '/upload?picToken='+user.picToken+"&folderName="+ folderName+'&directoryFolder=ChatFiles', 
+              url: '/upload?token='+user.token+"&folderName="+ folderName+'&directoryFolder=ChatFiles', 
               data: form,
               cancelToken: cancelTokenSource.token,
               onUploadProgress: (progress) => {
@@ -394,28 +403,30 @@ export default function ChatTab({WindowLoad}){
         <>
         <div className={` Nav`}> 
         </div>
-        <div className={`MainDisplay ${styles.chat}`}>
-            <div className={`borderColor ${styles.friendNameChat}`}>
-               <div>
-                     <p>{WindowLoad.username}</p>
-                    <span className='userCode'>#
-                    {WindowLoad.userCode && WindowLoad.userCode.toString().length == 1 ? "000" : ""}
-                    {WindowLoad.userCode && WindowLoad.userCode.toString().length == 2 ? "00" : ""}
-                    {WindowLoad.userCode && WindowLoad.userCode.toString().length == 3 ? "0" : ""}
-                    {WindowLoad.userCode}
-                    </span>
-               </div>
-            </div>
-            <div className={`borderColor ${styles.textHolder} ${mediaUploaded && mediaUploaded.length > 0 ? styles.changeTextHolderHeight : ''}`} onScroll={handleScroll}>
+        <div className={`MainDisplay ${styles.chat} ${inCall ? styles.pushDown : ''}`}>
+            {
+                !inCall ? <div className={`unInteractiveLayer ${styles.friendNameChat}`}>
+                    <div>
+                        <p>{WindowLoad.name}</p>
+                        <span className='code'>#
+                        {WindowLoad.code && WindowLoad.code.toString().length == 1 ? "000" : ""}
+                        {WindowLoad.code && WindowLoad.code.toString().length == 2 ? "00" : ""}
+                        {WindowLoad.code && WindowLoad.code.toString().length == 3 ? "0" : ""}
+                        {WindowLoad.code}
+                        </span>
+                    </div>
+                </div> : null
+            }
+            
+            
+            <div className={`borderColor ${styles.textHolder}`} onScroll={handleScroll}>
                 <div ref={messagesEndRef}/>
                 {
                     chatList && chatList.length > 0 ? chatList.map( (msg , index , array) =>{
-                        return <>
-                            {
+                        return  <MessageForm key={msg.Text_ID ? msg.Text_ID : msg.Old_ID} socket={socket} id={msg.Text_ID} myName={user.name} myCode={user.code} myPicToken={user.token} myPicType={user.prof} msgWriterName={msg.User_Name} msgWriterCode={msg.User_Code} talkingWithPicToken={WindowLoad.token} talkingWithPicType={WindowLoad.pic} text={msg.Text_Message} date={msg.Text_Date} flag={msg.Text_Flag} textEdited={msg.Text_Edit} status={msg.Text_Status} view={msg.Text_View}  tempMedia={msg.Text_TempMedia}  mediaFiles={msg.Text_MediaFiles} mediaFolder={msg.Text_MediaFolder} showUser={msg.showUser}/>
+                            {/* {
                                 msg.newMessages ? <div className={`${styles.newMessages}`}>{`(${msg.newMessages}) new message${msg.newMessages > 1 ? 's' : ''}`}</div> : null
-                            }
-                             <MessageForm key={msg.Text_ID ? msg.Text_ID : msg.Old_ID} socket={socket} id={msg.Text_ID} myName={user.name} myCode={user.code} myPicToken={user.picToken} myPicType={user.profilePicType} msgWriterName={msg.User_Name} msgWriterCode={msg.User_Code} talkingWithPicToken={WindowLoad.picToken} talkingWithPicType={WindowLoad.picType} text={msg.Text_Message} date={msg.Text_Date} flag={msg.Text_Flag} textEdited={msg.Text_Edit} status={msg.Text_Status} view={msg.Text_View}  tempMedia={msg.Text_TempMedia}  mediaFiles={msg.Text_MediaFiles} mediaFolder={msg.Text_MediaFolder} showUser={msg.showUser}/>
-                        </>
+                            } */}
                     })
                     :<div className={`pickedInput ${styles.credentials}`}>{`Please dont share your information`}<br /> {` We will never ask for your credentials`}</div>
                 }

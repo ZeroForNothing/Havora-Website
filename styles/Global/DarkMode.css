@@ -22,7 +22,10 @@
     background-color: #2d2d2d;
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
   }
-  
+  .bodyDarkMode .unInteractiveLayer{
+    background-color: #707070;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
+  }
   .bodyDarkMode :is(.secondLayer , .Nav .NavButton){
     background-color: #444444;
     color: #f9f9f9;

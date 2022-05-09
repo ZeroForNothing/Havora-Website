@@ -20,22 +20,6 @@
     border-radius: 5px;
 
   }
-  .CoinImage{
-    width: 30px;
-    height: 30px;
-    float: left;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-color: transparent;
-  }
-  .friendPreview {
-    position: fixed;
-    width: 23%;
-    height: 25%;
-    transition: transform .2s;
-    display: none;
-  }
   
   .friendIcon {
     height: 42px;
@@ -46,89 +30,6 @@
     background-position: center;
     margin-left:8px
   }
-  
-  .quickUserInfo {
-    border-radius: 5px;
-    margin-bottom: 14px;
-    position: relative;
-    padding: 3%;
-    display: inline-block;
-    width: 94%;
-    user-select: none;
-  }
-  
-  .quickUserInfo div:last-child {
-    margin-top: 6px;
-  }
-  
-  .ZeroCoinHolder, .NormalCoinHolder {
-    transition: 0.4s ease all;
-    width: 92%;
-    display: inline-block;
-    text-align: left;
-    cursor: pointer;
-    padding: 7px 4%;
-    border-radius: 5px;
-    border: 1px solid #e8e8e8;
-  }
-  
-  .ZeroCoinHolder span, .NormalCoinHolder span {
-    line-height: 30px;
-    font-size: 20px;
-    margin-right: 10px;
-    float: right;
-  }
-  
-  .quickUserInfo img {
-    width: 30px;
-    height: 30px;
-    float: left;
-  }
-  
-  .quickUserInfo input {
-    cursor: pointer;
-    outline: none;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  
-  .Profile {
-    margin-bottom: 14px;
-    transition: 0.4s ease all;
-    float: left;
-    padding: 4% 10px;
-    width: 88%;
-    border-radius: 5px;
-    cursor: pointer;
-    border-left: 5px solid #00de00;
-  }
-  
-  .Profile span {
-    clear: both;
-    float: left;
-    line-height: 25px;
-    font-size: 17px;
-  }
-  
-  .CurrentUserCode {
-    font-size: 15px !important;
-  }
-  
-  .Profile div {
-    float: left;
-    margin-left: 13px;
-  }
-  .Profile input {
-    border: none;
-    float: left;
-    width: 50px;
-    height: 50px;
-    border-radius: 5px;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-  }
-
   
   .friendText {
     font-size: 22px;
@@ -151,122 +52,314 @@
     transition: 0.3s ease all;
     background-color: #4e4e4e;
   }
-  
-  .hideMsgAlert {
-    display: none;
-  }
-  
-  .OnlineUsers:hover .friendPreview, .OfflineUsers:hover .friendPreview {
-    display: block;
-  }
-  
-  .OnlineUsers {
-    display: contents;
-  }
-  
-  .OfflineUsers {
-    display: contents;
-  }
-  
-  .usersTitle {
-    display: inline-block;
-    width: 106%;
-    margin: 3% 0%;
-    margin-left: -3%;
-    text-align: center;
-    padding: 3% 0%;
-    font-size: 20px;
-    user-select: none;
-  }
-  
-  .friendListCallContainer {
-    display: none;
-    width: 100%;
-    height: 36%;
-  }
-  
-  .callButtonFriendDiv {
-    text-align: center;
-    width: 50%;
-    height: 20%;
-    float: left;
-  }
-  
-  .callButtonFriend {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 31px;
-    width: 42%;
-    height: 100%;
-    border-radius: 50%;
-  }
-    
-  .callerUserName {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 15%;
-    user-select: none;
-  }
-  
-  .friendListCallContainer .callerUserPic {
-    margin-top: 75%;
-    margin-bottom: 13%;
-    height: 45%;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    border-radius: 50%;
-    width: 50%;
-    margin-left: 25%;
-  }
-  
-  .onGoingCallContainer {
-    display: none;
-    width: 75%;
-    height: 9.8%;
-    margin: auto;
-    margin-bottom: 14px;
-  }
-  
-  .userHangupCall {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 31px;
-    height: 74%;
-    margin-top: 4%;
-    width: 31%;
-    float: right;
-    border-radius: 50%;
-  }
-  
-  .onGoingCallContainer .callerUserPic {
-    width: 39%;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 100%;
-    display: inline-block;
-    border-radius: 50%;
-  }
-  
-  .userStatusOnline {
-    border-left-color: #2eda2e;
-  }
-  
-  .currentPlatform {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 26px;
-    height: 26px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-  
-  
+
+
 .friendListTitle{
   margin-bottom: 10px;
   font-size: 18px;
 }
-  
+.callAboveTitle{
+  margin-top : 20px;
+}
+.callOverlay{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+.callContainerInChat{
+  width: 100% !important;
+}
+.callContainerInChat :is(.callUserTitle , .callHandle){
+  visibility: hidden;
+}
+.callContainerInChat:hover :is(.callUserTitle , .callHandle , .keepOnlyBiggerView .toggleCallersDisplay){
+  visibility: visible;
+  display: flex;
+}
+.recievingPositon{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #00000096;
+  z-index: 10;
+}
+.recievingPositon .callContainer{
+  height: auto;
+}
+.callUserTitle{
+  width: 96%;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  font-size: 24px;
+  padding: 0px 2%;
+  background-image: linear-gradient(#00000038, transparent);
+  height: 50px;
+}
+.callUserTitle p{
+  margin: 0;
+}
+.callInChat{
+  position: fixed;
+  top: 74px;
+  right: 300px;
+  left: 20px;
+  height: 450px;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #202020;
+}
+  .callContainer{
+    height: 100%;
+    width: 270px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    /* min-height: 260px; */
+  }
+  .callContainerInChat .callUserProfile{
+    height: calc(100% - 130px);
+    margin-top: 50px;
+  }
+  .callUserProfile{
+    width: 100%;
+  }
+  .callUserProfile p{
+    margin: 0;
+  }
+  .inCallImages{
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+
+  .keepOnlyBiggerView .callerHolder:not(.biggerView){
+    z-index: 2;
+  }
+.keepOnlyBiggerView{
+  display: flex;
+  justify-content: flex-end;
+}
+.keepOnlyBiggerView .HoldImagesRight{
+  width: 200px;
+  margin-right: 72px;
+}
+
+.keepOnlyBiggerView .smallerView{
+  width: 0px !important;
+}
+.keepOnlyBiggerView .toggleCallersDisplay{
+  /* display: block; */
+}
+.smallerView .callerHolder:not(.biggerView){
+  display: none;
+}
+  .toggleCallersDisplay{
+    display: none;
+    position: absolute;
+    z-index: 2;
+    right: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-direction: column;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+  .toggleCallersDisplay div{
+    border-radius: 5px;
+    display: block;
+    padding: 24px 10px;
+  }
+  .toggleCallersDisplay div:first-child{
+margin-bottom: 14px;
+  }
+  .callerHolder{
+    height: auto;
+    max-height: 100%;
+    max-width: 400px;
+    cursor: pointer;
+    width: calc(100% - 10px);
+    box-sizing: border-box;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    /* border: 3px solid transparent; */
+    position: relative;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+.inviteToCall{
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  bottom: 7px;
+  display: flex;
+  font-size: 18px;
+  align-items: center;
+  padding: 0px 12px;
+  border-radius: 5px;
+  user-select: none;
+}
+
+  .inCallImages video{
+    height: 100%;
+    max-width: 100%;
+  }
+  /* .callerHolder::before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+  } */
+  .callerHolder span{
+    line-height: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .inCallImages img{
+    width: 70px;
+    height: 70px;
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  .callerImage{
+    margin: auto;
+    margin-bottom: 20px;
+    width: 80px;
+    height: 80px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 5px;
+  }
+  .callStatus{
+    margin-top: 20px;
+  }
+  .callInChat .callHandle{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    padding: 0px 2%;
+    background-image: linear-gradient(transparent , #00000038);
+    height: 80px;
+  }
+  .callHandle{
+    width: 96%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    margin-top: 14px;
+  }
+  .callHandle  div{
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 5px;
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 23px;
+  }
+  .callHandle  div:last-child{
+    margin-right: 0;
+  }
+  .callerAccept{
+    transform: rotate(-90deg);
+    background-color: green !important;
+  }
+  .previewContainer{
+    position: absolute;
+    right: 284px;
+    top: 0;
+    width: 300px;
+    border-radius: 5px;
+    padding: 12px;
+  }
+  .previewProfile{
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .previewProfile div{
+    width: 100%;
+    height: 110px;
+    border-radius: 5px;
+  }
+  .previewProfileImg{
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+  }
+  .previewProfile img{
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  .previewProfile div img{
+    width: 100%;
+    height: 100%;
+  }
+  .previewInteract{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .previewInteract div{
+    padding: 10px 0;
+    text-align: center;
+    width: 48%;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 18px;
+  }
+  .previewInteract span{
+    margin-right: 12px;
+  }
+  .biggerView{
+    width: auto !important;
+    height: 100% !important;
+    max-width: calc(100% - 10px) !important;
+    max-height: calc(100% - 10px) !important;
+    position: absolute !important;
+    border: none !important;
+    left: 70px;
+    right: 70px;
+    z-index: 0;
+  }
+  .keepOnlyBiggerView .HoldImagesRight:not(.smallerView) .biggerView{
+    width: auto !important;
+    right: 267px;
+  }
+  .callInChat .HoldImagesRight{
+    /* position: absolute;
+    top: 75px;
+    bottom: 75px;
+    justify-content: center; */
+  }
+  .HoldImagesRight{
+    display: flex;
+    place-content: center;
+    align-content: stretch;
+    font-size: 22px;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+  }

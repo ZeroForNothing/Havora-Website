@@ -44,16 +44,16 @@ export default function ProfileTab({userEmail , ...props}) {
   type UserInformation = {
     firstName: string,
     lastName: string,
-    username: string,
+    name: string,
     email: string,
     gender: number,
     date: string
   }
 
   type Profile = {
-    picToken: string,
-    profilePicType: number,
-    wallpaperPicType: number,
+    token: string,
+    prof: number,
+    wall: number,
     code: number,
     name: string,
     friendRequest: number
@@ -64,23 +64,23 @@ export default function ProfileTab({userEmail , ...props}) {
     const userParam = queryParams.get('user');
     const codeParam = queryParams.get('code');
       socket.emit('showUserProfile',{
-        username : userParam,
-        userCode : codeParam
+        name : userParam,
+        code : codeParam
       })
       socket.on('setProfileData', (data) => {
         let jsonData = {
-          name: data.username,
-          code: data.userCode,
-          picToken: data.picToken,
-          wallpaperPicType: data.wallpaperPicType,
-          profilePicType: data.profilePicType
+          name: data.name,
+          code: data.code,
+          token: data.token,
+          wall: data.wall,
+          prof: data.prof
         } as Profile
         SetCurrentProfile({
-          name: data.username,
-          code: data.userCode,
-          picToken: data.picToken,
-          wallpaperPicType: data.wallpaperPicType,
-          profilePicType: data.profilePicType,
+          name: data.name,
+          code: data.code,
+          token: data.token,
+          wall: data.wall,
+          prof: data.prof,
           friendRequest : data.friendRequest
         });
         CurrentProfileRef.current = jsonData;
@@ -139,7 +139,7 @@ export default function ProfileTab({userEmail , ...props}) {
           SetUserInformation({
             firstName: data.firstname,
             lastName: data.lastname,
-            username: data.username,
+            name: data.name,
             email: data.email,
             gender: data.gender,
             date: moment(data.birthDate).format('YYYY-MM-DD')
@@ -150,21 +150,21 @@ export default function ProfileTab({userEmail , ...props}) {
       });
       socket.on('manageFriendRequest', function(data) {
         console.log(data.relation)
-        if(data.username == user.name && data.userCode == user.code) return;
-        if (CurrentProfileRef.current.name == data.username 
-          && CurrentProfileRef.current.code == data.userCode 
+        if(data.name == user.name && data.code == user.code) return;
+        if (CurrentProfileRef.current.name == data.name 
+          && CurrentProfileRef.current.code == data.code 
           && (data.relation == 3 || data.relation == 2 || data.relation == 1 || data.relation == 0)) {
           SetCurrentProfile(prevState => ({ ...prevState, friendRequest: data.relation }));
         }
       });
       socket.on('updateUserPicture', function(data) {
-        if (data.picType == "Profile"){
+        if (data.prof == "Profile"){
           SetProfilePercentage(null)
-          SetCurrentProfile(prevState => ({ ...prevState, profilePicType: data.fileName }));
+          SetCurrentProfile(prevState => ({ ...prevState, prof: data.fileName }));
         }
         else {
           SetWallpaperPercentage(null)
-          SetCurrentProfile(prevState => ({ ...prevState, wallpaperPicType: data.fileName }));
+          SetCurrentProfile(prevState => ({ ...prevState, wall: data.fileName }));
         }
       });
   }, [socket]);
@@ -178,7 +178,7 @@ export default function ProfileTab({userEmail , ...props}) {
     }
     return true
   }
-  const uploadImage = picType => async e => {
+  const uploadImage = prof => async e => {
     const files = e.target.files
     const form = new FormData()
     if (files[0].size >= 2 * 1024 * 1024) {
@@ -196,11 +196,11 @@ export default function ProfileTab({userEmail , ...props}) {
     form.append(`email`, userEmail);
     let perc = "0%"
     let src = URL.createObjectURL(files[0])
-    if (picType == "Profile") {
+    if (prof == "Profile") {
       // SetProfilePic(src)
       SetProfilePercentage(perc)
     }
-    else if (picType == "Wallpaper") {
+    else if (prof == "Wallpaper") {
       // SetWallpaperPic(src)
       SetWallpaperPercentage(perc)
     } else {
@@ -212,19 +212,19 @@ export default function ProfileTab({userEmail , ...props}) {
     try {
       await axios.request({
         method: "post",
-        url: "/profileUpload?picToken=" + user.picToken+'&picType='+picType,
+        url: "/profileUpload?token=" + user.token+'&prof='+prof,
         data: form,
         onUploadProgress: (progress) => {
           let ratio = progress.loaded / progress.total
           let percentage = (ratio * 100).toFixed(2) + "%";
 
-          if (picType == "Profile") SetProfilePercentage(percentage)
+          if (prof == "Profile") SetProfilePercentage(percentage)
           else SetWallpaperPercentage(percentage)
         }
       }).then(response => {
         if (response.data.ok) {
           socket.emit('updateUserPicture' , {
-            picType,
+            prof,
             fileName : response.data.fileName
           })
         }
@@ -258,8 +258,8 @@ export default function ProfileTab({userEmail , ...props}) {
                       <div className={`NavButton`} onClick={()=>{
                         window.history.pushState({}, document.title, `/?user=${user.name}&code=${user.code}`);
                         socket.emit('showUserProfile',{
-                          username : user.name,
-                          userCode : user.code
+                          name : user.name,
+                          code : user.code
                         })
                         socket.emit('getTopPosts',{
                           categoryID : currentCategoryID,
@@ -373,9 +373,9 @@ export default function ProfileTab({userEmail , ...props}) {
         <div className={`${!editProfileNav && postNav ? "MainDisplayContentContainer" :"MainDisplay"}`}>
         {
         mainNav ?             
-        <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wallpaperPicType ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/" + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` : 'none'}}>
+        <div className={`${"secondLayer"} ${styles.headerView}`} style={{ backgroundImage: CurrentProfile.wall ? `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.token + "/" + CurrentProfile.wall + "?ver=" + Date.now()})` : 'none'}}>
           <div className={`${"secondLayer"} ${styles.userDataPosition}`}>
-            <div className={`${"secondLayer"} ${styles.profPic}`} style={{ backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/" + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}}></div>
+            <div className={`${"secondLayer"} ${styles.profPic}`} style={{ backgroundImage: CurrentProfile.prof ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.token + "/" + CurrentProfile.prof + "?ver=" + Date.now()})` : 'none'}}></div>
             <div className={`${styles.userInfoContainer}`}>
               <div className={`${styles.profileUsername}`}>{CurrentProfile.name}</div>
               <div className={`${styles.profileUserCode}`}>{`#`}{CurrentProfile.code}</div>
@@ -392,7 +392,7 @@ export default function ProfileTab({userEmail , ...props}) {
             {
               editPic ? <>
                <div className={`${styles.editPicContainer}`} >
-                <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.profilePicType ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.picToken + "/" + CurrentProfile.profilePicType + "?ver=" + Date.now()})` : 'none'}} ></div>
+                <div className={`secondLayer ${styles.displayPic}`} style={{ width: "120px", height: "120px", backgroundImage: CurrentProfile.prof ? `url(${"/MediaFiles/ProfilePic/" + CurrentProfile.token + "/" + CurrentProfile.prof + "?ver=" + Date.now()})` : 'none'}} ></div>
                     
                     {
                       profilePercentage ? <>
@@ -407,7 +407,7 @@ export default function ProfileTab({userEmail , ...props}) {
                
                
                   <div className={`${styles.editPicContainer}`}>
-                    <div className={`secondLayer ${styles.displayPic}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.picToken + "/" + CurrentProfile.wallpaperPicType + "?ver=" + Date.now()})` }}></div>
+                    <div className={`secondLayer ${styles.displayPic}`} style={{ backgroundImage: `url(${"/MediaFiles/WallpaperPic/" + CurrentProfile.token + "/" + CurrentProfile.wall + "?ver=" + Date.now()})` }}></div>
                     {
                       wallpaperPercentage ? <>
                         <span className={`${styles.picPercent}`}>{wallpaperPercentage}</span>
@@ -458,7 +458,7 @@ export default function ProfileTab({userEmail , ...props}) {
                 <Formik onSubmit={(values) => {  }} initialValues={{
                   firstName: UserInformation.firstName,
                   lastName: UserInformation.lastName,
-                  username: UserInformation.username,
+                  name: UserInformation.name,
                   email: UserInformation.email,
                   gender: UserInformation.gender,
                   date: UserInformation.date
@@ -474,8 +474,8 @@ export default function ProfileTab({userEmail , ...props}) {
                         <label htmlFor="email">Email</label>
                         <Field name="email" type="email" placeholder="ex. whatever@whatever.com" maxLength={50} component={InputField} disabled />
                       
-                        <label htmlFor="username">Username</label>
-                        <Field name="username" type="text" placeholder="ex. DevilsDontCry" maxLength={26} component={InputField} />
+                        <label htmlFor="name">Username</label>
+                        <Field name="name" type="text" placeholder="ex. DevilsDontCry" maxLength={26} component={InputField} />
                       
                     
                       <label className="title">Gender</label>

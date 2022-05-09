@@ -44,7 +44,7 @@ export default function PostTab({WindowLoad}){
       socket.on("promptToDiscardPost",()=>{
         console.log("promptToDiscardPost")
       })   
-      SetUploadURL("/upload?picToken=" + user.picToken+"&folderName="+ WindowLoad+'&directoryFolder=PostFiles')
+      SetUploadURL("/upload?token=" + user.token+"&folderName="+ WindowLoad+'&directoryFolder=PostFiles')
     }, [socket]);
 
     const handlePostUrl = e =>{

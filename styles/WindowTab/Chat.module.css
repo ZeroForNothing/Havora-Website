@@ -1,6 +1,7 @@
   .chat {
     display: flex;
     flex-direction: column;
+    left: 20px;
   }
 
   .msgContainer{
@@ -23,7 +24,9 @@
   /* .changeTextHolderHeight{
     bottom: 378px;
   } */
-
+.pushDown{
+  margin-top: 460px;
+}
   .inputHolder{
     border-color: #828282;
     background-color: #444444;
@@ -329,4 +332,10 @@
     font-size: 21px;
     line-height: 50px;
     text-align: center;
+  }
+  .callContainer{
+    height: 525px;
+    border-radius: 5px;
+    margin-bottom: 14px;
+    background-color: #3a3a3a;
   }

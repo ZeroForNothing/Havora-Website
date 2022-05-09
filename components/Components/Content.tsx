@@ -43,7 +43,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
             page : 1
           })
         socket.on('createComment', function(data) {
-            let newArr = {socket, id: data.id, picToken : user.picToken, picType : user.profilePicType, text : data.text, username : user.name, userCode : user.code, name: user.name, code : user.code, date : data.date, count : 0, agree : 0, disagree : 0, interact : 0}
+            let newArr = {socket, id: data.id, token : user.token, prof : user.prof, text : data.text, name : user.name, code : user.code, myName: user.name, myCode : user.code, date : data.date, count : 0, agree : 0, disagree : 0, interact : 0}
     
             if(data.itsComment){
               SetCommentPage(commentCurrentPage);
@@ -315,7 +315,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
               
                 {PostsView && PostsView.length > 0 ?
                   PostsView.map(data => {
-                    return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={data.categoryName} categoryID={data.categoryID} currentCategoryID={currentCategoryID} title={data.title} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
+                    return <PostForm key={data.id} socket={socket} contentID={data.id} token={data.token} prof={data.prof} categoryName={data.categoryName} categoryID={data.categoryID} currentCategoryID={currentCategoryID} title={data.title} mediaFolder={data.folder} mediaFiles={data.file} mediaUrl={data.url} postText={data.text} name={data.name} code={data.code} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={data.views} itsComment={false} itsReply={false} />
                   })
                   : (
                     <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`No posts yet`}</div>
@@ -333,7 +333,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
                   {
                       CommentsView ?
                       CommentsView.map(data=>{  
-                        return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={null} categoryID={null}  currentCategoryID={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
+                        return <PostForm key={data.id} socket={socket} contentID={data.id} token={data.token} prof={data.prof} categoryName={null} categoryID={null}  currentCategoryID={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} name={data.name} code={data.code} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={true} itsReply={false} />     
                       }) 
                       : 
                         <div className={`${"secondLayer"} ${styles.loadingContent}`}>{`No posts yet`}</div>
@@ -348,7 +348,7 @@ const Content = ({ socket, user, currentCategoryID, SetCurrentCategoryID, Curren
                 {
                     RepliesView ?
                     RepliesView.map(data=>{  
-                      return <PostForm key={data.id} socket={socket} contentID={data.id} picToken={data.picToken} profilePicType={data.picType} categoryName={null} categoryID={null} currentCategoryID={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} username={data.username} userCode={data.userCode} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
+                      return <PostForm key={data.id} socket={socket} contentID={data.id} token={data.token} prof={data.prof} categoryName={null} categoryID={null} currentCategoryID={null} title={null} mediaFolder={null} mediaFiles={null} mediaUrl={null} postText={data.text} name={data.name} code={data.code} myName={user.name} myCode={user.code} postDate={data.date} commentsCount={data.count} postAgree={data.agree} postDisagree={data.disagree} userInteracted={data.interact} postViews={null} itsComment={false} itsReply={true} />  
                     }) 
                     : <div className={`${"secondLayer"} ${styles.loadingContent}`}>No replies yet</div>
                   }

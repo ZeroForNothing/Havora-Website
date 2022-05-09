@@ -3,8 +3,9 @@ type User = {
     email: string,
     name: string,
     code : number,
-    picToken: string,
-    profilePicType: string,
+    token: string,
+    prof: string,
+    wall: string,
     newAcc: number,
     settings: string
 }

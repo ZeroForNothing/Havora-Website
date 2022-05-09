@@ -1,13 +1,12 @@
 import { useRef, useState } from 'react'
 import moment from "moment";
 import styles from '../../../styles/WindowTab/Chat.module.css'
-import 'react-circular-progressbar/dist/styles.css';
 
 const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterName,msgWriterCode ,talkingWithPicToken, talkingWithPicType, text, date, textEdited, status, view,tempMedia , mediaFiles , mediaFolder , showUser , flag})=> {
 
     let [myMsg,SetMyMSg] = useState( myName === msgWriterName && myCode === msgWriterCode);
-    let [picToken , SetPicToken] = useState(myMsg ? myPicToken : talkingWithPicToken)
-    let [picType , SetPicType] = useState(myMsg ? myPicType : talkingWithPicType)
+    let [token , SetPicToken] = useState(myMsg ? myPicToken : talkingWithPicToken)
+    let [prof , SetPicType] = useState(myMsg ? myPicType : talkingWithPicType)
     let EditedText = useRef(null);
     let [textBeingEdited, SetTextBeingEdited] = useState(false);
     mediaFiles = mediaFiles ? mediaFiles.toString().split(",") : null
@@ -15,10 +14,10 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
         <div className={`${styles.msgContainer}`}>
             <div className={`${styles.msgUserInfo}`}>
                 {
-                    showUser ?  <div className={`secondLayer ${styles.msgUserImage}`} style={{ backgroundImage:  picType ? `url(${"/MediaFiles/ProfilePic/" + picToken + "/" + picType })` : 'none'}}></div> : null
+                    showUser ?  <div className={`secondLayer ${styles.msgUserImage}`} style={{ backgroundImage:  prof ? `url(${"/MediaFiles/ProfilePic/" + token + "/" + prof })` : 'none'}}></div> : null
                 }   
                 {
-                    !showUser? <div className={`userCode ${styles.shortTime}`}>{moment(date).format('hh:mm')}</div> : null
+                    !showUser? <div className={`code ${styles.shortTime}`}>{moment(date).format('hh:mm')}</div> : null
                 }
                 
             </div>
@@ -31,13 +30,13 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                                window : 'Profile'
                             })
                         }}>{msgWriterName}</p>
-                        <span className='userCode'>#
+                        <span className='code'>#
                         {msgWriterCode && msgWriterCode.toString().length == 1 ? "000" : ""}
                         {msgWriterCode && msgWriterCode.toString().length == 2 ? "00" : ""}
                         {msgWriterCode && msgWriterCode.toString().length == 3 ? "0" : ""}
                         {msgWriterCode}
                         </span>
-                        <div className={`userCode ${styles.longTime}`}>
+                        <div className={`code ${styles.longTime}`}>
                             {
                                 moment(date).format('hh:mm A')
                             }
@@ -54,11 +53,11 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                         return <div key={index}  className={`${styles.msgMediaResult}`}>
                            {
                                 (media.endsWith(".png") || media.endsWith(".jpg") || media.endsWith(".jpeg")) ?
-                                <img className={`secondLayer`} src={`/MediaFiles/ChatFiles/${picToken}/${mediaFolder}/${media}`} />
+                                <img className={`secondLayer`} src={`/MediaFiles/ChatFiles/${token}/${mediaFolder}/${media}`} />
                                 : (
                                   (media.endsWith(".mp4") || media.endsWith(".MP4") || media.endsWith(".mov")|| media.endsWith(".x-matroska")) ?
                                     <video className={`secondLayer`} controls>
-                                      <source src={`/MediaFiles/ChatFiles/${picToken}/${mediaFolder}/${media}`} />
+                                      <source src={`/MediaFiles/ChatFiles/${token}/${mediaFolder}/${media}`} />
                                       Can't view video here
                                     </video> : null)
                            }
@@ -114,7 +113,7 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                             <div className={`${styles.msgText}`}>
                                 <span>{text}
                                 {
-                                    textEdited === "edited" ?  <span className={`userCode ${styles.edited}`}>{`(edited)`}</span> : null
+                                    textEdited === "edited" ?  <span className={`code ${styles.edited}`}>{`(edited)`}</span> : null
                                 }
                                 </span>
                             </div> : 

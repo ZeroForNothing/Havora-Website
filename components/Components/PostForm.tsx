@@ -3,7 +3,7 @@ import moment from "moment";
 import contentStyles from '../../styles/WindowTab/Content.module.css'
 
 
-const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , categoryID , currentCategoryID, title, mediaFolder, mediaFiles, mediaUrl, postText, username, userCode, myName, myCode, postDate, commentsCount, postAgree, postDisagree, userInteracted, postViews, itsComment, itsReply, ...props})=> {
+const PostForm = ({socket, contentID, token, prof,  categoryName , categoryID , currentCategoryID, title, mediaFolder, mediaFiles, mediaUrl, postText, name, code, myName, myCode, postDate, commentsCount, postAgree, postDisagree, userInteracted, postViews, itsComment, itsReply, ...props})=> {
   
     let [textBeingEdited,SetTextBeingEdited] = useState(false);
     let [showMoreText,SetShowMoreText] = useState(false);
@@ -20,22 +20,22 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
           : null
         }
         <div className={`secondLayer ${contentStyles.userProfilePic}`} style={{
-          backgroundImage: profilePicType ? `url(/MediaFiles/ProfilePic/${picToken}/${profilePicType})` : 'none'
+          backgroundImage: prof ? `url(/MediaFiles/ProfilePic/${token}/${prof})` : 'none'
         }}></div>
         <div className={`secondLayer ${contentStyles.userContentData}`}
            onClick={() => { 
-              window.history.pushState({}, document.title, `/?user=${username}&code=${userCode}`);
+              window.history.pushState({}, document.title, `/?user=${name}&code=${code}`);
               socket.emit('OpenWindow',{
                 window : 'Profile'
               })
             }}
         >
-          <span className={`${contentStyles.userProfileName}`}>{username}
-            <span className='userCode'>#
-              {userCode.toString().length == 1 ? "000" : ""}
-              {userCode.toString().length == 2 ? "00" : ""}
-              {userCode.toString().length == 3 ? "0" : ""}
-              {userCode}</span></span>
+          <span className={`${contentStyles.userProfileName}`}>{name}
+            <span className='code'>#
+              {code.toString().length == 1 ? "000" : ""}
+              {code.toString().length == 2 ? "00" : ""}
+              {code.toString().length == 3 ? "0" : ""}
+              {code}</span></span>
           <div className={`${contentStyles.userDateTime}`}>{moment(postDate).format('MMMM Do YYYY, hh:mm a')}</div>
         </div>
         {
@@ -51,7 +51,7 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
         {
           showUserBoxTools && !textBeingEdited ? <div className={`baseLayer ${contentStyles.userBoxToolContainer}`}>
             {
-              username == myName && userCode == myCode ?
+              name == myName && code == myCode ?
                 <>
                   <input type="button" value="Edit" className={`secondLayer ${contentStyles.editContent}`}
                     onClick={() => { SetTextBeingEdited(true); SetShowUserBoxTools(false);}}
@@ -76,11 +76,11 @@ const PostForm = ({socket, contentID, picToken, profilePicType,  categoryName , 
             mediaFiles ? 
             mediaFiles.map((media , index) => {
               return (media.endsWith(".png") || media.endsWith(".jpg") || media.endsWith(".jpeg")) ?
-                <img key={index} className={`secondLayer`} src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
+                <img key={index} className={`secondLayer`} src={`/MediaFiles/PostFiles/${token}/${mediaFolder}/${media}`} />
                 : (
                   (media.endsWith(".mp4") || media.endsWith(".MP4") || media.endsWith(".mov")|| media.endsWith(".x-matroska")) ?
                     <video key={index} className={`secondLayer`} controls>
-                      <source src={`/MediaFiles/PostFiles/${picToken}/${mediaFolder}/${media}`} />
+                      <source src={`/MediaFiles/PostFiles/${token}/${mediaFolder}/${media}`} />
                       Can't view video here
                     </video> : null)
               }) : null

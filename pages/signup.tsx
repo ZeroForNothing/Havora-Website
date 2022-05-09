@@ -39,7 +39,7 @@ export default function signup() {
         <Formik onSubmit={(values) => { }} initialValues={{
           firstName: "qwe",
           lastName: "qwe",
-          username: "qwe",
+          name: "qwe",
           email: "qwe@qwe.com",
           password: "qweqweqwe",
           confPassword: "qweqweqwe",
@@ -61,8 +61,8 @@ export default function signup() {
                  currentPage == 2 ? <>
                  <label htmlFor="email">Email</label>
                  <Field name="email" type="email" placeholder="ex. whatever@whatever.com" maxLength={50} component={InputField} />
-                 <label htmlFor="username">Username</label>
-                 <Field name="username" type="text" placeholder="ex. DevilsDontCry" maxLength={26} component={InputField} />
+                 <label htmlFor="name">Username</label>
+                 <Field name="name" type="text" placeholder="ex. DevilsDontCry" maxLength={26} component={InputField} />
                   </> : null
               }
               {
