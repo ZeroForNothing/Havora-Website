@@ -5,7 +5,7 @@ export const FriendSlot = ({ socket, name, code, unReadMsg, userClientAvability,
     let [gotInvited , SetGotInvited] = useState(false);
     const slotRef = useRef(null);
     return (
-    <div className={`borderColor WindowButton ${styles.friendStatus} ${unReadMsg > 0 ? styles.gotMsgFromFriend: '' } ${userClientAvability == 1 || userWebAvability == 1 || userMobileAvability == 1 || userGameAvability == 1 ? styles.userStatusOnline: '' }`}
+    <div className={`WindowButton ${styles.friendStatus} ${unReadMsg > 0 ? styles.gotMsgFromFriend: '' } ${userClientAvability == 1 || userWebAvability == 1 || userMobileAvability == 1 || userGameAvability == 1 ? styles.userStatusOnline: '' }`}
         onClick={() => { SetPreview({name, code , prof , wall , token : token , top : slotRef.current.offsetTop}) 
     }} ref={slotRef}>
 
@@ -24,7 +24,7 @@ export const FriendSlot = ({ socket, name, code, unReadMsg, userClientAvability,
                 inviteToCall ? <div className={`${styles.inviteToCall} ${gotInvited ? 'unInteractiveLayer' : "pickedInput"}`} onClick={()=>{ 
                     SetGotInvited(true)
                     if(!gotInvited){
-                        socket.emit("addPersonToCall" , {name, code , prof , wall , token , room : "public"})
+                        socket.emit("inviteToLobby" , {name, code})
                         // callUser({name, code , prof , wall , token} , true);
                     }
                 }}>

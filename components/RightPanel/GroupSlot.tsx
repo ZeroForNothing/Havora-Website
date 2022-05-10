@@ -4,7 +4,7 @@ import styles from '../../styles/RightPanel/FriendsList.module.css'
 export const GroupSlot = ({ socket, name })=>{
     const slotRef = useRef(null);
     return (
-        <div onClick={() => {  }} ref={slotRef}>
+        <div className={`WindowButton ${styles.friendStatus}`} onClick={() => {  }} ref={slotRef}>
 
             {name}
             
