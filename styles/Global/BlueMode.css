@@ -1,0 +1,108 @@
+  :root{
+    --blue-primary-color: #21446e;
+    --blue-secondary-color: #29497a;
+    --blue-placeholder-text-color: lightgrey;
+    --blue-text-color: lightgrey;
+    --blue-hover-color: #2e3e57;
+    --blue-pickedInput-color: #3569a3;
+    --blue-disabled-color: #444444;
+    --blue-border-color: #82828245;
+    --blue-button-active-color: #717171;
+    --blue-button-border-color: #828282;
+    --blue-hyphen-text-color: #f9f9f9a6;
+    --blue-unInteractive-layer-color: #707070;
+    --blue-box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
+  }
+
+  .blue-primary-bgcolor{
+    background-color: var(--blue-primary-color) !important;    
+  }
+  .blue-secondary-bgcolor{
+    background-color: var(--blue-secondary-color) !important;
+  }
+  .blue-pickedInput-bgcolor{
+    background-color: var(--blue-pickedInput-color) !important;
+  }
+
+  .bodyBlueMode ::placeholder {
+    color: var(--blue-placeholder-text-color);
+  }
+  
+  .bodyBlueMode :-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: var(--blue-placeholder-text-color);
+  }
+  
+  .bodyBlueMode ::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: var(--blue-placeholder-text-color);
+  }
+  
+  .bodyBlueMode .baseLayer {
+    background-color: var(--blue-primary-color);
+    color: var(--blue-text-color);
+    box-shadow: var(--blue-box-shadow);
+  }
+
+  .bodyBlueMode .unInteractiveLayer{
+    background-color: var(--blue-unInteractive-layer-color);
+    box-shadow: var(--blue-box-shadow);
+  }
+  
+  .bodyBlueMode :is(.secondLayer , .Nav .NavButton){
+    background-color: var(--blue-secondary-color);
+    color: var(--blue-text-color);
+    box-shadow: var(--blue-box-shadow);
+  }
+  
+  .bodyBlueMode .inputText {
+    color: var(--blue-text-color);
+  }
+  
+  .bodyBlueMode .outsideShadow {
+    box-shadow: var(--blue-box-shadow);
+  }
+  
+  .bodyBlueMode .insideShadow {
+    box-shadow: inset var(--blue-box-shadow);
+  }
+  .bodyBlueMode .borderColor {
+    border-color: var(--blue-border-color);
+  }
+  
+  .bodyBlueMode input[type=button].secondLayer:active {
+    background-color: var(--blue-button-active-color);
+    box-shadow: none;
+  }
+  .bodyBlueMode :is(input[type=text].secondLayer , textarea.secondLayer) {
+    border-width: 2px;
+    border-color: var(--blue-button-border-color);
+  }
+  .bodyBlueMode :is(input[type=text].secondLayer:focus , textarea.secondLayer:focus) {
+    box-shadow: none ;
+  }
+  
+  .bodyBlueMode input[type=button].secondLayer:disabled {
+    opacity: 0.5;
+    background-color: transparent ;
+    border-color: var(--blue-disabled-color) ;
+    color: var(--blue-disabled-color) ;
+    box-shadow: none ;
+  }
+
+  .bodyBlueMode :is(.WindowButton , .Nav div  , .Nav label, input[type=button].secondLayer, div.secondLayer):hover{
+    transition: 0.4s ease all;
+    background-color: var(--blue-hover-color);
+  }
+  
+  .bodyBlueMode .pickedBorderColor {
+    border-color: var(--blue-pickedInput-color) !important;
+  }
+  .bodyBlueMode :is(.pickedInput , input[type=submit]){
+    background-color: var(--blue-pickedInput-color) !important;
+    /* color: #450e0e; */
+    box-shadow: var(--blue-box-shadow);
+  }
+  .bodyBlueMode .userCode{
+    color: var(--blue-hyphen-text-color);
+  }

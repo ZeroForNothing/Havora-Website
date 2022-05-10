@@ -1,73 +1,108 @@
-.bodyDarkMode{
-    background-color: #1e1e1e;
-    color: #f9f9f9;
-    /* background-image: url(/Media/darkMode.png); */
-  }
-  
-  .bodyDarkMode ::placeholder {
-    color: lightgrey;
-  }
-  
-  .bodyDarkMode :-ms-input-placeholder {
-    /* Internet Explorer 10-11 */
-    color: lightgrey;
-  }
-  
-  .bodyDarkMode ::-ms-input-placeholder {
-    /* Microsoft Edge */
-    color: lightgrey;
-  }
-  
-  .bodyDarkMode .baseLayer {
-    background-color: #2d2d2d;
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
-  }
-  .bodyDarkMode .unInteractiveLayer{
-    background-color: #707070;
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
-  }
-  .bodyDarkMode :is(.secondLayer , .Nav .NavButton){
-    background-color: #444444;
-    color: #f9f9f9;
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
-  }
-  
-  .bodyDarkMode .inputText {
-    color: #f9f9f9;
-  }
-  
-  .bodyDarkMode .outsideShadow {
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
-  }
-  
-  .bodyDarkMode .insideShadow {
-    box-shadow: inset 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
-  }
-  .bodyDarkMode .borderColor {
-    border-color: #82828245;
-  }
-  
-  .bodyDarkMode input[type=button].secondLayer:active {
-    background-color: #717171;
-    box-shadow: none;
-  }
-  .bodyDarkMode :is(input[type=text].secondLayer , textarea.secondLayer) {
-    border-width: 2px;
-    border-color: #828282;
-  }
-  .bodyDarkMode :is(input[type=text].secondLayer:focus , textarea.secondLayer:focus) {
-    box-shadow: none ;
-  }
-  
-  .bodyDarkMode input[type=button].secondLayer:disabled {
-    opacity: 0.5;
-    background-color: transparent ;
-    border-color: #444444 ;
-    color: #444444 ;
-    box-shadow: none ;
-  }
+:root{
+  --dark-primary-color: #2d2d2d;
+  --dark-secondary-color: #444444;
+  --dark-placeholder-text-color: lightgrey;
+  --dark-text-color: #f9f9f9;
+  --dark-hover-color: #565656;
+  --dark-pickedInput-color: #ff3232;
+  --dark-disabled-color: #444444;
+  --dark-border-color: #82828245;
+  --dark-button-active-color: #717171;
+  --dark-button-border-color: #828282;
+  --dark-hyphen-text-color: #f9f9f9a6;
+  --dark-unInteractive-layer-color: #707070;
+  --dark-box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
+}
 
-  .bodyDarkMode :is(.WindowButton , .Nav div  , .Nav label, input[type=button].secondLayer, div.secondLayer):hover{
-    transition: 0.4s ease all;
-    background-color: #565656;
-  }
+.dark-primary-bgcolor{
+  background-color: var(--dark-primary-color) !important;    
+}
+.dark-secondary-bgcolor{
+  background-color: var(--dark-secondary-color) !important;
+}
+.dark-pickedInput-bgcolor{
+  background-color: var(--dark-pickedInput-color) !important;
+}
+
+.bodyDarkMode ::placeholder {
+  color: var(--dark-placeholder-text-color);
+}
+
+.bodyDarkMode :-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: var(--dark-placeholder-text-color);
+}
+
+.bodyDarkMode ::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: var(--dark-placeholder-text-color);
+}
+
+.bodyDarkMode .baseLayer {
+  background-color: var(--dark-primary-color);
+  color: var(--dark-text-color);
+  box-shadow: var(--dark-box-shadow);
+}
+
+.bodyDarkMode .unInteractiveLayer{
+  background-color: var(--dark-unInteractive-layer-color);
+  box-shadow: var(--dark-box-shadow);
+}
+
+.bodyDarkMode :is(.secondLayer , .Nav .NavButton){
+  background-color: var(--dark-secondary-color);
+  color: var(--dark-text-color);
+  box-shadow: var(--dark-box-shadow);
+}
+
+.bodyDarkMode .inputText {
+  color: var(--dark-text-color);
+}
+
+.bodyDarkMode .outsideShadow {
+  box-shadow: var(--dark-box-shadow);
+}
+
+.bodyDarkMode .insideShadow {
+  box-shadow: inset var(--dark-box-shadow);
+}
+.bodyDarkMode .borderColor {
+  border-color: var(--dark-border-color);
+}
+
+.bodyDarkMode input[type=button].secondLayer:active {
+  background-color: var(--dark-button-active-color);
+  box-shadow: none;
+}
+.bodyDarkMode :is(input[type=text].secondLayer , textarea.secondLayer) {
+  border-width: 2px;
+  border-color: var(--dark-button-border-color);
+}
+.bodyDarkMode :is(input[type=text].secondLayer:focus , textarea.secondLayer:focus) {
+  box-shadow: none ;
+}
+
+.bodyDarkMode input[type=button].secondLayer:disabled {
+  opacity: 0.5;
+  background-color: transparent ;
+  border-color: var(--dark-disabled-color) ;
+  color: var(--dark-disabled-color) ;
+  box-shadow: none ;
+}
+
+.bodyDarkMode :is(.WindowButton , .Nav div  , .Nav label, input[type=button].secondLayer, div.secondLayer):hover{
+  transition: 0.4s ease all;
+  background-color: var(--dark-hover-color);
+}
+
+.bodyDarkMode .pickedBorderColor {
+  border-color: var(--dark-pickedInput-color) !important;
+}
+.bodyDarkMode :is(.pickedInput , input[type=submit]){
+  background-color: var(--dark-pickedInput-color) !important;
+  /* color: #450e0e; */
+  box-shadow: var(--dark-box-shadow);
+}
+.bodyDarkMode .userCode{
+  color: var(--dark-hyphen-text-color);
+}

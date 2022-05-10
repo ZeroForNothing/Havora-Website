@@ -7,7 +7,11 @@ type User = {
     prof: string,
     wall: string,
     newAcc: number,
-    settings: string
+    settings: Settings
+}
+type Settings = {
+    Sound_UI : number,
+    Theme_Color : number
 }
 export const fetchUser = (data : User) => async dispatch => {
     dispatch({

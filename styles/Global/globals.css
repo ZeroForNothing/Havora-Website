@@ -134,16 +134,6 @@ input:focus, textarea:focus{
   border-color: #ff3232 !important;
 }
 
-.pickedBorderColor {
-  border-color: #ff3232;
-}
-.pickedInput , input[type=submit]{
-  background-color: #ff3232 !important;
-  /* color: #450e0e; */
-  border-radius: 5px;
-  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
-}
-
 .NavButton p{
   font-size: 18px;
   width: 100%;
@@ -172,5 +162,4 @@ input:focus, textarea:focus{
 }
 .code{
   font-size: 12px;
-  color: #f9f9f9a6;
 }

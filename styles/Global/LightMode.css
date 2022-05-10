@@ -1,0 +1,108 @@
+:root{
+  --light-primary-color: #e4e3e3;
+  --light-secondary-color: #d8d8d8;
+  --light-placeholder-text-color: rgb(124, 124, 124);
+  --light-text-color: #131313;
+  --light-hover-color: #bebebe;
+  --light-pickedInput-color: #ff3232;
+  --light-disabled-color: #444444;
+  --light-border-color: #9d9d9d45;
+  --light-button-active-color: #959494;
+  --light-button-border-color: #828282;
+  --light-hyphen-text-color: #2d2d2dda;
+  --light-unInteractive-layer-color: #707070;
+  --light-box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
+}
+
+.light-primary-bgcolor{
+  background-color: var(--light-primary-color) !important;    
+}
+.light-secondary-bgcolor{
+  background-color: var(--light-secondary-color) !important;
+}
+.light-pickedInput-bgcolor{
+  background-color: var(--light-pickedInput-color) !important;
+}
+
+.bodyLightMode ::placeholder {
+  color: var(--light-placeholder-text-color);
+}
+
+.bodyLightMode :-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: var(--light-placeholder-text-color);
+}
+
+.bodyLightMode ::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: var(--light-placeholder-text-color);
+}
+
+.bodyLightMode .baseLayer {
+  background-color: var(--light-primary-color);
+  color: var(--light-text-color);
+  box-shadow: var(--light-box-shadow);
+}
+
+.bodyLightMode .unInteractiveLayer{
+  background-color: var(--light-unInteractive-layer-color);
+  box-shadow: var(--light-box-shadow);
+}
+
+.bodyLightMode :is(.secondLayer , .Nav .NavButton){
+  background-color: var(--light-secondary-color);
+  color: var(--light-text-color);
+  box-shadow: var(--light-box-shadow);
+}
+
+.bodyLightMode .inputText {
+  color: var(--light-text-color);
+}
+
+.bodyLightMode .outsideShadow {
+  box-shadow: var(--light-box-shadow);
+}
+
+.bodyLightMode .insideShadow {
+  box-shadow: inset var(--light-box-shadow);
+}
+.bodyLightMode .borderColor {
+  border-color: var(--light-border-color);
+}
+
+.bodyLightMode input[type=button].secondLayer:active {
+  background-color: var(--light-button-active-color);
+  box-shadow: none;
+}
+.bodyLightMode :is(input[type=text].secondLayer , textarea.secondLayer) {
+  border-width: 2px;
+  border-color: var(--light-button-border-color);
+}
+.bodyLightMode :is(input[type=text].secondLayer:focus , textarea.secondLayer:focus) {
+  box-shadow: none ;
+}
+
+.bodyLightMode input[type=button].secondLayer:disabled {
+  opacity: 0.5;
+  background-color: transparent ;
+  border-color: var(--light-disabled-color) ;
+  color: var(--light-disabled-color) ;
+  box-shadow: none ;
+}
+
+.bodyLightMode :is(.WindowButton , .Nav div  , .Nav label, input[type=button].secondLayer, div.secondLayer):hover{
+  transition: 0.4s ease all;
+  background-color: var(--light-hover-color);
+}
+
+.bodyLightMode .pickedBorderColor {
+  border-color: var(--light-pickedInput-color) !important;
+}
+.bodyLightMode :is(.pickedInput , input[type=submit]){
+  background-color: var(--light-pickedInput-color) !important;
+  /* color: #450e0e; */
+  box-shadow: var(--light-box-shadow);
+}
+.bodyLightMode .userCode{
+  color: var(--light-hyphen-text-color);
+}

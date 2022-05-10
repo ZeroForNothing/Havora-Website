@@ -15,6 +15,7 @@ import ProfileTab from '../components/WindowTab/Profile'
 import PostTab from '../components/WindowTab/Post'
 import CommunityTab from '../components/WindowTab/Community'
 import ChatTab from '../components/WindowTab/Chat'
+import SettingsTab from '../components/WindowTab/Settings'
 
 
 const Index = ({ user })=> {
@@ -26,6 +27,7 @@ const Index = ({ user })=> {
   let [postTab, SetPostTab] = useState(false)
   let [communityTab, SetCommunityTab] = useState(false)
   let [chatTab, SetChatTab] = useState(false)
+  let [settingsTab, SetSettingsTab] = useState(false)
 
   let [WindowLoad, SetWindowLoad]  = useState(null)
 
@@ -35,6 +37,7 @@ const Index = ({ user })=> {
        else {        
           if(user) socket.emit('socketLogin',user)
           socket.on('registerUser',data =>{
+            console.log(data)
            dispatch(fetchUser(data))
            socket.emit('tellFriendsImOnline');
           })
@@ -57,6 +60,7 @@ const Index = ({ user })=> {
               SetPostTab(false)
               SetCommunityTab(false)
               SetChatTab(false)
+              SetSettingsTab(false)
               if(window === "Home") SetHomeTab(true)
               else if(window === "Profile") SetProfileTab(true)
               else if(window === "Post"){
@@ -67,7 +71,7 @@ const Index = ({ user })=> {
               else if(window === "Chat"){
                 SetWindowLoad(data.load)
                 SetChatTab(true)
-              }
+              }else if(window === "Settings") SetSettingsTab(true)
           })
         }
       }
@@ -84,6 +88,7 @@ const Index = ({ user })=> {
             { postTab ? <PostTab WindowLoad={WindowLoad} /> : null }
             { communityTab ? <CommunityTab /> : null }
             { chatTab ? <ChatTab WindowLoad={WindowLoad} /> : null }
+            { settingsTab ? <SettingsTab userEmail={user.email}/> : null }
           </div>
         </Layout>
         : <LoginForm />}
