@@ -31,7 +31,7 @@ const PostForm = ({socket, contentID, token, prof,  categoryName , categoryID , 
             }}
         >
           <span className={`${contentStyles.userProfileName}`}>{name}
-            <span className='code'>#
+            <span className='hyphen'>#
               {code.toString().length == 1 ? "000" : ""}
               {code.toString().length == 2 ? "00" : ""}
               {code.toString().length == 3 ? "0" : ""}

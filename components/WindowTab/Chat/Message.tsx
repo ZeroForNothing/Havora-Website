@@ -17,7 +17,7 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                     showUser ?  <div className={`secondLayer ${styles.msgUserImage}`} style={{ backgroundImage:  prof ? `url(${"/MediaFiles/ProfilePic/" + token + "/" + prof })` : 'none'}}></div> : null
                 }   
                 {
-                    !showUser? <div className={`code ${styles.shortTime}`}>{moment(date).format('hh:mm')}</div> : null
+                    !showUser? <div className={`hyphen ${styles.shortTime}`}>{moment(date).format('hh:mm')}</div> : null
                 }
                 
             </div>
@@ -30,13 +30,13 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                                window : 'Profile'
                             })
                         }}>{msgWriterName}</p>
-                        <span className='code'>#
+                        <span className='hyphen'>#
                         {msgWriterCode && msgWriterCode.toString().length == 1 ? "000" : ""}
                         {msgWriterCode && msgWriterCode.toString().length == 2 ? "00" : ""}
                         {msgWriterCode && msgWriterCode.toString().length == 3 ? "0" : ""}
                         {msgWriterCode}
                         </span>
-                        <div className={`code ${styles.longTime}`}>
+                        <div className={`hyphen ${styles.longTime}`}>
                             {
                                 moment(date).format('hh:mm A')
                             }
@@ -113,7 +113,7 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                             <div className={`${styles.msgText}`}>
                                 <span>{text}
                                 {
-                                    textEdited === "edited" ?  <span className={`code ${styles.edited}`}>{`(edited)`}</span> : null
+                                    textEdited === "edited" ?  <span className={`hyphen ${styles.edited}`}>{`(edited)`}</span> : null
                                 }
                                 </span>
                             </div> : 

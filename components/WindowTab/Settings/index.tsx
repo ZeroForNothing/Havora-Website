@@ -9,7 +9,7 @@ export default function SettingsTab({ userEmail, ...props }) {
   const [editProfileNav, SetEditProfileNav] = useState(false);
   const [editSecurityNav, SetEditSecurityNav] = useState(false);
   const [editAppearanceNav, SetEditAppearanceNav] = useState(false);
-  const [editOverviewNav, SetEditOverviewNav] = useState(true);
+  // const [editOverviewNav, SetEditOverviewNav] = useState(true);
   const [editInfo, SetEditInfo] = useState(null);
   const [editPic, SetEditPic] = useState(true);
   const [editPassword, SetEditPassword] = useState(true);
@@ -18,18 +18,13 @@ export default function SettingsTab({ userEmail, ...props }) {
   let { socket } = useSelector((state: any) => state.socket);
 
   function selectNav(parentId : number) {
-    SetEditOverviewNav(false);    // - Overview :   0
+    // SetEditOverviewNav(false);    // - Overview :   0
     SetEditAppearanceNav(false);  // - Appearance : 1
     SetEditProfileNav(false);     // - Profile :    2
     SetEditSecurityNav(false);    // - Security :   3
     SetMainNav(false);            // - MainNav :    Default
 
     switch (parentId) {
-      case 0:
-        SetEditOverviewNav(true);
-        SetMainNav(true);
-        selectNavChild(parentId, 0);
-        break;
       case 1:
         SetEditAppearanceNav(true);
         selectNavChild(parentId, 0);
@@ -97,11 +92,13 @@ export default function SettingsTab({ userEmail, ...props }) {
         <div className={`Nav`}>
           {mainNav ? (
             <>
-              <div className={`NavButton pickedInput`} onClick={()=>{
-                selectNav(0);
+              <div className={`NavButton`} onClick={()=>{
+                socket.emit('OpenWindow',{
+                  window : "Home"
+                })
               }}>
-                <span className={`bi bi-filter-left`}></span>
-                <p>Overview</p>
+                <span className={`bi bi-arrow-left`}></span>
+                <p>Back</p>
               </div>
               <div
                 className={`NavButton`}

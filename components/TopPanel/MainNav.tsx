@@ -56,7 +56,7 @@ export default function MainNav(){
                 <span className={`${"secondLayer"} ${styles.image}`} style={{ backgroundImage: user.prof ? `url(${"/MediaFiles/ProfilePic/" + user.token + "/" + user.prof })` : 'none'}} ></span>
                     <div>
                         <p>{user.name}</p>
-                        <span className='code'>#
+                        <span className='hyphen'>#
                         {user.code && user.code.toString().length == 1 ? "000" : ""}
                         {user.code && user.code.toString().length == 2 ? "00" : ""}
                         {user.code && user.code.toString().length == 3 ? "0" : ""}

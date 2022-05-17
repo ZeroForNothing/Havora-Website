@@ -28,21 +28,23 @@ export default function ChatTab({WindowLoad}){
     
     let [fetchMoreMsgs , SetFetchMoreMsgs]  = useState(false);
     let [chatCurrentPage , SetChatPage]  = useState(1);
-    let [inCall , SetInCall]  = useState(WindowLoad.inCall);
+    const [inCall , SetInCall]  = useState<boolean>(WindowLoad.inCall);
 
     const scrollToBottom = () => {
         setTimeout(()=>{ messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) },50)
     }
     useEffect(()=>{
-        // socket.emit('showChatHistory',{
-        //     page : 1,
-        //     refresh : true
-        // })
+    //     // socket.emit('showChatHistory',{
+    //     //     page : 1,
+    //     //     refresh : true
+    //     // })
         SetInCall(WindowLoad.inCall);
-    },[WindowLoad])
+    },[])
     useEffect(()=>{
         if(!socket) return;
-
+        socket.on('SetCallFromChat',(data)=>{
+            SetInCall(data.inCall);
+        })
         socket.emit('showChatHistory',{
             page : chatCurrentPage
         })
@@ -405,10 +407,10 @@ export default function ChatTab({WindowLoad}){
         </div>
         <div className={`MainDisplay ${styles.chat} ${inCall ? styles.pushDown : ''}`}>
             {
-                !inCall ? <div className={`unInteractiveLayer ${styles.friendNameChat}`}>
+                !inCall ? <div className={`borderColor ${styles.friendNameChat}`}>
                     <div>
                         <p>{WindowLoad.name}</p>
-                        <span className='code'>#
+                        <span className='hyphen'>#
                         {WindowLoad.code && WindowLoad.code.toString().length == 1 ? "000" : ""}
                         {WindowLoad.code && WindowLoad.code.toString().length == 2 ? "00" : ""}
                         {WindowLoad.code && WindowLoad.code.toString().length == 3 ? "0" : ""}

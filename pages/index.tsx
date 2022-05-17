@@ -18,10 +18,11 @@ import ChatTab from '../components/WindowTab/Chat'
 import SettingsTab from '../components/WindowTab/Settings'
 
 
-const Index = ({ user })=> {
+const Index = ({ userSession })=> {
 
   const dispatch : any = useDispatch();
   let { socket } = useSelector((state: any) => state.socket)
+  let { user } = useSelector((state: any) => state.user)
   let [homeTab, SetHomeTab] = useState(true)
   let [profileTab, SetProfileTab] = useState(false)
   let [postTab, SetPostTab] = useState(false)
@@ -32,14 +33,12 @@ const Index = ({ user })=> {
   let [WindowLoad, SetWindowLoad]  = useState(null)
 
    useEffect(()=>{  
-     if(user){
+     if(userSession){
        if(!socket){ dispatch(fetchSocket()) }
        else {        
-          if(user) socket.emit('socketLogin',user)
+          if(userSession) socket.emit('socketLogin',userSession)
           socket.on('registerUser',data =>{
-            console.log(data)
            dispatch(fetchUser(data))
-           socket.emit('tellFriendsImOnline');
           })
           socket.on('ShowError',data =>{
             ShowError(data.error)
@@ -78,17 +77,17 @@ const Index = ({ user })=> {
     }, [socket])
   return (
     <>
-      {user ?
-        <Layout title="Zero for Nothing">
+      {userSession ?
+        <Layout title="Havora" showTheme={user && user.settings && user.settings.Theme_Color}>
           <MainNav />
           <FriendsList />
           <div className={`baseLayer WindowTab`}>
             { homeTab ? <HomeTab /> : null }
-            { profileTab ? <ProfileTab userEmail={user.email}/> : null }
+            { profileTab ? <ProfileTab userEmail={userSession.email}/> : null }
             { postTab ? <PostTab WindowLoad={WindowLoad} /> : null }
             { communityTab ? <CommunityTab /> : null }
             { chatTab ? <ChatTab WindowLoad={WindowLoad} /> : null }
-            { settingsTab ? <SettingsTab userEmail={user.email}/> : null }
+            { settingsTab ? <SettingsTab userEmail={userSession.email}/> : null }
           </div>
         </Layout>
         : <LoginForm />}
@@ -97,14 +96,14 @@ const Index = ({ user })=> {
 }
 export const getServerSideProps = withIronSession(
   async ({ req, res }) => {
-    const user = req.session.get("user");
-    if (!user) {
+    const userSession = req.session.get("user");
+    if (!userSession) {
       //res.statusCode = 403;
       //res.end();
       return { props: {} };
     }
     
-    return { props: { user } };
+    return { props: { userSession } };
   },
   {
     cookieName: "ZeroForNothing",

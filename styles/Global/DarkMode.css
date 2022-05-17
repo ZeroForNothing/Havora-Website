@@ -38,9 +38,12 @@
   color: var(--dark-placeholder-text-color);
 }
 
+.bodyDarkMode{
+  color: var(--dark-text-color);
+}
+
 .bodyDarkMode .baseLayer {
   background-color: var(--dark-primary-color);
-  color: var(--dark-text-color);
   box-shadow: var(--dark-box-shadow);
 }
 
@@ -51,12 +54,7 @@
 
 .bodyDarkMode :is(.secondLayer , .Nav .NavButton){
   background-color: var(--dark-secondary-color);
-  color: var(--dark-text-color);
   box-shadow: var(--dark-box-shadow);
-}
-
-.bodyDarkMode .inputText {
-  color: var(--dark-text-color);
 }
 
 .bodyDarkMode .outsideShadow {
@@ -103,6 +101,6 @@
   /* color: #450e0e; */
   box-shadow: var(--dark-box-shadow);
 }
-.bodyDarkMode .userCode{
+.bodyDarkMode .hyphen{
   color: var(--dark-hyphen-text-color);
 }

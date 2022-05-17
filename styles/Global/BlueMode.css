@@ -38,9 +38,12 @@
     color: var(--blue-placeholder-text-color);
   }
   
+  .bodyBlueMode{
+    color: var(--dark-text-color);
+  }
+
   .bodyBlueMode .baseLayer {
     background-color: var(--blue-primary-color);
-    color: var(--blue-text-color);
     box-shadow: var(--blue-box-shadow);
   }
 
@@ -51,12 +54,7 @@
   
   .bodyBlueMode :is(.secondLayer , .Nav .NavButton){
     background-color: var(--blue-secondary-color);
-    color: var(--blue-text-color);
     box-shadow: var(--blue-box-shadow);
-  }
-  
-  .bodyBlueMode .inputText {
-    color: var(--blue-text-color);
   }
   
   .bodyBlueMode .outsideShadow {
@@ -103,6 +101,6 @@
     /* color: #450e0e; */
     box-shadow: var(--blue-box-shadow);
   }
-  .bodyBlueMode .userCode{
+  .bodyBlueMode .hyphen{
     color: var(--blue-hyphen-text-color);
   }

@@ -49,10 +49,23 @@
     transition: 0.3s ease all;
     background-color: #4e4e4e;
   }
-
-
+  .shake {
+    animation: skew-x-shakeng 2s infinite;
+  }
+  @keyframes skew-x-shakeng{
+    0% { transform: skewX(-2deg); }
+    5% { transform: skewX(2deg); }
+    10% { transform: skewX(-2deg); }
+    15% { transform: skewX(2deg); }
+    20% { transform: skewX(-2deg); }
+    25% { transform: skewX(2deg); }
+    30% { transform: skewX(-2deg); }
+    35% { transform: skewX(2deg); }
+    40% { transform: skewX(0deg); }
+    100% { transform: skewX(0deg); }
+   }
 .friendListTitle{
-  margin-bottom: 10px;
+  margin: 10px 0;
   font-size: 18px;
 }
 .callAboveTitle{
@@ -62,7 +75,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
+  background-color: #202020;
+  border-radius: 5px;
+  overflow: hidden;
+  padding: 5px;
+  margin: -5px;
 }
 .callContainerInChat{
   width: 100% !important;
@@ -87,30 +104,31 @@
   height: auto;
 }
 .callUserTitle{
-  width: 96%;
+  width: 100%;
   display: flex;
   align-items: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  font-size: 24px;
-  padding: 0px 2%;
-  background-image: linear-gradient(#00000038, transparent);
+}
+.callUserTitle div{
   height: 50px;
+  margin: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 5px;
+  font-size: 24px;
 }
 .callUserTitle p{
   margin: 0;
 }
 .callInChat{
   position: fixed;
-  top: 74px;
-  right: 300px;
-  left: 20px;
-  height: 450px;
+  top: 79px;
+  right: 305px;
+  left: 25px;
+  height: 445px;
   border-radius: 5px;
   overflow: hidden;
-  background-color: #202020;
 }
   .callContainer{
     height: 100%;
@@ -124,8 +142,7 @@
     /* min-height: 260px; */
   }
   .callContainerInChat .callUserProfile{
-    height: calc(100% - 130px);
-    margin-top: 50px;
+    height: 100%;
   }
   .callUserProfile{
     width: 100%;
@@ -153,9 +170,6 @@
 
 .keepOnlyBiggerView .smallerView{
   width: 0px !important;
-}
-.keepOnlyBiggerView .toggleCallersDisplay{
-  /* display: block; */
 }
 .smallerView .callerHolder:not(.biggerView){
   display: none;
@@ -226,11 +240,12 @@ margin-bottom: 14px;
     cursor: pointer;
     user-select: none;
   }
-  .inCallImages img{
+  .callUserProfile img{
     width: 50px;
     height: 50px;
     border-radius: 5px;
     object-fit: cover;
+    margin: 10px;
   }
   .callerImage{
     margin: auto;
@@ -245,23 +260,11 @@ margin-bottom: 14px;
   .callStatus{
     margin-top: 20px;
   }
-  .callInChat .callHandle{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-    padding: 0px 2%;
-    background-image: linear-gradient(transparent , #00000038);
-    height: 80px;
-  }
   .callHandle{
-    width: 96%;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: center;
-    height: 50px;
-    margin-top: 14px;
+    width: 100%;
   }
   .callHandle  div{
     width: 50px;
@@ -334,19 +337,13 @@ margin-bottom: 14px;
     max-height: calc(100% - 10px) !important;
     position: absolute !important;
     border: none !important;
-    left: 70px;
-    right: 70px;
+    left: 0;
+    right: 0;
     z-index: 0;
   }
   .keepOnlyBiggerView .HoldImagesRight:not(.smallerView) .biggerView{
     width: auto !important;
-    right: 267px;
-  }
-  .callInChat .HoldImagesRight{
-    /* position: absolute;
-    top: 75px;
-    bottom: 75px;
-    justify-content: center; */
+    right: 272px;
   }
   .HoldImagesRight{
     display: flex;
@@ -356,5 +353,4 @@ margin-bottom: 14px;
     flex-wrap: wrap;
     width: 100%;
     height: 100%;
-    min-height: 200px;
   }
