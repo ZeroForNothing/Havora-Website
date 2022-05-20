@@ -39,7 +39,7 @@
 }
 
 .bodyLightMode{
-  color: var(--dark-text-color);
+  color: var(--light-text-color);
 }
 
 .bodyLightMode .baseLayer {
@@ -55,6 +55,7 @@
 .bodyLightMode :is(.secondLayer , .Nav .NavButton){
   background-color: var(--light-secondary-color);
   box-shadow: var(--light-box-shadow);
+  color: var(--light-text-color);
 }
 
 .bodyLightMode .outsideShadow {

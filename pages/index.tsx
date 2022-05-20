@@ -78,7 +78,7 @@ const Index = ({ userSession })=> {
   return (
     <>
       {userSession ?
-        <Layout title="Havora" showTheme={user && user.settings && user.settings.Theme_Color}>
+        <Layout title="Havora" >
           <MainNav />
           <FriendsList />
           <div className={`baseLayer WindowTab`}>

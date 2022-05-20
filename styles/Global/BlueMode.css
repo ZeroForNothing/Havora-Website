@@ -39,7 +39,7 @@
   }
   
   .bodyBlueMode{
-    color: var(--dark-text-color);
+    color: var(--blue-text-color);
   }
 
   .bodyBlueMode .baseLayer {
@@ -55,6 +55,7 @@
   .bodyBlueMode :is(.secondLayer , .Nav .NavButton){
     background-color: var(--blue-secondary-color);
     box-shadow: var(--blue-box-shadow);
+    color: var(--blue-text-color);
   }
   
   .bodyBlueMode .outsideShadow {

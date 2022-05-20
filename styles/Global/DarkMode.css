@@ -55,6 +55,7 @@
 .bodyDarkMode :is(.secondLayer , .Nav .NavButton){
   background-color: var(--dark-secondary-color);
   box-shadow: var(--dark-box-shadow);
+  color: var(--dark-text-color);
 }
 
 .bodyDarkMode .outsideShadow {

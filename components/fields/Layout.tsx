@@ -3,17 +3,10 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux'
 import Error  from './error'
 
-export default function Layout({ children , title , showTheme }) {
+export default function Layout({ children , title }) {
     
     const { user } = useSelector((state: any) => { return state.user; });
-    const [currentTheme , SetCurrentTheme] = useState(null);
     const Themes = ["bodyLightMode", "bodyDarkMode", "bodyBlueMode","bodyPurpleMode"]
-    useEffect(()=>{
-        if(user && user.settings && localStorage){
-            localStorage.setItem('Theme_Color', Themes[user.settings.Theme_Color]);
-            SetCurrentTheme(localStorage.getItem('Theme_Color'));
-        }
-    },[user])
 
     return (
         <>
@@ -23,9 +16,7 @@ export default function Layout({ children , title , showTheme }) {
             </Head>
             <Error />
             {
-                showTheme && currentTheme != null ? 
-                <div className={`${currentTheme}`}> {children} </div> 
-                : <div className='loading'>{`loading`}</div>
+                <div className={`${ user && user.settings && user.settings.Theme_Color ? Themes[user.settings.Theme_Color] : Themes[1]}`}> {children} </div> 
             }
         </>
     )

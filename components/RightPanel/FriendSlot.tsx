@@ -5,8 +5,7 @@ export const FriendSlot = ({ socket, name, code, unReadMsg, userClientAvability,
     const slotRef = useRef(null);
     return (
     <div className={`WindowButton ${styles.friendStatus} ${unReadMsg > 0 ? styles.gotMsgFromFriend: '' } ${userClientAvability == 1 || userWebAvability == 1 || userMobileAvability == 1 || userGameAvability == 1 ? styles.userStatusOnline: '' }`}
-        onClick={() => { SetPreview({name, code , prof , wall , token : token , top : slotRef.current.offsetTop}) 
-    }} ref={slotRef}>
+        onClick={() => { SetPreview({name, code , prof , wall , token : token , top : slotRef.current.offsetTop}) }} ref={slotRef}>
 
             <div className={`secondLayer ${styles.friendIcon}`} style={{ backgroundImage: prof ? `url(/MediaFiles/ProfilePic/${token}/${prof})` : 'none' }} ></div>
             {/* <div className={`${styles.currentPlatform} ${userGameAvability == 1 ? styles.GamePlatform : ""} ${userClientAvability == 1 ? styles.ClientPlatform : ""} ${userWebAvability == 1 ? styles.WebPlatform : ""} ${userMobileAvability == 1 ? styles.MobilePlatform : ""}`}></div> */}

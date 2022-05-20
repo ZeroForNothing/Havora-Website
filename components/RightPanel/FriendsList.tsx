@@ -11,7 +11,7 @@ export default function FriendsList(){
 
     const { user } = useSelector((state: any) => state.user)
     let { socket } = useSelector((state: any) => state.socket)
-
+  
     const [friendList,SetFriendList] = useState(null)
     let friendPrevListRef = useRef(null);
     interface inCallUser{
@@ -43,12 +43,13 @@ export default function FriendsList(){
         reJoin ?: boolean
     }
     interface messageInfo extends callerInfo{
-        top : string
+        top : string,
+        group ?: string
     }
     interface callTitle{
         name : string;
         code : number;
-        group : string;
+        group ?: string;
     }
     const [currentScreenShareStream , SetCurrentScreenShareStream] = useState(null);
 
@@ -66,6 +67,7 @@ export default function FriendsList(){
     const [preview , SetPreview] = useState<messageInfo>(null)
     const previewRef = useRef(null)
     const friendsListSlots = useRef(null)
+    const groupsListSlots = useRef(null)
 
     const maximizeScreenRef = useRef(null)
 
@@ -379,14 +381,15 @@ export default function FriendsList(){
             if(!previewRef.current) return;
             var isClickInsideElement = previewRef.current.contains((event as any).target);
             var isClickInsideElement2 = friendsListSlots.current.contains((event as any).target);
-            if (!isClickInsideElement && !isClickInsideElement2) {
+            var isClickInsideElement3 = groupsListSlots.current.contains((event as any).target);
+            if (!isClickInsideElement && !isClickInsideElement2 && !isClickInsideElement3) {
                 //Do something click is outside specified element
                 SetPreview(null)
             }
         });
     },[])
     useEffect(()=>{
-        if(!socket) return;
+        if(socket?.id == undefined) return;
         socket.emit('tellFriendsImOnline');
         socket.on('silentCall',(data)=>{
             if(data && data.members && data.members.length != 0){
@@ -407,8 +410,8 @@ export default function FriendsList(){
         socket.on('validateCall',()=>{
             callUser([callValidationRef.current])
         })
-        socket.on('onEnterLobby',(data)=>{
-            SetLobbyList([{ name : data.name }])
+        socket.on('updateGroupList',(data)=>{
+            if(data.lobbies) SetLobbyList([...data.lobbies])
         })
 
         socket.on("updateVoiceActivity", (data) => {
@@ -589,7 +592,7 @@ export default function FriendsList(){
         //       }
         //     }).appendTo('#OnlineUsersList');
         //   }
-    },[socket])
+    },[socket?.id])
 
     return (
         <div  className={`borderColor ${styles.FriendsList}`}>
@@ -688,10 +691,10 @@ export default function FriendsList(){
                 }
                 </div>
                 <div className={`${styles.friendListTitle}`}>Groups</div>
-                <div>
+                <div ref={groupsListSlots}>
                 {
-                    lobbyList && lobbyList.length > 0 ? lobbyList.map((group,index) => {
-                        return <GroupSlot key={index} socket={socket} name={group.name} />
+                    lobbyList && lobbyList.length > 0 ? lobbyList.map((name,index) => {
+                        return <GroupSlot key={index} socket={socket} name={name}  SetPreview={SetPreview}/>
                     }) : 'No groups yet'
                 }
                 </div>
@@ -699,18 +702,24 @@ export default function FriendsList(){
                 {
                     preview ? 
                     <div id="preview" ref={previewRef} className={`unInteractiveLayer ${styles.previewContainer}`} style={{top : preview.top}}>
-                        <div className={`${styles.previewProfile}`}>
-                            <div className='unInteractiveLayer'>
-                                <img src={`/MediaFiles/WallpaperPic/${preview.token}/${preview.wall}`} />
+                        {
+                            preview.token && <div className={`${styles.previewProfile}`}>
+                                {
+                                    preview.wall && <div className='unInteractiveLayer'>
+                                        <img src={`/MediaFiles/WallpaperPic/${preview.token}/${preview.wall}`} />
+                                    </div>
+                                }
+                                {
+                                    preview.prof && <img className={`${styles.previewProfileImg}`} src={`/MediaFiles/ProfilePic/${preview.token}/${preview.prof}`} />
+                                }
                             </div>
-                            <img className={`${styles.previewProfileImg}`} src={`/MediaFiles/ProfilePic/${preview.token}/${preview.prof}`} />
-                        </div>
+                        }
                         <div className={`${styles.previewInteract}`}>
                             <div className="secondLayer" onClick={()=>{ 
-                                const temp = {name : preview.name, code : preview.code , prof : preview.prof , wall : preview.wall , token : preview.token , private : true}
+                                const temp = {group: preview.group , name : preview.name, code : preview.code , prof : preview.prof , wall : preview.wall , token : preview.token , private : true}
                                 callValidationRef.current = temp;
                                 SetPreview(null); 
-                                socket.emit("validateCall", { name : temp.name, code : temp.code })
+                                socket.emit("validateCall", { name : temp.name, code : temp.code , group : temp.group })
                             }}>
                                 <span className="bi bi-telephone-fill" />Call
                             </div>

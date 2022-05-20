@@ -38,8 +38,8 @@
     color: var(--purple-placeholder-text-color);
   }
   
-  .bodyLightMode{
-    color: var(--dark-text-color);
+  .bodyPurpleMode{
+    color: var(--purple-text-color);
   }
 
   .bodyPurpleMode .baseLayer {
@@ -55,6 +55,7 @@
   .bodyPurpleMode :is(.secondLayer , .Nav .NavButton){
     background-color: var(--purple-secondary-color);
     box-shadow: var(--purple-box-shadow);
+    color: var(--purple-text-color);
   }
   
   .bodyPurpleMode .outsideShadow {
