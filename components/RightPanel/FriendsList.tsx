@@ -412,6 +412,7 @@ export default function FriendsList(){
         })
         socket.on('updateGroupList',(data)=>{
             if(data.lobbies) SetLobbyList([...data.lobbies])
+            if(data.lobby) SetLobbyList(oldArr =>{ return [...oldArr , data.lobby]; })
         })
 
         socket.on("updateVoiceActivity", (data) => {
@@ -495,11 +496,11 @@ export default function FriendsList(){
             SetFriendList(friendList)
             //console.log(friendList)
         })
-        socket.on('msgsRecievedWhileNotTaklingWithUser', (data) => {
+        socket.on('msgsRecievedWhileNotTalkingWithUser', (data) => {
             if (!data || !data.message || !data.textID || !data.name || !data.code || !data.unSeenMsgsCount) return;
             if(!data.showUnreadMsgs){
                 data.showUnreadMsgs = false;
-                socket.emit("msgsRecievedWhileNotTaklingWithUser" , data)
+                socket.emit("msgsRecievedWhileNotTalkingWithUser" , data)
             }else{
                 let friend = [...friendPrevListRef.current].find(slot => slot.name == data.name && slot.code == data.code)
                 const index = [...friendPrevListRef.current].indexOf(friend)
@@ -724,7 +725,14 @@ export default function FriendsList(){
                                 <span className="bi bi-telephone-fill" />Call
                             </div>
                             <div className="secondLayer" onClick={()=>{  
-                                socket.emit('OpenWindow', { window : "Chat" ,name : preview.name , code : preview.code });
+                                socket.emit('OpenWindow', { 
+                                    window : "Chat" ,
+                                    load : {
+                                        name : preview.name,
+                                        code : preview.code,
+                                        group : preview.group
+                                    }
+                                });
                                 SetPreview(null); 
                             }}>
                                 <span className="bi bi-chat-left-fill" />Message

@@ -8,6 +8,7 @@
     z-index: 1;
     display: flex;
     flex-direction: row;
+    border-bottom: 1px solid;
   }
   
   .UtilityTools {

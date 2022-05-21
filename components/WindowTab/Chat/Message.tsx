@@ -164,7 +164,7 @@ const MessageForm = ({socket ,id,myName,myCode,myPicToken,myPicType, msgWriterNa
                     }
                 </div>
                 </>
-           : `Message has been deleted`}
+           : <span className={`hyphen ${styles.deletedMsg}`}>{`Message has been deleted`}</span>}
             </div>
      
 

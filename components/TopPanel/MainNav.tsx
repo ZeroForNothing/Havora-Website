@@ -18,7 +18,7 @@ export default function MainNav(){
         })
     };
     return (
-        <div  className={`baseLayer ${styles.TopPanel}`}>
+        <div  className={`baseLayer borderColor ${styles.TopPanel}`}>
             <div className={`${styles.UtilityTools}`}>
                 <div id="Home" onClick={()=> OpenWindow("Home")} className={`WindowButton pickedInput NavButton`}>
                     <span className={`bi bi-house`}></span>

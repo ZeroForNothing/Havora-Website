@@ -11,7 +11,6 @@
     --purple-button-border-color: #828282;
     --purple-hyphen-text-color: #f9f9f9a6;
     --purple-unInteractive-layer-color: #707070;
-    --purple-box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
   }
 
   .purple-primary-bgcolor{
@@ -44,41 +43,27 @@
 
   .bodyPurpleMode .baseLayer {
     background-color: var(--purple-primary-color);
-    box-shadow: var(--purple-box-shadow);
   }
 
   .bodyPurpleMode .unInteractiveLayer{
     background-color: var(--purple-unInteractive-layer-color);
-    box-shadow: var(--purple-box-shadow);
   }
   
   .bodyPurpleMode :is(.secondLayer , .Nav .NavButton){
     background-color: var(--purple-secondary-color);
-    box-shadow: var(--purple-box-shadow);
     color: var(--purple-text-color);
   }
   
-  .bodyPurpleMode .outsideShadow {
-    box-shadow: var(--purple-box-shadow);
-  }
-  
-  .bodyPurpleMode .insideShadow {
-    box-shadow: inset var(--purple-box-shadow);
-  }
   .bodyPurpleMode .borderColor {
     border-color: var(--purple-border-color);
   }
   
   .bodyPurpleMode input[type=button].secondLayer:active {
     background-color: var(--purple-button-active-color);
-    box-shadow: none;
   }
   .bodyPurpleMode :is(input[type=text].secondLayer , textarea.secondLayer) {
     border-width: 2px;
     border-color: var(--purple-button-border-color);
-  }
-  .bodyPurpleMode :is(input[type=text].secondLayer:focus , textarea.secondLayer:focus) {
-    box-shadow: none ;
   }
   
   .bodyPurpleMode input[type=button].secondLayer:disabled {
@@ -86,7 +71,6 @@
     background-color: transparent ;
     border-color: var(--purple-disabled-color) ;
     color: var(--purple-disabled-color) ;
-    box-shadow: none ;
   }
 
   .bodyPurpleMode :is(.WindowButton , .Nav div  , .Nav label, input[type=button].secondLayer, div.secondLayer):hover{
@@ -99,8 +83,6 @@
   }
   .bodyPurpleMode :is(.pickedInput , input[type=submit]){
     background-color: var(--purple-pickedInput-color) !important;
-    /* color: #450e0e; */
-    box-shadow: var(--purple-box-shadow);
   }
   .bodyPurpleMode .hyphen{
     color: var(--purple-hyphen-text-color);

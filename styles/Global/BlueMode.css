@@ -11,7 +11,6 @@
     --blue-button-border-color: #828282;
     --blue-hyphen-text-color: #f9f9f9a6;
     --blue-unInteractive-layer-color: #707070;
-    --blue-box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.20);
   }
 
   .blue-primary-bgcolor{
@@ -44,41 +43,27 @@
 
   .bodyBlueMode .baseLayer {
     background-color: var(--blue-primary-color);
-    box-shadow: var(--blue-box-shadow);
   }
 
   .bodyBlueMode .unInteractiveLayer{
     background-color: var(--blue-unInteractive-layer-color);
-    box-shadow: var(--blue-box-shadow);
   }
   
   .bodyBlueMode :is(.secondLayer , .Nav .NavButton){
     background-color: var(--blue-secondary-color);
-    box-shadow: var(--blue-box-shadow);
     color: var(--blue-text-color);
   }
   
-  .bodyBlueMode .outsideShadow {
-    box-shadow: var(--blue-box-shadow);
-  }
-  
-  .bodyBlueMode .insideShadow {
-    box-shadow: inset var(--blue-box-shadow);
-  }
   .bodyBlueMode .borderColor {
     border-color: var(--blue-border-color);
   }
   
   .bodyBlueMode input[type=button].secondLayer:active {
     background-color: var(--blue-button-active-color);
-    box-shadow: none;
   }
   .bodyBlueMode :is(input[type=text].secondLayer , textarea.secondLayer) {
     border-width: 2px;
     border-color: var(--blue-button-border-color);
-  }
-  .bodyBlueMode :is(input[type=text].secondLayer:focus , textarea.secondLayer:focus) {
-    box-shadow: none ;
   }
   
   .bodyBlueMode input[type=button].secondLayer:disabled {
@@ -86,7 +71,6 @@
     background-color: transparent ;
     border-color: var(--blue-disabled-color) ;
     color: var(--blue-disabled-color) ;
-    box-shadow: none ;
   }
 
   .bodyBlueMode :is(.WindowButton , .Nav div  , .Nav label, input[type=button].secondLayer, div.secondLayer):hover{
@@ -99,8 +83,6 @@
   }
   .bodyBlueMode :is(.pickedInput , input[type=submit]){
     background-color: var(--blue-pickedInput-color) !important;
-    /* color: #450e0e; */
-    box-shadow: var(--blue-box-shadow);
   }
   .bodyBlueMode .hyphen{
     color: var(--blue-hyphen-text-color);

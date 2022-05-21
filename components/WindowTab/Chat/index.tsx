@@ -39,7 +39,7 @@ export default function ChatTab({WindowLoad}){
     //     //     refresh : true
     //     // })
         SetInCall(WindowLoad.inCall);
-    },[])
+    },[WindowLoad.inCall])
     useEffect(()=>{
         if(!socket) return;
         socket.on('SetCallFromChat',(data)=>{
@@ -122,7 +122,7 @@ export default function ChatTab({WindowLoad}){
                 }
                 SetLastMsgFromUserName(null);
                 SetLastMsgFromUserCode(null);
-                CreateMessageHolder(parseInt(data.textID),data.message, null  , data.folderName , data.tempFiles ,data.name,data.code , showUser)
+                CreateMessageHolder(parseInt(data.textID),data.message, null  , data.folderName , data.tempFiles ,data.name,data.code,data.prof,data.token , showUser)
                 socket.emit('msgsSeen')
             }
           })
@@ -179,9 +179,9 @@ export default function ChatTab({WindowLoad}){
           })
     },[socket])
 
-    function CreateMessageHolder(id,text , Text_TempMedia , Text_MediaFolder ,Text_MediaFiles ,name,code , showUser){
+    function CreateMessageHolder(id,text , Text_TempMedia , Text_MediaFolder ,Text_MediaFiles ,name,code,prof,token , showUser){
 
-        let newArr = {Old_ID: id, Text_ID: null, User_Name:name, User_Code : code,Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , showUser , Text_TempMedia  , Text_MediaFiles , Text_MediaFolder , Text_Flag : 'active'}
+        let newArr = {Old_ID: id, Text_ID: null, User_Name:name, User_Code : code, User_Prof : prof, User_Token : token, Text_Message:text,Text_Date:new Date(),Text_Edit:'original', Text_Status:"waiting",Text_View : "unSeen" , showUser , Text_TempMedia  , Text_MediaFiles , Text_MediaFolder , Text_Flag : 'active'}
 
         chatPrevListRef.current = chatPrevListRef.current ? [newArr].concat([...chatPrevListRef.current]) : [newArr];
         SetChatList(chatPrevListRef.current)
@@ -259,7 +259,7 @@ export default function ChatTab({WindowLoad}){
             if(messageText.current.value.trim().length != 0){
                 if(mediaAndText) showUser = false
                 let message = messageText.current.value.trim()
-                CreateMessageHolder("oldText_"+writtenMessagesCounter, message,null, null , null , user.name, user.code , showUser)
+                CreateMessageHolder("oldText_"+writtenMessagesCounter, message,null, null , null , user.name, user.code  , user.prof,user.token, showUser)
                 socket.emit('sendMessage', { message, id : writtenMessagesCounter})
                 messageText.current.value = '';
                 mediaAndText = true;
@@ -286,7 +286,7 @@ export default function ChatTab({WindowLoad}){
                       return false;
                   });
                   if(folderName){
-                      CreateMessageHolder("oldMedia_"+mediaMessagesCounter,null , files, folderName , null ,user.name,user.code , showUser)
+                      CreateMessageHolder("oldMedia_"+mediaMessagesCounter,null , files, folderName , null ,user.name,user.code , user.prof, user.token , showUser)
                   }
             }
         }
@@ -407,25 +407,27 @@ export default function ChatTab({WindowLoad}){
         </div>
         <div className={`MainDisplay ${styles.chat} ${inCall ? styles.pushDown : ''}`}>
             {
-                !inCall ? <div className={`borderColor ${styles.friendNameChat}`}>
+                !inCall ? <div className={`${styles.friendNameChat}`}>
                     <div>
                         <p>{WindowLoad.name}</p>
-                        <span className='hyphen'>#
-                        {WindowLoad.code && WindowLoad.code.toString().length == 1 ? "000" : ""}
-                        {WindowLoad.code && WindowLoad.code.toString().length == 2 ? "00" : ""}
-                        {WindowLoad.code && WindowLoad.code.toString().length == 3 ? "0" : ""}
-                        {WindowLoad.code}
-                        </span>
+                        {
+                            WindowLoad.code && <span className='hyphen'>#
+                            {WindowLoad.code.toString().length == 1 ? "000" : ""}
+                            {WindowLoad.code.toString().length == 2 ? "00" : ""}
+                            {WindowLoad.code.toString().length == 3 ? "0" : ""}
+                            {WindowLoad.code}
+                            </span>
+                        }
                     </div>
                 </div> : null
             }
             
             
-            <div className={`borderColor ${styles.textHolder}`} onScroll={handleScroll}>
+            <div className={`${styles.textHolder}`} onScroll={handleScroll}>
                 <div ref={messagesEndRef}/>
                 {
-                    chatList && chatList.length > 0 ? chatList.map( (msg , index , array) =>{
-                        return  <MessageForm key={msg.Text_ID ? msg.Text_ID : msg.Old_ID} socket={socket} id={msg.Text_ID} myName={user.name} myCode={user.code} myPicToken={user.token} myPicType={user.prof} msgWriterName={msg.User_Name} msgWriterCode={msg.User_Code} talkingWithPicToken={WindowLoad.token} talkingWithPicType={WindowLoad.pic} text={msg.Text_Message} date={msg.Text_Date} flag={msg.Text_Flag} textEdited={msg.Text_Edit} status={msg.Text_Status} view={msg.Text_View}  tempMedia={msg.Text_TempMedia}  mediaFiles={msg.Text_MediaFiles} mediaFolder={msg.Text_MediaFolder} showUser={msg.showUser}/>
+                    chatList && chatList.length > 0 ? chatList.map( (msg) =>{
+                        return  <MessageForm key={msg.Text_ID ? msg.Text_ID : msg.Old_ID} socket={socket} id={msg.Text_ID} myName={user.name} myCode={user.code} myPicToken={user.token} myPicType={user.prof} msgWriterName={msg.User_Name} msgWriterCode={msg.User_Code} talkingWithPicToken={msg.User_Token} talkingWithPicType={msg.User_Prof} text={msg.Text_Message} date={msg.Text_Date} flag={msg.Text_Flag} textEdited={msg.Text_Edit} status={msg.Text_Status} view={msg.Text_View}  tempMedia={msg.Text_TempMedia}  mediaFiles={msg.Text_MediaFiles} mediaFolder={msg.Text_MediaFolder} showUser={msg.showUser}/>
                             {/* {
                                 msg.newMessages ? <div className={`${styles.newMessages}`}>{`(${msg.newMessages}) new message${msg.newMessages > 1 ? 's' : ''}`}</div> : null
                             } */}

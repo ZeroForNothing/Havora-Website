@@ -1,7 +1,7 @@
   .chat {
     display: flex;
     flex-direction: column;
-    left: 20px;
+    left: 16px;
   }
 
   .msgContainer{
@@ -13,11 +13,8 @@
   }
   .textHolder {
     overflow-y: auto;
-    padding: 2%;
     display: flex;
     flex-direction: column-reverse;
-    border: 1px solid;
-    border-radius: 5px;
     margin-bottom: 14px;
     height: 100%;
   }
@@ -26,6 +23,9 @@
   } */
 .pushDown{
   margin-top: 470px;
+}
+.deletedMsg{
+  font-size: inherit;
 }
   .inputHolder{
     border-color: #828282;
@@ -56,9 +56,6 @@
   }
   
   .friendNameChat{
-    padding: 8px 16px;
-    border: 1px solid;
-    border-radius: 5px;
     margin-bottom: 14px;
   }
   .friendNameChat div{
