@@ -120,15 +120,18 @@
 }
 .callUserTitle p{
   margin: 0;
+  max-width: calc(100% - 10px);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-size: initial;
 }
 .callInChat{
   position: fixed;
-  top: 79px;
-  right: 305px;
-  left: 25px;
-  height: 445px;
-  border-radius: 5px;
-  overflow: hidden;
+  top: 60px;
+  right: 276px;
+  left: 5px;
+  height: 465px;
+  border-radius: 0;
 }
   .callContainer{
     height: 100%;

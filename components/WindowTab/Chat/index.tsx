@@ -432,7 +432,7 @@ export default function ChatTab({WindowLoad}){
                                 msg.newMessages ? <div className={`${styles.newMessages}`}>{`(${msg.newMessages}) new message${msg.newMessages > 1 ? 's' : ''}`}</div> : null
                             } */}
                     })
-                    :<div className={`pickedInput ${styles.credentials}`}>{`Please dont share your information`}<br /> {` We will never ask for your credentials`}</div>
+                    :<div className={`unInteractiveLayer ${styles.credentials}`}>{`Please dont share your information`}<br /> {` We will never ask for your credentials`}</div>
                 }
             </div>
                 {mediaUploaded && mediaUploaded.length > 0 ?

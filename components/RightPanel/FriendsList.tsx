@@ -114,7 +114,7 @@ export default function FriendsList(){
         }
       }
 
-    const callUser = async (userInfoList : callerInfo[] , silentCall : boolean = false , newMember : boolean = false) => {
+    const callUser = async (userInfoList : callerInfo[], isGroupCall : boolean , silentCall : boolean, newMember : boolean ) => {
         if(!userInfoList || userInfoList.length == 0) return;
 
         const localStream = await fetchMediaStream();
@@ -135,7 +135,7 @@ export default function FriendsList(){
 
         userInfoList.forEach((userInfo : callerInfo)=>{
             if(userInfo.doNotCall) return;
-            if(!silentCall && !newMember){
+            if(!isGroupCall){
                 SetCallTitle({name : userInfo.name, code : userInfo.code , group : null})
             }
             const connectionID = nanoid();
@@ -219,7 +219,6 @@ export default function FriendsList(){
                 setInCall(true)
                 setReceivingCall(false);
                 manageCallRingtone(true);
-                SetCallTitle({name : info.name, code : info.code , group : null})
             }
             
             const peer = new Peer({
@@ -393,14 +392,14 @@ export default function FriendsList(){
         socket.emit('tellFriendsImOnline');
         socket.on('silentCall',(data)=>{
             if(data && data.members && data.members.length != 0){
-                callUser(data.members , true);
+                callUser(data.members , true, true ,false);
             }
         })
         socket.on('startGroupCall', (data) => {
             if(data && data.members && data.members.length != 0){
                 SetCallTitle({name : null, code : null , group : data.group})
                 let members : callerInfo[] = data.members;
-                callUser(members, false, true)
+                callUser(members,true, false, data.newMember)
             }
         })
 
@@ -408,7 +407,7 @@ export default function FriendsList(){
             SetCallTitle({name : data.name, code : data.code , group : data.group})
         })
         socket.on('validateCall',()=>{
-            callUser([callValidationRef.current])
+            callUser([callValidationRef.current] , false , false, false)
         })
         socket.on('updateGroupList',(data)=>{
             if(data.lobbies) SetLobbyList([...data.lobbies])
@@ -599,11 +598,11 @@ export default function FriendsList(){
         <div  className={`borderColor ${styles.FriendsList}`}>
 
                 
-            { receivingCall || inCall || calling ?
+            { (receivingCall || inCall || calling) &&
                 <div  ref={maximizeScreenRef} className={`${styles.callOverlay} ${callInChat ? styles.callInChat : ''}`}>
                     <div className={`${styles.callContainer} ${callInChat ? styles.callContainerInChat : ''}`}>
                         {
-                            callTitle ? <div className={`${styles.callUserTitle}`}>
+                            callTitle && <div className={`${styles.callUserTitle}`}>
                                 <div className='unInteractiveLayer'>
                                     {   callTitle.group ? <p>{callTitle.group}</p> :
                                         <>
@@ -617,11 +616,11 @@ export default function FriendsList(){
                                         </>
                                     }
                                 </div>
-                            </div>: null
+                            </div>
                         }
                         <div className={`${styles.callUserProfile}`}>
                                 {
-                                    inCallUserList && inCallUserList.length != 0 ? <>
+                                    inCallUserList && inCallUserList.length != 0 && <>
                                         <div className={`${styles.inCallImages} ${biggerView !== null ? styles.keepOnlyBiggerView : ''}`}>
                                                 <div className={`${styles.HoldImagesRight} ${smallerView ? styles.smallerView : ''}`}>
                                                 {
@@ -638,7 +637,6 @@ export default function FriendsList(){
                                                 </div>
                                         </div>
                                     </>
-                                    : null
                                 }
                                 {
                                     callerSignalInfo && receivingCall && <CallSlot index={null} stream={null} calling={null} biggerView={biggerView} volume={0} prof={callerSignalInfo.prof} wall={callerSignalInfo.wall} token={callerSignalInfo.token} muted={true} callInChat={callInChat} SetBiggerView={SetBiggerView} SetSmallerView={SetSmallerView}  />
@@ -648,27 +646,30 @@ export default function FriendsList(){
                                 {receivingCall ? 'Calling...' : calling ? 'Calling' : inCall && 'In-Call' }
                             </div> */}
                             <div className={`${styles.callHandle}`}>
-                                {inCall ?  <div className={` ${!inviteToCall ? 'secondLayer bi bi-person-plus' : 'pickedInput bi bi-x-lg' }`} onClick={()=>{ SetInviteToCall(!inviteToCall) }} />  : null}
-                                {inCall ?  <div className={`secondLayer bi ${currentScreenShareStream ? 'pickedInput bi-x-square' : ' bi-tv'}`} onClick={()=>{ currentScreenShareStream  ? stopScreenShare() : startScreenCapture() }} />  : null}
-                                {/* {callAccepted && !callInChat ? <div className='secondLayer bi bi-arrows-angle-expand' onClick={()=>{ 
-                                    socket.emit('OpenWindow',{
-                                        window : "Chat",
-                                        name : callerInfo.name,
-                                        code: callerInfo.code
+                                {inCall && <div className={` ${!inviteToCall ? 'secondLayer bi bi-person-plus' : 'pickedInput bi bi-x-lg' }`} onClick={()=>{ SetInviteToCall(!inviteToCall) }} /> }
+                                {inCall && <div className={`secondLayer bi ${currentScreenShareStream ? 'pickedInput bi-x-square' : ' bi-tv'}`} onClick={()=>{ currentScreenShareStream  ? stopScreenShare() : startScreenCapture() }} />}
+                                {!callInChat && <div className='secondLayer bi bi-box-arrow-left' onClick={()=>{ 
+                                    socket.emit('OpenWindow', { 
+                                        window : "Chat" ,
+                                        load : {
+                                            name : callTitle.name,
+                                            code : callTitle.code,
+                                            group : callTitle.group
+                                        }
                                     }); 
-                                }} /> : null} */}
+                                }} />}
                                 <div className={`secondLayer bi bi-telephone pickedInput`} onClick={()=>{ socket.emit('hangupCall') }} />
-                                { receivingCall && !inCall ? <div className={`secondLayer bi bi-telephone ${styles.callerAccept}`} onClick={()=>{ answerCall(callerSignalInfo) }} /> : null}
-                                {inCall ?  <div className={`secondLayer bi bi-fullscreen`} onClick={()=>{ 
+                                { receivingCall && !inCall && <div className={`secondLayer bi bi-telephone ${styles.callerAccept}`} onClick={()=>{ answerCall(callerSignalInfo) }} />}
+                                {inCall && callInChat && <div className={`secondLayer bi bi-fullscreen`} onClick={()=>{ 
                                     if(screen.availWidth === window.innerWidth){
                                         closeFullscreen(document);
                                     }else{
                                         openFullscreen(maximizeScreenRef.current)
                                     }
-                                 }} />  : null}
+                                 }} /> }
                             </div>
                     </div>
-                </div> : null
+                </div>
                 }
                 
                 <div>

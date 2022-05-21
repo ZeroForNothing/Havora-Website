@@ -166,4 +166,5 @@ input:focus, textarea:focus{
 }
 .hyphen{
   font-size: 12px;
+  font-style: italic;
 }
