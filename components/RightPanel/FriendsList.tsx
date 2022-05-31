@@ -33,6 +33,7 @@ export default function FriendsList(){
         wall ?: string,
         doNotCall ?: boolean,
         private ?: boolean
+        group ?: string
     }
     interface callerSignalInfo extends callerInfo{
         socketID : string
@@ -74,8 +75,6 @@ export default function FriendsList(){
     const [biggerView , SetBiggerView] = useState(null);
     const [smallerView , SetSmallerView] = useState(false);
 
-    const callValidationRef = useRef(null);
-
 	const ringtone = useRef(null)
 	const waitingTone = useRef(null)
 	const connectionRef = useRef([])
@@ -93,25 +92,18 @@ export default function FriendsList(){
     useEffect(()=>{
         currentUser.current =  user;
     } , [user])
-    function openFullscreen(elem) {
-        if (elem.requestFullscreen) {
-          elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) { /* Safari */
-          elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) { /* IE11 */
-          elem.msRequestFullscreen();
-        }
-      }
-      
-      /* Close fullscreen */
-      function closeFullscreen(doc) {
-        if (doc.exitFullscreen) {
-            doc.exitFullscreen();
-        } else if (doc.webkitExitFullscreen) { /* Safari */
-            doc.webkitExitFullscreen();
-        } else if (doc.msExitFullscreen) { /* IE11 */
-            doc.msExitFullscreen();
-        }
+    function fullscreen(element) {
+        if (
+            document.fullscreenElement
+          ) {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            }
+          } else {
+            if (element.requestFullscreen) {
+              element.requestFullscreen();
+            }
+          }
       }
 
     const callUser = async (userInfoList : callerInfo[], isGroupCall : boolean , silentCall : boolean, newMember : boolean ) => {
@@ -326,18 +318,35 @@ export default function FriendsList(){
     async function startScreenCapture() {
         try {
             const stream = await navigator.mediaDevices.getDisplayMedia();
+            let supports = navigator.mediaDevices.getSupportedConstraints();
+            if (!supports["width"] || !supports["height"] || !supports["frameRate"]) {
+                // We're missing needed properties, so handle that error.
+            } else {
+            let constraints = {
+                width: { min: 640, ideal: 1920, max: 1920 },
+                height: { min: 400, ideal: 1080 },
+                aspectRatio: 1.777777778,
+                frameRate: { max: 30 }
+            };
             SetInCallUserList(oldArr => {
                 let temp : inCallUser = {id : null , name : null,calling : false,code: null,prof : null, wall:null, token:null , muted : false , stream}; 
                 inCallUserListRef.current = [temp , ...oldArr ];
                 return [temp , ...oldArr]
-             });
+            });
             for (const track of stream.getTracks()) {
-                connectionRef.current.forEach(conn => {
-                    conn.peer.addTrack(track, stream);
+                track.applyConstraints(constraints).then(() => {
+                    /* do stuff if constraints applied successfully */          
+                    connectionRef.current.forEach(conn => {
+                        conn.peer.addTrack(track, stream);
+                    });
+                    manageTrack(track,stream)
+                }).catch(function(reason) {
+                    /* failed to apply constraints; reason is why */
+                    console.error(reason)
                 });
-                manageTrack(track,stream)
             }
             SetCurrentScreenShareStream(stream);
+            }
         } catch(err) {
           console.error("Error: " + err);
         }
@@ -390,24 +399,20 @@ export default function FriendsList(){
     useEffect(()=>{
         if(socket?.id == undefined) return;
         socket.emit('tellFriendsImOnline');
-        socket.on('silentCall',(data)=>{
-            if(data && data.members && data.members.length != 0){
-                callUser(data.members , true, true ,false);
-            }
-        })
+
         socket.on('startGroupCall', (data) => {
             if(data && data.members && data.members.length != 0){
                 SetCallTitle({name : null, code : null , group : data.group})
                 let members : callerInfo[] = data.members;
-                callUser(members,true, false, data.newMember)
+                callUser(members,true, data.silent, data.newMember)
             }
         })
 
         socket.on('SetCallTitle',(data)=>{
             SetCallTitle({name : data.name, code : data.code , group : data.group})
         })
-        socket.on('validateCall',()=>{
-            callUser([callValidationRef.current] , false , false, false)
+        socket.on('validateCall',(data)=>{
+            callUser([{group: data.group , name : data.name, code : data.code , prof : data.prof , wall : data.wall , token : data.token , private : true}] , false , false, false)
         })
         socket.on('updateGroupList',(data)=>{
             if(data.lobbies) SetLobbyList([...data.lobbies])
@@ -624,8 +629,9 @@ export default function FriendsList(){
                                         <div className={`${styles.inCallImages} ${biggerView !== null ? styles.keepOnlyBiggerView : ''}`}>
                                                 <div className={`${styles.HoldImagesRight} ${smallerView ? styles.smallerView : ''}`}>
                                                 {
-                                                    inCallUserList && inCallUserList.map((callUser , index) =>{
-                                                        return <CallSlot key={index} index={index} stream={callUser.stream} calling={callUser.calling} biggerView={biggerView} volume={0} prof={callUser.prof} wall={callUser.wall} token={callUser.token} muted={callUser.muted} callInChat={callInChat} SetBiggerView={SetBiggerView} SetSmallerView={SetSmallerView}  />
+                                                    inCallUserList && inCallUserList.map((callUser , index , array) =>{
+                                                        let amount = array.length;
+                                                        return <CallSlot key={index} index={index} stream={callUser.stream} calling={callUser.calling} biggerView={biggerView} volume={0} prof={callUser.prof} wall={callUser.wall} token={callUser.token} muted={callUser.muted} callInChat={callInChat} SetBiggerView={SetBiggerView} SetSmallerView={SetSmallerView} amount={amount} />
                                                     })
                                                 }
                                                 {
@@ -639,7 +645,7 @@ export default function FriendsList(){
                                     </>
                                 }
                                 {
-                                    callerSignalInfo && receivingCall && <CallSlot index={null} stream={null} calling={null} biggerView={biggerView} volume={0} prof={callerSignalInfo.prof} wall={callerSignalInfo.wall} token={callerSignalInfo.token} muted={true} callInChat={callInChat} SetBiggerView={SetBiggerView} SetSmallerView={SetSmallerView}  />
+                                    callerSignalInfo && receivingCall && <CallSlot index={null} stream={null} calling={null} biggerView={biggerView} volume={0} prof={callerSignalInfo.prof} wall={callerSignalInfo.wall} token={callerSignalInfo.token} muted={true} callInChat={callInChat} SetBiggerView={SetBiggerView} SetSmallerView={SetSmallerView} amount={1} />
                                 }
                             </div>
                             {/* <div className={`${styles.callStatus}`}>
@@ -661,11 +667,7 @@ export default function FriendsList(){
                                 <div className={`secondLayer bi bi-telephone pickedInput`} onClick={()=>{ socket.emit('hangupCall') }} />
                                 { receivingCall && !inCall && <div className={`secondLayer bi bi-telephone ${styles.callerAccept}`} onClick={()=>{ answerCall(callerSignalInfo) }} />}
                                 {inCall && callInChat && <div className={`secondLayer bi bi-fullscreen`} onClick={()=>{ 
-                                    if(screen.availWidth === window.innerWidth){
-                                        closeFullscreen(document);
-                                    }else{
-                                        openFullscreen(maximizeScreenRef.current)
-                                    }
+                                    fullscreen(maximizeScreenRef.current);
                                  }} /> }
                             </div>
                     </div>
@@ -719,9 +721,8 @@ export default function FriendsList(){
                         <div className={`${styles.previewInteract}`}>
                             <div className="secondLayer" onClick={()=>{ 
                                 const temp = {group: preview.group , name : preview.name, code : preview.code , prof : preview.prof , wall : preview.wall , token : preview.token , private : true}
-                                callValidationRef.current = temp;
                                 SetPreview(null); 
-                                socket.emit("validateCall", { name : temp.name, code : temp.code , group : temp.group })
+                                socket.emit("validateCall", { name : temp.name, code : temp.code , group : temp.group ,token : preview.token, prof : preview.prof , wall : preview.wall})
                             }}>
                                 <span className="bi bi-telephone-fill" />Call
                             </div>

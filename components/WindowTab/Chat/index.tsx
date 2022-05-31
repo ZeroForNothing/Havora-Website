@@ -34,10 +34,10 @@ export default function ChatTab({WindowLoad}){
         setTimeout(()=>{ messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) },50)
     }
     useEffect(()=>{
-    //     // socket.emit('showChatHistory',{
-    //     //     page : 1,
-    //     //     refresh : true
-    //     // })
+        // socket.emit('showChatHistory',{
+        //     page : 1,
+        //     refresh : true
+        // })
         SetInCall(WindowLoad.inCall);
     },[WindowLoad.inCall])
     useEffect(()=>{
@@ -49,6 +49,8 @@ export default function ChatTab({WindowLoad}){
             page : chatCurrentPage
         })
         socket.on('refreshChat',()=>{
+            chatPrevListRef.current = []
+            SetChatList(chatPrevListRef.current)
             socket.emit('showChatHistory',{
                 page : 1,
                 refresh : true
@@ -408,8 +410,8 @@ export default function ChatTab({WindowLoad}){
         <div className={`MainDisplay ${styles.chat} ${inCall ? styles.pushDown : ''}`}>
             {
                 !inCall ? <div className={`${styles.friendNameChat}`}>
-                    <div>
-                        <p>{WindowLoad.name}</p>
+                    <div className={`${styles.userName}`}>
+                        <p>{WindowLoad.group ? WindowLoad.group : WindowLoad.name}</p>
                         {
                             WindowLoad.code && <span className='hyphen'>#
                             {WindowLoad.code.toString().length == 1 ? "000" : ""}
@@ -418,6 +420,11 @@ export default function ChatTab({WindowLoad}){
                             {WindowLoad.code}
                             </span>
                         }
+                    </div>
+                    <div className={`${styles.utilities}`}>
+                        <span className='secondLayer bi bi-telephone-fill' onClick={()=>{ 
+                            socket.emit("validateCall", { name : WindowLoad.name, code : WindowLoad.code, group : WindowLoad.group,token : WindowLoad.token, prof : WindowLoad.prof , wall : WindowLoad.wall})
+                        }}></span>
                     </div>
                 </div> : null
             }

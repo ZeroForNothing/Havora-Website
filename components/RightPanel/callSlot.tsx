@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react"
 import styles from '../../styles/RightPanel/FriendsList.module.css'
 
-export const CallSlot = ({ index ,stream , calling , biggerView,volume ,prof ,wall , token, muted , callInChat , SetBiggerView , SetSmallerView })=>{
+export const CallSlot = ({ index ,stream , calling , biggerView,volume ,prof ,wall , token, muted , callInChat , SetBiggerView , SetSmallerView , amount })=>{
     let isAudio = false;
     let isVideo = false;
     if(!calling && stream){
@@ -11,7 +11,7 @@ export const CallSlot = ({ index ,stream , calling , biggerView,volume ,prof ,wa
             isVideo=true;
     }
     return (
-        <div className={`secondLayer ${calling? styles.shake : ''} ${styles.callerHolder} ${biggerView != null && biggerView === index ? styles.biggerView : ''}`} style={{borderColor : `rgba(0,150,0, ${volume ? volume : 0})`, 
+        <div className={`secondLayer ${calling? styles.shake : ''} ${styles.callerHolder} ${biggerView != null && biggerView === index ? styles.biggerView : ''}`} style={{borderColor : `rgba(0,150,0, ${volume ? volume : 0})`, width: `calc(${100/amount}% - 10px)`,
         backgroundImage: wall ? `url(${"/MediaFiles/WallpaperPic/" + token + "/" + wall })` : 'none' }}  onClick={()=>{ 
             if(!callInChat) return;
             if(biggerView != null && biggerView === index){

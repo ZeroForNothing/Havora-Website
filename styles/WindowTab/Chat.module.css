@@ -57,8 +57,21 @@
   
   .friendNameChat{
     margin-bottom: 14px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
-  .friendNameChat div{
+  .utilities span{
+    width: 48px;
+    height: 48px;
+    display: block;
+    border-radius: 5px;
+    font-size: 22px;
+    line-height: 48px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .userName{
     height: 100%;
     display: flex;
     align-items: center;

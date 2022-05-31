@@ -86,10 +86,10 @@ input:focus, textarea:focus{
 }
 
 .InputField{
-  width: 94%;
+  width: calc(100% - 24px);
   font-size: 21px;
   border: 2px solid #f3f3f3;
-  padding: 12px 3%;
+  padding: 12px;
   border-radius: 5px;
   resize: none;
 }
