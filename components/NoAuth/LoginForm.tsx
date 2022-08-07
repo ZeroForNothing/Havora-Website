@@ -28,8 +28,8 @@ export default function Login() {
             </div>
             <div className={`${"baseLayer"} ${styles.signInMainContainer}`}>
                 <Formik onSubmit={(values) => { LoginUser(values) }} initialValues={{
-                    email: "asd@asd.com",
-                    password: "asdasdasd"
+                    email: "",
+                    password: ""
                 }}>{({ handleSubmit }) => (
                     <form className={`${styles.formContainer}`} onSubmit={handleSubmit}>
                         <Field name="email" type="email" placeholder="My Email..." component={InputField} />
